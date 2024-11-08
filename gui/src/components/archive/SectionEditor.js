@@ -90,6 +90,9 @@ const useSectionEditorStyles = makeStyles(theme => ({
   },
   quantityTable: {
     marginBottom: 5
+  },
+  editor: {
+    height: '100%'
   }
 }))
 const SectionEditor = React.memo(function SectionEditor({sectionDef, section, onChange, showJson}) {
@@ -140,8 +143,8 @@ const SectionEditor = React.memo(function SectionEditor({sectionDef, section, on
     <div className={classes.root} ref={rootRef}>
       {showJson
         ? (
-          <Box height={rootRef.current?.clientHeight} marginY={1}>
-            <InputConfig data={jsonData} onChange={handleJsonChange} />
+          <Box minHeight={rootRef.current?.clientHeight}>
+            <InputConfig data={jsonData} onChange={handleJsonChange} className={classes.editor}/>
           </Box>
         ) : (
           allVisibleQuantities.map(quantity => (
