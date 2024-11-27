@@ -434,100 +434,6157 @@ window.nomadEnv = {
     "example_uploads": {}
   },
   "plugins": {
-    "entry_points": [
-      {
-        "id": "runschema:run_schema_entry_point",
-        "entry_point_type": "schema_package",
-        "name": "RunSchema",
-        "description": "Schema for the nomad run section.",
-        "plugin_package": "runschema"
-      },
-      {
-        "id": "simulationworkflowschema:simulationworkflow_schema_entry_point",
-        "entry_point_type": "schema_package",
-        "name": "SimulationWorkflowSchema",
-        "description": "Schema for the nomad simulation workflows.",
-        "plugin_package": "simulationworkflowschema"
-      },
-      {
-        "id": "electronicparsers:vasp_parser_entry_point",
-        "entry_point_type": "parser",
-        "name": "parsers/vasp",
-        "description": "NOMAD parser for VASP.",
-        "plugin_package": "electronicparsers",
-        "level": 0,
-        "aliases": [
-          "parsers/vasp"
-        ],
-        "mainfile_contents_re": "^\\s*<\\?xml version=\"1\\.0\" encoding=\"ISO-8859-1\"\\?>\\s*?\\s*<modeling>?\\s*<generator>?\\s*<i name=\"program\" type=\"string\">\\s*vasp\\s*</i>?|^\\svasp[\\.\\d]+.+?(?:\\(build|complex)[\\s\\S]+?executed on",
-        "mainfile_name_re": ".*[^/]*xml[^/]*",
-        "mainfile_mime_re": "(application/.*)|(text/.*)",
-        "mainfile_alternative": true,
-        "supported_compressions": [
-          "gz",
-          "bz2",
-          "xz"
-        ]
+    "entry_points": {
+      "exclude": [
+        "nomad_porous_materials.normalizers:porositynormalizer"
+      ],
+      "include": [
+        "runschema:run_schema_entry_point",
+        "simulationworkflowschema:simulationworkflow_schema_entry_point",
+        "electronicparsers:vasp_parser_entry_point"
+      ],
+      "options": {
+        "apps/1_all/1_entries": {
+          "id": "apps/1_all/1_entries",
+          "entry_point_type": "app",
+          "app": {
+            "label": "Entries",
+            "path": "entries",
+            "resource": "entries",
+            "category": "All",
+            "description": "Search entries across all domains",
+            "readme": "This page allows you to search **entries** within NOMAD. Entries represent any individual data items that have been uploaded to NOMAD, no matter whether they come from theoretical calculations, experiments, lab notebooks or any other source of data. This allows you to perform cross-domain queries, but if you are interested in a specific subfield, you should see if a specific application exists for it in the explore menu to get more details.",
+            "pagination": {
+              "order_by": "upload_create_time",
+              "order": "desc",
+              "page_size": 20
+            },
+            "columns": [
+              {
+                "search_quantity": "entry_name",
+                "selected": true,
+                "title": "Name",
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.chemical_formula_hill",
+                "selected": true,
+                "title": "Formula",
+                "align": "left"
+              },
+              {
+                "search_quantity": "entry_type",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "upload_create_time",
+                "selected": true,
+                "title": "Upload time",
+                "align": "left"
+              },
+              {
+                "search_quantity": "authors",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "upload_name",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "upload_id",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.method_name",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.program_name",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.dft.xc_functional_type",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.apw_cutoff",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.basis_set",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.k_line_density",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.native_tier",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.planewave_cutoff",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.structural_type",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.symmetry.crystal_system",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.symmetry.space_group_symbol",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.symmetry.space_group_number",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.lab_ids",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.sections",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.methods",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.tags",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.instruments",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "mainfile",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "comment",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "references",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "datasets",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "published",
+                "selected": false,
+                "title": "Access",
+                "align": "left"
+              }
+            ],
+            "rows": {
+              "actions": {
+                "enabled": true
+              },
+              "details": {
+                "enabled": true
+              },
+              "selection": {
+                "enabled": true
+              }
+            },
+            "menu": {
+              "width": 12,
+              "show_header": true,
+              "title": "Filters",
+              "type": "menu",
+              "size": "sm",
+              "indentation": 0,
+              "items": [
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Material",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Elements / Formula",
+                  "type": "menu",
+                  "size": "xxl",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "periodic_table",
+                      "search_quantity": "results.material.elements",
+                      "scale": "linear",
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_hill",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_iupac",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_reduced",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_anonymous",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.material.n_elements",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Structure / Symmetry",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.material.structural_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.bravais_lattice",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.crystal_system",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.space_group_symbol",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.structure_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.strukturbericht_designation",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.point_group",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.hall_symbol",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.prototype_aflow_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Method",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "search_quantity": "results.method.simulation.program_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.program_version",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Precision",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.precision.k_line_density",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.precision.native_tier",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.precision.basis_set",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.precision.planewave_cutoff",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.precision.apw_cutoff",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "DFT",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "DFT": {
+                          "label": "Search DFT entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.xc_functional_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.xc_functional_names",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dft.exact_exchange_mixing_factor",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dft.hubbard_kanamori_model.u_effective",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.core_electron_treatment",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.relativity_method",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "TB",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "TB": {
+                          "label": "Search TB entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.tb.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.tb.localization_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "GW",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "GW": {
+                          "label": "Search GW entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.basis_set_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "BSE",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "BSE": {
+                          "label": "Search BSE entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.solver",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.basis_set_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.gw_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "DMFT",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "DMFT": {
+                          "label": "Search DMFT entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.impurity_solver_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.inverse_temperature",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.magnetic_state",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.u",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.jh",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.analytical_continuation",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "EELS",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "EELS": {
+                          "label": "Search EELS entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.spectroscopic.spectra.provenance.eels",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.detector_type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.resolution",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.min_energy",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.max_energy",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Workflow",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Molecular dynamics",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.workflow_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "MolecularDynamics": {
+                          "label": "Search molecular dynamics entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.thermodynamic.trajectory",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.thermodynamic.trajectory.available_properties",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 4,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "search_quantity": "results.properties.thermodynamic.trajectory.provenance.molecular_dynamics.ensemble_type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 2,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.thermodynamic.trajectory.provenance.molecular_dynamics.time_step",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Geometry Optimization",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.properties.available_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "geometry_optimization": {
+                          "label": "Search geometry optimization entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.geometry_optimization",
+                      "items": [
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_energy_difference",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_force_maximum",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_displacement_maximum",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Properties",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Electronic",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "electronic_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.band_structure_electronic.band_gap",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.band_structure_electronic.band_gap.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 2,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.electronic.band_structure_electronic.band_gap.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.band_structure_electronic",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.band_structure_electronic.spin_polarized",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.dos_electronic",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.dos_electronic.spin_polarized",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Vibrational",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "vibrational_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Mechanical",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "mechanical_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.bulk_modulus",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.bulk_modulus.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.mechanical.bulk_modulus.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.shear_modulus",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.shear_modulus.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.mechanical.shear_modulus.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.energy_volume_curve",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.energy_volume_curve.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 5,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Use Cases",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Solar Cells",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.optoelectronic.solar_cell.efficiency",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.optoelectronic.solar_cell.fill_factor",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.optoelectronic.solar_cell.open_circuit_voltage",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.optoelectronic.solar_cell.short_circuit_current_density",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.optoelectronic.solar_cell.illumination_intensity",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.optoelectronic.solar_cell.device_area",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.device_architecture",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.device_stack",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.absorber",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.absorber_fabrication",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.electron_transport_layer",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.hole_transport_layer",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.substrate",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.properties.optoelectronic.solar_cell.back_contact",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Heterogeneous Catalysis",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.properties.catalytic.reaction.name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.catalytic.reaction.reactants",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.catalytic.reaction.reactants.name",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.catalytic.reaction.reactants.conversion",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_out",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.catalytic.reaction.products",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.catalytic.reaction.products.name",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.catalytic.reaction.products.selectivity",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.catalytic.reaction.products.gas_concentration_out",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.properties.catalytic.reaction.reaction_conditions.temperature",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.catalytic.catalyst",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.catalytic.catalyst.catalyst_type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "search_quantity": "results.properties.catalytic.catalyst.preparation_method",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "search_quantity": "results.properties.catalytic.catalyst.catalyst_name",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "search_quantity": "results.properties.catalytic.catalyst.characterization_methods",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.catalytic.catalyst.surface_area",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Author / Origin / Dataset",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "search_quantity": "authors.name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "upload_create_time",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "external_db",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.doi",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Visibility / IDs / Schema",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "visibility"
+                    },
+                    {
+                      "search_quantity": "entry_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.material_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "definitions"
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Optimade",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "optimade"
+                    }
+                  ]
+                }
+              ]
+            },
+            "search_quantities": {
+              "exclude": [
+                "mainfile",
+                "entry_name",
+                "combine"
+              ]
+            },
+            "search_syntaxes": {
+              "exclude": [
+                "free_text"
+              ]
+            }
+          }
+        },
+        "apps/2_theory/1_calculations": {
+          "id": "apps/2_theory/1_calculations",
+          "entry_point_type": "app",
+          "app": {
+            "label": "Calculations",
+            "path": "calculations",
+            "resource": "entries",
+            "category": "Theory",
+            "description": "Search calculations",
+            "readme": "This page allows you to search **calculations** within NOMAD. Calculations typically come from a specific simulation software that uses an approximate model to investigate and report different physical properties.",
+            "pagination": {
+              "order_by": "upload_create_time",
+              "order": "desc",
+              "page_size": 20
+            },
+            "columns": [
+              {
+                "search_quantity": "results.material.chemical_formula_hill",
+                "selected": true,
+                "title": "Formula",
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.program_name",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.method_name",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.dft.xc_functional_type",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "upload_create_time",
+                "selected": true,
+                "title": "Upload time",
+                "align": "left"
+              },
+              {
+                "search_quantity": "authors",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.apw_cutoff",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.basis_set",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.k_line_density",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.native_tier",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.simulation.precision.planewave_cutoff",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.structural_type",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.symmetry.crystal_system",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.symmetry.space_group_symbol",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.symmetry.space_group_number",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "entry_name",
+                "selected": false,
+                "title": "Name",
+                "align": "left"
+              },
+              {
+                "search_quantity": "mainfile",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "comment",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "references",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "datasets",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "published",
+                "selected": false,
+                "title": "Access",
+                "align": "left"
+              }
+            ],
+            "rows": {
+              "actions": {
+                "enabled": true
+              },
+              "details": {
+                "enabled": true
+              },
+              "selection": {
+                "enabled": true
+              }
+            },
+            "menu": {
+              "width": 12,
+              "show_header": true,
+              "title": "Filters",
+              "type": "menu",
+              "size": "sm",
+              "indentation": 0,
+              "items": [
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Material",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Elements / Formula",
+                  "type": "menu",
+                  "size": "xxl",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "periodic_table",
+                      "search_quantity": "results.material.elements",
+                      "scale": "linear",
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_hill",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_iupac",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_reduced",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_anonymous",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.material.n_elements",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Structure / Symmetry",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.material.structural_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.bravais_lattice",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.crystal_system",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.space_group_symbol",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.structure_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.strukturbericht_designation",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.point_group",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.hall_symbol",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.prototype_aflow_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Method",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "search_quantity": "results.method.simulation.program_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.program_version",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Precision",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.precision.k_line_density",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.precision.native_tier",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.precision.basis_set",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.precision.planewave_cutoff",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.precision.apw_cutoff",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "DFT",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "DFT": {
+                          "label": "Search DFT entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.xc_functional_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.xc_functional_names",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dft.exact_exchange_mixing_factor",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dft.hubbard_kanamori_model.u_effective",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.core_electron_treatment",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.relativity_method",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "TB",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "TB": {
+                          "label": "Search TB entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.tb.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.tb.localization_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "GW",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "GW": {
+                          "label": "Search GW entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.basis_set_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "BSE",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "BSE": {
+                          "label": "Search BSE entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.solver",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.basis_set_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.gw_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "DMFT",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "DMFT": {
+                          "label": "Search DMFT entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.impurity_solver_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.inverse_temperature",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.magnetic_state",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.u",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.jh",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.analytical_continuation",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Workflow",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Molecular dynamics",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.workflow_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "MolecularDynamics": {
+                          "label": "Search molecular dynamics entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.thermodynamic.trajectory",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.thermodynamic.trajectory.available_properties",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 4,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "search_quantity": "results.properties.thermodynamic.trajectory.provenance.molecular_dynamics.ensemble_type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 2,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.thermodynamic.trajectory.provenance.molecular_dynamics.time_step",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Geometry Optimization",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.properties.available_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "geometry_optimization": {
+                          "label": "Search geometry optimization entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.geometry_optimization",
+                      "items": [
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_energy_difference",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_force_maximum",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_displacement_maximum",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Properties",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Electronic",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "electronic_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.band_structure_electronic.band_gap",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.band_structure_electronic.band_gap.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 2,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.electronic.band_structure_electronic.band_gap.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.band_structure_electronic",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.band_structure_electronic.spin_polarized",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.dos_electronic",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.dos_electronic.spin_polarized",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Vibrational",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "vibrational_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Mechanical",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "mechanical_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.bulk_modulus",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.bulk_modulus.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.mechanical.bulk_modulus.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.shear_modulus",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.shear_modulus.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.mechanical.shear_modulus.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.energy_volume_curve",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.energy_volume_curve.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 5,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Author / Origin / Dataset",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "search_quantity": "authors.name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "upload_create_time",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "external_db",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.doi",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Visibility / IDs / Schema",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "visibility"
+                    },
+                    {
+                      "search_quantity": "entry_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.material_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "definitions"
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Optimade",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "optimade"
+                    }
+                  ]
+                }
+              ]
+            },
+            "search_quantities": {
+              "exclude": [
+                "mainfile",
+                "entry_name",
+                "combine"
+              ]
+            },
+            "dashboard": {
+              "widgets": [
+                {
+                  "type": "periodictable",
+                  "search_quantity": "results.material.elements",
+                  "scale": "linear",
+                  "layout": {
+                    "lg": {
+                      "h": 11,
+                      "w": 14,
+                      "x": 0,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "md": {
+                      "h": 8,
+                      "w": 12,
+                      "x": 0,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "sm": {
+                      "h": 8,
+                      "w": 12,
+                      "x": 0,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xl": {
+                      "h": 11,
+                      "w": 14,
+                      "x": 0,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xxl": {
+                      "h": 9,
+                      "w": 13,
+                      "x": 0,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    }
+                  }
+                },
+                {
+                  "search_quantity": "results.material.symmetry.space_group_symbol",
+                  "type": "terms",
+                  "scale": "linear",
+                  "show_input": true,
+                  "layout": {
+                    "lg": {
+                      "h": 5,
+                      "w": 5,
+                      "x": 19,
+                      "y": 6,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "md": {
+                      "h": 6,
+                      "w": 6,
+                      "x": 12,
+                      "y": 8,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "sm": {
+                      "h": 5,
+                      "w": 6,
+                      "x": 6,
+                      "y": 13,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xl": {
+                      "h": 6,
+                      "w": 6,
+                      "x": 24,
+                      "y": 5,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xxl": {
+                      "h": 9,
+                      "w": 6,
+                      "x": 30,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    }
+                  }
+                },
+                {
+                  "search_quantity": "results.material.structural_type",
+                  "type": "terms",
+                  "scale": "log",
+                  "show_input": false,
+                  "layout": {
+                    "lg": {
+                      "h": 6,
+                      "w": 5,
+                      "x": 19,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "md": {
+                      "h": 6,
+                      "w": 6,
+                      "x": 0,
+                      "y": 8,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "sm": {
+                      "h": 5,
+                      "w": 6,
+                      "x": 6,
+                      "y": 8,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xl": {
+                      "h": 11,
+                      "w": 5,
+                      "x": 19,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xxl": {
+                      "h": 9,
+                      "w": 6,
+                      "x": 19,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    }
+                  }
+                },
+                {
+                  "search_quantity": "results.method.simulation.program_name",
+                  "type": "terms",
+                  "scale": "log",
+                  "show_input": true,
+                  "layout": {
+                    "lg": {
+                      "h": 6,
+                      "w": 5,
+                      "x": 14,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "md": {
+                      "h": 8,
+                      "w": 6,
+                      "x": 12,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "sm": {
+                      "h": 5,
+                      "w": 6,
+                      "x": 0,
+                      "y": 8,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xl": {
+                      "h": 11,
+                      "w": 5,
+                      "x": 14,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xxl": {
+                      "h": 9,
+                      "w": 6,
+                      "x": 13,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    }
+                  }
+                },
+                {
+                  "search_quantity": "results.material.symmetry.crystal_system",
+                  "type": "terms",
+                  "scale": "linear",
+                  "show_input": false,
+                  "layout": {
+                    "lg": {
+                      "h": 5,
+                      "w": 5,
+                      "x": 14,
+                      "y": 6,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "md": {
+                      "h": 6,
+                      "w": 6,
+                      "x": 6,
+                      "y": 8,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "sm": {
+                      "h": 5,
+                      "w": 6,
+                      "x": 0,
+                      "y": 13,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xl": {
+                      "h": 5,
+                      "w": 6,
+                      "x": 24,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    },
+                    "xxl": {
+                      "h": 9,
+                      "w": 5,
+                      "x": 25,
+                      "y": 0,
+                      "minH": 3,
+                      "minW": 3
+                    }
+                  }
+                }
+              ]
+            },
+            "filters_locked": {
+              "quantities": "results.method.simulation.program_name"
+            },
+            "search_syntaxes": {
+              "exclude": [
+                "free_text"
+              ]
+            }
+          }
+        },
+        "apps/2_theory/2_materials": {
+          "id": "apps/2_theory/2_materials",
+          "entry_point_type": "app",
+          "app": {
+            "label": "Materials",
+            "path": "materials",
+            "resource": "materials",
+            "category": "Theory",
+            "description": "Search materials that are identified from calculations",
+            "readme": "This page allows you to search **materials** within NOMAD. NOMAD can often automatically detect the material from individual calculations that contain the full atomistic structure and can then group the data by using these detected materials. This allows you to search individual materials which have properties that are aggregated from several entries. Following the link for a specific material will take you to the corresponding [NOMAD Encyclopedia](https://nomad-lab.eu/prod/rae/encyclopedia/#/search) page for that material. NOMAD Encyclopedia is a service that is specifically oriented towards materials property exploration.\nNotice that by default the properties that you search can be combined from several different entries. If instead you wish to search for a material with an individual entry fullfilling your search criteria, uncheck the **combine results from several entries**-checkbox.",
+            "pagination": {
+              "order_by": "chemical_formula_hill",
+              "order": "asc",
+              "page_size": 20
+            },
+            "columns": [
+              {
+                "search_quantity": "chemical_formula_hill",
+                "selected": true,
+                "title": "Formula",
+                "align": "left"
+              },
+              {
+                "search_quantity": "structural_type",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "symmetry.structure_name",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "symmetry.space_group_number",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "symmetry.crystal_system",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "symmetry.space_group_symbol",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "material_id",
+                "selected": false,
+                "align": "left"
+              }
+            ],
+            "rows": {
+              "actions": {
+                "enabled": true
+              },
+              "details": {
+                "enabled": false
+              },
+              "selection": {
+                "enabled": false
+              }
+            },
+            "menu": {
+              "width": 12,
+              "show_header": true,
+              "title": "Filters",
+              "type": "menu",
+              "size": "sm",
+              "indentation": 0,
+              "items": [
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Material",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Elements / Formula",
+                  "type": "menu",
+                  "size": "xxl",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "periodic_table",
+                      "search_quantity": "results.material.elements",
+                      "scale": "linear",
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_hill",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_iupac",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_reduced",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_anonymous",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.material.n_elements",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Structure / Symmetry",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.material.structural_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.bravais_lattice",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.crystal_system",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.space_group_symbol",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.structure_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.strukturbericht_designation",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.point_group",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.hall_symbol",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.symmetry.prototype_aflow_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Method",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "search_quantity": "results.method.simulation.program_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.program_version",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "DFT",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "DFT": {
+                          "label": "Search DFT entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.xc_functional_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.xc_functional_names",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dft.exact_exchange_mixing_factor",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dft.hubbard_kanamori_model.u_effective",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.core_electron_treatment",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dft.relativity_method",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "TB",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "TB": {
+                          "label": "Search TB entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.tb.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.tb.localization_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "GW",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "GW": {
+                          "label": "Search GW entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.gw.basis_set_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "BSE",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "BSE": {
+                          "label": "Search BSE entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.solver",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.starting_point_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.basis_set_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.bse.gw_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "DMFT",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "DMFT": {
+                          "label": "Search DMFT entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.impurity_solver_type",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 2,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.inverse_temperature",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.magnetic_state",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.u",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.method.simulation.dmft.jh",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.dmft.analytical_continuation",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Workflow",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Molecular dynamics",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.workflow_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "MolecularDynamics": {
+                          "label": "Search molecular dynamics entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.thermodynamic.trajectory",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.thermodynamic.trajectory.available_properties",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 4,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "search_quantity": "results.properties.thermodynamic.trajectory.provenance.molecular_dynamics.ensemble_type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 2,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.thermodynamic.trajectory.provenance.molecular_dynamics.time_step",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Geometry Optimization",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.properties.available_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "geometry_optimization": {
+                          "label": "Search geometry optimization entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.geometry_optimization",
+                      "items": [
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_energy_difference",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_force_maximum",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.geometry_optimization.final_displacement_maximum",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Properties",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Electronic",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "electronic_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.band_structure_electronic.band_gap",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.band_structure_electronic.band_gap.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 2,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.electronic.band_structure_electronic.band_gap.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.band_structure_electronic",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.band_structure_electronic.spin_polarized",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.electronic.dos_electronic",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.electronic.dos_electronic.spin_polarized",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Vibrational",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "vibrational_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Mechanical",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "mechanical_properties",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.bulk_modulus",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.bulk_modulus.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.mechanical.bulk_modulus.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.shear_modulus",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.shear_modulus.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": false,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.mechanical.shear_modulus.value",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.mechanical.energy_volume_curve",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.mechanical.energy_volume_curve.type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "options": 5,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Author / Origin / Dataset",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "search_quantity": "authors.name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "upload_create_time",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "external_db",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.doi",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Visibility / IDs / Schema",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "visibility"
+                    },
+                    {
+                      "search_quantity": "entry_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.material_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "definitions"
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Optimade",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "optimade"
+                    }
+                  ]
+                },
+                {
+                  "search_quantity": "combine",
+                  "type": "terms",
+                  "scale": "linear",
+                  "show_input": false,
+                  "width": 12,
+                  "show_header": false,
+                  "options": {
+                    "True": {
+                      "label": "Combine results from several entries",
+                      "description": "If selected, your filters may be matched from several entries that contain the same material. When unchecked, the material has to have a single entry that matches all your filters."
+                    }
+                  },
+                  "n_columns": 1,
+                  "sort_static": true,
+                  "show_statistics": false
+                }
+              ]
+            },
+            "search_quantities": {
+              "exclude": [
+                "mainfile",
+                "entry_name"
+              ]
+            },
+            "search_syntaxes": {
+              "exclude": [
+                "free_text"
+              ]
+            }
+          }
+        },
+        "apps/3_experiment/1_eln": {
+          "id": "apps/3_experiment/1_eln",
+          "entry_point_type": "app",
+          "app": {
+            "label": "ELN",
+            "path": "eln",
+            "resource": "entries",
+            "category": "Experiment",
+            "description": "Search electronic lab notebooks",
+            "readme": "This page allows you to specifically seach **electronic lab notebooks (ELNs)** within NOMAD. It is very similar to the entries search, but with a reduced filter set and specialized arrangement of default columns.",
+            "pagination": {
+              "order_by": "upload_create_time",
+              "order": "desc",
+              "page_size": 20
+            },
+            "columns": [
+              {
+                "search_quantity": "entry_name",
+                "selected": true,
+                "title": "Name",
+                "align": "left"
+              },
+              {
+                "search_quantity": "entry_type",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "upload_create_time",
+                "selected": true,
+                "title": "Upload time",
+                "align": "left"
+              },
+              {
+                "search_quantity": "authors",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.material.chemical_formula_hill",
+                "selected": false,
+                "title": "Formula",
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.method.method_name",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.lab_ids",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.sections",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.methods",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.tags",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.eln.instruments",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "mainfile",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "comment",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "references",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "datasets",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "published",
+                "selected": false,
+                "title": "Access",
+                "align": "left"
+              }
+            ],
+            "rows": {
+              "actions": {
+                "enabled": true
+              },
+              "details": {
+                "enabled": true
+              },
+              "selection": {
+                "enabled": true
+              }
+            },
+            "menu": {
+              "width": 12,
+              "show_header": true,
+              "title": "Filters",
+              "type": "menu",
+              "size": "sm",
+              "indentation": 0,
+              "items": [
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Material",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Elements / Formula",
+                  "type": "menu",
+                  "size": "xxl",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "periodic_table",
+                      "search_quantity": "results.material.elements",
+                      "scale": "linear",
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_hill",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_iupac",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_reduced",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_anonymous",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.material.n_elements",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Electronic Lab Notebook",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "search_quantity": "results.eln.sections",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.eln.tags",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.eln.methods",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.eln.instruments",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.eln.names",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.eln.descriptions",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.eln.lab_ids",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "User Defined Quantities",
+                  "type": "menu",
+                  "size": "xl",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "custom_quantities"
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Author / Origin / Dataset",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "search_quantity": "authors.name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "upload_create_time",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "external_db",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.doi",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Visibility / IDs / Schema",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "visibility"
+                    },
+                    {
+                      "search_quantity": "entry_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.material_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "definitions"
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Optimade",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "optimade"
+                    }
+                  ]
+                }
+              ]
+            },
+            "search_quantities": {
+              "exclude": [
+                "mainfile",
+                "entry_name",
+                "combine"
+              ]
+            },
+            "filters_locked": {
+              "quantities": "data"
+            }
+          }
+        },
+        "apps/3_experiment/2_eels": {
+          "id": "apps/3_experiment/2_eels",
+          "entry_point_type": "app",
+          "app": {
+            "label": "EELS",
+            "path": "eels",
+            "resource": "entries",
+            "category": "Experiment",
+            "description": "Search electron energy loss spectroscopy experiments",
+            "readme": "This page allows you to spefically search **Electron Energy Loss Spectroscopy (EELS) experiments** within NOMAD. It is similar to the entries search, but with a reduced filter set and specialized arrangement of default columns.",
+            "pagination": {
+              "order_by": "upload_create_time",
+              "order": "desc",
+              "page_size": 20
+            },
+            "columns": [
+              {
+                "search_quantity": "results.material.chemical_formula_hill",
+                "selected": true,
+                "title": "Formula",
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.detector_type",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.resolution",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "upload_create_time",
+                "selected": true,
+                "title": "Upload time",
+                "align": "left"
+              },
+              {
+                "search_quantity": "authors",
+                "selected": true,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.min_energy",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.max_energy",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "entry_name",
+                "selected": false,
+                "title": "Name",
+                "align": "left"
+              },
+              {
+                "search_quantity": "entry_type",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "mainfile",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "comment",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "references",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "datasets",
+                "selected": false,
+                "align": "left"
+              },
+              {
+                "search_quantity": "published",
+                "selected": false,
+                "title": "Access",
+                "align": "left"
+              }
+            ],
+            "rows": {
+              "actions": {
+                "enabled": true
+              },
+              "details": {
+                "enabled": true
+              },
+              "selection": {
+                "enabled": true
+              }
+            },
+            "menu": {
+              "width": 12,
+              "show_header": true,
+              "title": "Filters",
+              "type": "menu",
+              "size": "sm",
+              "indentation": 0,
+              "items": [
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Material",
+                  "type": "menu",
+                  "size": "md"
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Elements / Formula",
+                  "type": "menu",
+                  "size": "xxl",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "type": "periodic_table",
+                      "search_quantity": "results.material.elements",
+                      "scale": "linear",
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_hill",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_iupac",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_reduced",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.chemical_formula_anonymous",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 6,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "results.material.n_elements",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Method",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "search_quantity": "results.method.simulation.program_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.method.simulation.program_version",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "EELS",
+                  "type": "menu",
+                  "size": "md",
+                  "indentation": 1,
+                  "items": [
+                    {
+                      "search_quantity": "results.method.method_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": false,
+                      "options": {
+                        "EELS": {
+                          "label": "Search EELS entries"
+                        }
+                      },
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": false
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "nested_object",
+                      "path": "results.properties.spectroscopic.spectra.provenance.eels",
+                      "items": [
+                        {
+                          "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.detector_type",
+                          "type": "terms",
+                          "scale": "linear",
+                          "show_input": true,
+                          "width": 12,
+                          "show_header": true,
+                          "n_columns": 1,
+                          "sort_static": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.resolution",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.min_energy",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        },
+                        {
+                          "type": "histogram",
+                          "show_input": true,
+                          "x": {
+                            "search_quantity": "results.properties.spectroscopic.spectra.provenance.eels.max_energy",
+                            "scale": "linear"
+                          },
+                          "y": {
+                            "scale": "linear"
+                          },
+                          "autorange": false,
+                          "width": 12,
+                          "show_header": true,
+                          "show_statistics": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Author / Origin / Dataset",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "search_quantity": "authors.name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "type": "histogram",
+                      "show_input": true,
+                      "x": {
+                        "search_quantity": "upload_create_time",
+                        "scale": "linear"
+                      },
+                      "y": {
+                        "scale": "linear"
+                      },
+                      "autorange": false,
+                      "width": 12,
+                      "show_header": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "external_db",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": false,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 5,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.doi",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Visibility / IDs / Schema",
+                  "type": "menu",
+                  "size": "md",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "visibility"
+                    },
+                    {
+                      "search_quantity": "entry_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "upload_name",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "results.material.material_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "search_quantity": "datasets.dataset_id",
+                      "type": "terms",
+                      "scale": "linear",
+                      "show_input": true,
+                      "width": 12,
+                      "show_header": true,
+                      "options": 0,
+                      "n_columns": 1,
+                      "sort_static": true,
+                      "show_statistics": true
+                    },
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "definitions"
+                    }
+                  ]
+                },
+                {
+                  "width": 12,
+                  "show_header": true,
+                  "title": "Optimade",
+                  "type": "menu",
+                  "size": "lg",
+                  "items": [
+                    {
+                      "width": 12,
+                      "show_header": true,
+                      "type": "optimade"
+                    }
+                  ]
+                }
+              ]
+            },
+            "search_quantities": {
+              "exclude": [
+                "mainfile",
+                "entry_name",
+                "combine"
+              ]
+            },
+            "filters_locked": {
+              "results.method.method_name": "EELS"
+            },
+            "search_syntaxes": {
+              "exclude": [
+                "free_text"
+              ]
+            }
+          }
+        },
+        "eelsdbparser:eelsdb_parser_entry_point": {
+          "id": "eelsdbparser:eelsdb_parser_entry_point",
+          "entry_point_type": "parser",
+          "name": "parsers/eels",
+          "description": "NOMAD parser for EELSDB.",
+          "plugin_package": "eelsdbparser",
+          "level": 0,
+          "aliases": [
+            "parsers/eels"
+          ],
+          "mainfile_name_re": ".*",
+          "mainfile_mime_re": ".*",
+          "mainfile_alternative": false,
+          "supported_compressions": []
+        },
+        "example_uploads/1_basic_examples/1_theory": {
+          "id": "example_uploads/1_basic_examples/1_theory",
+          "entry_point_type": "example_upload",
+          "description": "This upload demonstrate the basic use of NOMAD's *parsers*. For many *electronic\nstructure codes* (VASP, etc.), NOMAD provides parsers. You simply upload\nthe *input and output files* of your simulations and NOMAD parsers are extracting\nall necessary metadata to produce a **FAIR** dataset.\n",
+          "category": "Basic examples",
+          "title": "Electronic structure code input and output files",
+          "resources": [
+            {
+              "path": "theory/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": true
+        },
+        "example_uploads/1_basic_examples/2_eln": {
+          "id": "example_uploads/1_basic_examples/2_eln",
+          "entry_point_type": "example_upload",
+          "description": "This example contains a custom NOMAD *schema* to create an **Electronic\nLab Notebook (ELN)** and a few example *data* entries that use this schema.\nThe schema demonstrates the basic concepts behind a NOMAD ELN and can be a good\n**starting point** to create you own schemas that model **FAIR data** acquired in your lab.\n",
+          "category": "Basic examples",
+          "title": "Electronic Lab Notebook",
+          "resources": [
+            {
+              "path": "eln/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": true
+        },
+        "example_uploads/1_basic_examples/3_tables": {
+          "id": "example_uploads/1_basic_examples/3_tables",
+          "entry_point_type": "example_upload",
+          "description": "This upload demonstrates the use of tabular data. In this example we use an *xlsx*\nfile in combination with a custom schema. The schema describes what the columns\nin the excel file mean and NOMAD can parse everything accordingly to\nproduce a **FAIR** dataset.\n",
+          "category": "Basic examples",
+          "title": "Tabular Data",
+          "resources": [
+            {
+              "path": "tabular/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": true
+        },
+        "example_uploads/2_tutorials/1_rdm_tutorial": {
+          "id": "example_uploads/2_tutorials/1_rdm_tutorial",
+          "entry_point_type": "example_upload",
+          "description": "This notebook will teach you how you can build tailored research data\nmanagement (RDM) solutions using NOMAD. It uses existing thermally\nactivated delayed fluorescent (TADF) molecule data to teach you how we\ncan use the NOMAD to turn research data into datasets that are FAIR:\nFindable, Accessible, Interoperable and Reusable. The end-result can be\ndistributed as a NOMAD plugin: a self-contained Python package that can be\ninstalled on a NOMAD Oasis.\n",
+          "category": "Tutorials",
+          "title": "Tailored Research Data Management (RDM) with NOMAD",
+          "resources": [
+            {
+              "path": "rdm_tutorial/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": true
+        },
+        "example_uploads/2_tutorials/2_cow_tutorial": {
+          "id": "example_uploads/2_tutorials/2_cow_tutorial",
+          "entry_point_type": "example_upload",
+          "description": "This upload provides a notebook as a tutorial that demonstrates how to use NOMAD\nfor managing custom data and file types. Based on a simple *Countries of the World*\ndataset, it shows how to model the data in a schema, do parsing and normalization,\nprocess data, access existing data with NOMAD's API for analysis, and how to\nadd visualization to your data.\n",
+          "category": "Tutorials",
+          "title": "NOMAD as a Data Management Framework Tutorial",
+          "resources": [
+            {
+              "path": "cow_tutorial/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": true
+        },
+        "pynxtools.nomad.entrypoints:nexus_data_converter": {
+          "id": "pynxtools.nomad.entrypoints:nexus_data_converter",
+          "entry_point_type": "schema_package",
+          "name": "NeXus Dataconverter",
+          "description": "The NeXus dataconverter to convert data into the NeXus format.",
+          "plugin_package": "pynxtools"
+        },
+        "pynxtools.nomad.entrypoints:nexus_parser": {
+          "id": "pynxtools.nomad.entrypoints:nexus_parser",
+          "entry_point_type": "parser",
+          "name": "pynxtools parser",
+          "description": "A parser for nexus files.",
+          "plugin_package": "pynxtools",
+          "level": 0,
+          "aliases": [],
+          "mainfile_name_re": ".*\\.nxs",
+          "mainfile_mime_re": "application/x-hdf5",
+          "mainfile_alternative": false,
+          "supported_compressions": []
+        },
+        "pynxtools.nomad.entrypoints:nexus_schema": {
+          "id": "pynxtools.nomad.entrypoints:nexus_schema",
+          "entry_point_type": "schema_package",
+          "name": "NeXus",
+          "description": "The NeXus metainfo package.",
+          "plugin_package": "pynxtools"
+        },
+        "pynxtools_apm.nomad.entrypoints:apm_example": {
+          "id": "pynxtools_apm.nomad.entrypoints:apm_example",
+          "entry_point_type": "example_upload",
+          "description": "\n        This example presents the capabilities of the NOMAD platform to store and standardize atom probe data.\n        It shows the generation of a NeXus file according to the\n        [NXapm](https://fairmat-nfdi.github.io/nexus_definitions/classes/contributed_definitions/NXapm.html#nxapm)\n        application definition and a successive analysis of an example data set.\n        The example contains a small atom probe dataset from an experiment with a LEAP instrument to get you started\n        and keep the size of your NOMAD installation small. Once started, we recommend changing the respective\n        input file in the NOMAD Oasis ELN to run the example with your own datasets.\n    ",
+          "plugin_package": "pynxtools_apm",
+          "category": "FAIRmat examples",
+          "title": "Atom Probe Microscopy",
+          "resources": [
+            {
+              "path": "nomad/examples/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": false
+        },
+        "pynxtools_ellips.nomad.entrypoints:ellips_example": {
+          "id": "pynxtools_ellips.nomad.entrypoints:ellips_example",
+          "entry_point_type": "example_upload",
+          "description": "\n        This example presents the capabilities of the NOMAD platform to store and standardize ellipsometry data.\n        It shows the generation of a NeXus file according to the [NXellipsometry](https://manual.nexusformat.org/classes/contributed_definitions/NXellipsometry.html#nxellipsometry)\n        application definition and a successive analysis of a SiO2 on Si Psi/Delta measurement.\n    ",
+          "plugin_package": "pynxtools_ellips",
+          "category": "FAIRmat examples",
+          "title": "Ellipsometry",
+          "resources": [
+            {
+              "path": "nomad/examples/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": false
+        },
+        "pynxtools_em.nomad.entrypoints:em_example": {
+          "id": "pynxtools_em.nomad.entrypoints:em_example",
+          "entry_point_type": "example_upload",
+          "description": "\n        This example presents the capabilities of the NOMAD platform to store and standardize electron microscopy.\n        It shows the generation of a NeXus file according to the\n        [NXem](https://fairmat-nfdi.github.io/nexus_definitions/classes/contributed_definitions/NXem.html#nxem)\n        application definition.\n        The example contains a small set of electron microscopy datasets to get started and keep the size of your\n        NOMAD installation small. Ones started, we recommend to change the respective input file in the NOMAD Oasis\n        ELN to run the example with your own datasets.\n    ",
+          "plugin_package": "pynxtools_em",
+          "category": "FAIRmat examples",
+          "title": "Electron Microscopy",
+          "resources": [
+            {
+              "path": "nomad/examples/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": false
+        },
+        "pynxtools_mpes.nomad.entrypoints:mpes_example": {
+          "id": "pynxtools_mpes.nomad.entrypoints:mpes_example",
+          "entry_point_type": "example_upload",
+          "description": "\n        This example presents the capabilities of the NOMAD platform to store and standardize multidimensional photoemission spectroscopy (MPES) experimental data. It contains three major examples:\n\n      - Taking a pre-binned file, here stored in a h5 file, and converting it into the standardized MPES NeXus format.\n        There exists a [NeXus application definition for MPES](https://manual.nexusformat.org/classes/contributed_definitions/NXmpes.html#nxmpes) which details the internal structure of such a file.\n      - Binning of raw data (see [here](https://www.nature.com/articles/s41597-020-00769-8) for additional resources) into a h5 file and consecutively generating a NeXus file from it.\n      - An analysis example using data in the NeXus format and employing the [pyARPES](https://github.com/chstan/arpes) analysis tool to reproduce the main findings of [this paper](https://arxiv.org/pdf/2107.07158.pdf).\n    ",
+          "plugin_package": "pynxtools_mpes",
+          "category": "FAIRmat examples",
+          "title": "Multidimensional photoemission spectroscopy (MPES)",
+          "resources": [
+            {
+              "path": "nomad/examples/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": false
+        },
+        "pynxtools_stm.nomad.entrypoints:stm_example": {
+          "id": "pynxtools_stm.nomad.entrypoints:stm_example",
+          "entry_point_type": "example_upload",
+          "description": "This example presents the capabilities of the NOMAD platform to store standardized Scanning Tunneling Microscopy (stm)",
+          "plugin_package": "pynxtools_stm",
+          "category": "SPM experiments examples",
+          "title": "Scanning Tunneling Microscopy (STM)",
+          "resources": [
+            {
+              "path": "nomad/examples/stm/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": false
+        },
+        "pynxtools_stm.nomad.entrypoints:sts_example": {
+          "id": "pynxtools_stm.nomad.entrypoints:sts_example",
+          "entry_point_type": "example_upload",
+          "description": "This example presents the capabilities of the NOMAD platform to store standardized Scanning Tunneling Spectroscopy (sts) data.",
+          "plugin_package": "pynxtools_stm",
+          "category": "SPM experiments examples",
+          "title": "Scanning Tunneling Spectroscopy (STS)",
+          "resources": [
+            {
+              "path": "nomad/examples/sts/*",
+              "target": ""
+            }
+          ],
+          "from_examples_directory": false
+        }
       }
     ],
     "plugin_packages": {
-      "atomisticparsers": {
-        "description": "Collection of NOMAD parsers for atomistic codes.",
-        "documentation": null,
-        "entry_points": [
-          "atomisticparsers:amber_parser_entry_point",
-          "atomisticparsers:asap_parser_entry_point",
-          "atomisticparsers:bopfox_parser_entry_point",
-          "atomisticparsers:dftbplus_parser_entry_point",
-          "atomisticparsers:dlpoly_parser_entry_point",
-          "atomisticparsers:gromacs_parser_entry_point",
-          "atomisticparsers:gromos_parser_entry_point",
-          "atomisticparsers:gulp_parser_entry_point",
-          "atomisticparsers:h5md_parser_entry_point",
-          "atomisticparsers:lammps_parser_entry_point",
-          "atomisticparsers:libatoms_parser_entry_point",
-          "atomisticparsers:namd_parser_entry_point",
-          "atomisticparsers:tinker_parser_entry_point",
-          "atomisticparsers:xtb_parser_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/atomistic-parsers",
-        "name": "atomisticparsers",
-        "repository": null,
-        "version": "1.0.2"
-      },
-      "bandstructurenormalizer": {
-        "description": "Band structure normalizer plugin for NOMAD.",
-        "documentation": null,
-        "entry_points": [
-          "bandstructurenormalizer:bandstructure_normalizer_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-bandstructure",
-        "name": "bandstructurenormalizer",
-        "repository": null,
-        "version": "1.0"
-      },
-      "databaseparsers": {
-        "description": "Collection of NOMAD parsers for databases.",
-        "documentation": null,
-        "entry_points": [
-          "databaseparsers:openkim_parser_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/database-parsers",
-        "name": "databaseparsers",
-        "repository": null,
-        "version": "1.0"
-      },
-      "dosnormalizer": {
-        "description": "DOS normalizer plugin for NOMAD.",
-        "documentation": null,
-        "entry_points": [
-          "dosnormalizer:dos_normalizer_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-dos",
-        "name": "dosnormalizer",
-        "repository": null,
-        "version": "1.0"
-      },
       "eelsdbparser": {
         "description": "NOMAD converter/parser for metadata from EELS database.",
         "documentation": null,
@@ -538,121 +6595,6 @@ window.nomadEnv = {
         "name": "eelsdbparser",
         "repository": null,
         "version": "1.0"
-      },
-      "electronicparsers": {
-        "description": "Collection of NOMAD parsers for electronic structure codes.",
-        "documentation": null,
-        "entry_points": [
-          "electronicparsers:abacus_parser_entry_point",
-          "electronicparsers:abinit_parser_entry_point",
-          "electronicparsers:ams_parser_entry_point",
-          "electronicparsers:atk_parser_entry_point",
-          "electronicparsers:bigdft_parser_entry_point",
-          "electronicparsers:castep_parser_entry_point",
-          "electronicparsers:charmm_parser_entry_point",
-          "electronicparsers:cp2k_parser_entry_point",
-          "electronicparsers:cpmd_parser_entry_point",
-          "electronicparsers:crystal_parser_entry_point",
-          "electronicparsers:dmol3_parser_entry_point",
-          "electronicparsers:edmft_parser_entry_point",
-          "electronicparsers:elk_parser_entry_point",
-          "electronicparsers:exciting_parser_entry_point",
-          "electronicparsers:fhiaims_parser_entry_point",
-          "electronicparsers:fleur_parser_entry_point",
-          "electronicparsers:fplo_parser_entry_point",
-          "electronicparsers:gamess_parser_entry_point",
-          "electronicparsers:gaussian_parser_entry_point",
-          "electronicparsers:gpaw_parser_entry_point",
-          "electronicparsers:magres_parser_entry_point",
-          "electronicparsers:molcas_parser_entry_point",
-          "electronicparsers:mopac_parser_entry_point",
-          "electronicparsers:nwchem_parser_entry_point",
-          "electronicparsers:ocean_parser_entry_point",
-          "electronicparsers:octopus_parser_entry_point",
-          "electronicparsers:onetep_parser_entry_point",
-          "electronicparsers:openmx_parser_entry_point",
-          "electronicparsers:orca_parser_entry_point",
-          "electronicparsers:psi4_parser_entry_point",
-          "electronicparsers:qball_parser_entry_point",
-          "electronicparsers:qbox_parser_entry_point",
-          "electronicparsers:quantumespresso_parser_entry_point",
-          "electronicparsers:siesta_parser_entry_point",
-          "electronicparsers:soliddmft_parser_entry_point",
-          "electronicparsers:tbstudio_parser_entry_point",
-          "electronicparsers:turbomole_parser_entry_point",
-          "electronicparsers:vasp_parser_entry_point",
-          "electronicparsers:w2dynamics_parser_entry_point",
-          "electronicparsers:wannier90_parser_entry_point",
-          "electronicparsers:wien2k_parser_entry_point",
-          "electronicparsers:yambo_parser_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/electronic-parsers",
-        "name": "electronicparsers",
-        "repository": null,
-        "version": "1.0.2"
-      },
-      "nomad_aitoolkit": {
-        "description": "Schema and app for AI Toolkit notebooks.",
-        "documentation": null,
-        "entry_points": [
-          "nomad_aitoolkit.apps:aitoolkit",
-          "nomad_aitoolkit:aitoolkit"
-        ],
-        "homepage": null,
-        "name": "nomad_aitoolkit",
-        "repository": "https://github.com/FAIRmat-NFDI/nomad-aitoolkit",
-        "version": "0.1.1"
-      },
-      "nomad_external_eln_integrations": {
-        "description": "3rd Party Integration packages",
-        "documentation": null,
-        "entry_points": [
-          "nomad_external_eln_integrations.parsers:chemotion_parser_entry_point",
-          "nomad_external_eln_integrations.example_uploads:elabftwexample",
-          "nomad_external_eln_integrations.parsers:elabftw_parser_entry_point",
-          "nomad_external_eln_integrations.schema_packages.elabftw:elabftw_schema",
-          "nomad_external_eln_integrations.schema_packages.labfolder:labfolder_schema",
-          "nomad_external_eln_integrations.schema_packages.openbis:openbis_schema"
-        ],
-        "homepage": null,
-        "name": "nomad_external_eln_integrations",
-        "repository": "https://github.com/FAIRmat-NFDI/nomad-external-eln-integrations",
-        "version": "0.1.0"
-      },
-      "nomad_porous_materials": {
-        "description": "NOMAD plugin for porous materials",
-        "documentation": null,
-        "entry_points": [
-          "nomad_porous_materials.apps:mofapp",
-          "nomad_porous_materials.normalizers:porositynormalizer"
-        ],
-        "homepage": null,
-        "name": "nomad_porous_materials",
-        "repository": "https://github.com/lauri-codes/nomad-porous-materials",
-        "version": "0.1.0"
-      },
-      "nomad_simulations": {
-        "description": "A NOMAD plugin for FAIR schemas for simulation data.",
-        "documentation": "https://nomad-coe.github.io/nomad-simulations/",
-        "entry_points": [
-          "nomad_simulations.schema_packages:nomad_simulations_plugin"
-        ],
-        "homepage": "https://github.com/nomad-coe/nomad-simulations",
-        "name": "nomad_simulations",
-        "repository": null,
-        "version": "0.0.1"
-      },
-      "perovskite_solar_cell_database": {
-        "description": "Perovskite solar cell data schema plugin for NOMAD.",
-        "documentation": null,
-        "entry_points": [
-          "perovskite_solar_cell_database:perovskite_solar_cell",
-          "perovskite_solar_cell_database.apps:solar_cells"
-        ],
-        "homepage": "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database",
-        "name": "perovskite_solar_cell_database",
-        "repository": "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database",
-        "version": "0.0.0"
       },
       "pynxtools": {
         "description": "Extend NeXus for experiments and characterization in Materials Science and Materials Engineering and serve as a NOMAD parser implementation for NeXus.",
@@ -665,93 +6607,63 @@ window.nomadEnv = {
         "homepage": "https://github.com/FAIRmat-NFDI/pynxtools",
         "name": "pynxtools",
         "repository": null,
-        "version": "0.7.0"
+        "version": "0.8.2.post1.dev9+g46b043e.d20241127"
       },
-      "runschema": {
-        "description": "Run schema plugin for NOMAD.",
+      "pynxtools_apm": {
+        "description": "Make atom probe tomography and field-ion microscopy results interoperable via NeXus",
         "documentation": null,
         "entry_points": [
-          "runschema:run_schema_entry_point"
+          "pynxtools_apm.nomad.entrypoints:apm_example"
         ],
-        "homepage": "https://github.com/nomad-coe/nomad-schema-plugin-run.git",
-        "name": "runschema",
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-apm",
+        "name": "pynxtools_apm",
         "repository": null,
-        "version": "1.0.2"
+        "version": "0.2.1.post1.dev23+gcfcc8e3"
       },
-      "simulationworkflownormalizer": {
-        "description": "Simulation workflow nomad plugin for NOMAD.",
+      "pynxtools_ellips": {
+        "description": "A reader for transferring ellipsometry data from vendor formats to NeXus and NOMAD.",
         "documentation": null,
         "entry_points": [
-          "simulationworkflownormalizer:simulationworkflow_normalizer_entry_point"
+          "pynxtools_ellips.nomad.entrypoints:ellips_example"
         ],
-        "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-simulation-workflow",
-        "name": "simulationworkflownormalizer",
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-ellips",
+        "name": "pynxtools_ellips",
         "repository": null,
-        "version": "1.0"
+        "version": "0.0.4.post1.dev25+gf21be30"
       },
-      "simulationworkflowschema": {
-        "description": "Simulation workflow schema plugin for NOMAD.",
+      "pynxtools_em": {
+        "description": "Make electron microscopy results interoperable via NeXus",
         "documentation": null,
         "entry_points": [
-          "simulationworkflowschema:simulationworkflow_schema_entry_point"
+          "pynxtools_em.nomad.entrypoints:em_example"
         ],
-        "homepage": "https://github.com/nomad-coe/nomad-schema-simulation-workflow-plugin",
-        "name": "simulationworkflowschema",
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-em",
+        "name": "pynxtools_em",
         "repository": null,
-        "version": "1.0.4"
+        "version": "0.3.0.post1.dev17+gc4c0c5f"
       },
-      "soapnormalizer": {
-        "description": "SOAP nomad plugin for NOMAD.",
+      "pynxtools_mpes": {
+        "description": null,
         "documentation": null,
         "entry_points": [
-          "soapnormalizer:soap_normalizer_entry_point"
+          "pynxtools_mpes.nomad.entrypoints:mpes_example"
         ],
-        "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-soap",
-        "name": "soapnormalizer",
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-mpes",
+        "name": "pynxtools_mpes",
         "repository": null,
-        "version": "1.0"
+        "version": "0.2.1.dev43+g373edb6"
       },
-      "spectranormalizer": {
-        "description": "Spectra normalizer plugin for NOMAD.",
+      "pynxtools_stm": {
+        "description": "A plugin for pynxtools to convert sts and stm files",
         "documentation": null,
         "entry_points": [
-          "spectranormalizer:spectra_normalizer_entry_point"
+          "pynxtools_stm.nomad.entrypoints:stm_example",
+          "pynxtools_stm.nomad.entrypoints:sts_example"
         ],
-        "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-spectra",
-        "name": "spectranormalizer",
+        "homepage": null,
+        "name": "pynxtools_stm",
         "repository": null,
-        "version": "1.0"
-      },
-      "systemnormalizer": {
-        "description": "System normalizer plugin for NOMAD.",
-        "documentation": null,
-        "entry_points": [
-          "systemnormalizer:system_normalizer_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-system",
-        "name": "systemnormalizer",
-        "repository": null,
-        "version": "1.0"
-      },
-      "workflowparsers": {
-        "description": "Collection of NOMAD parsers for workflow engines.",
-        "documentation": null,
-        "entry_points": [
-          "workflowparsers:aflow_parser_entry_point",
-          "workflowparsers:asr_parser_entry_point",
-          "workflowparsers:atomate_parser_entry_point",
-          "workflowparsers:elastic_parser_entry_point",
-          "workflowparsers:fhivibes_parser_entry_point",
-          "workflowparsers:lobster_parser_entry_point",
-          "workflowparsers:phonopy_parser_entry_point",
-          "workflowparsers:quantum_espresso_epw_parser_entry_point",
-          "workflowparsers:quantum_espresso_phonon_parser_entry_point",
-          "workflowparsers:quantum_espresso_xspectra_parser_entry_point"
-        ],
-        "homepage": "https://github.com/nomad-coe/electronic-parsers",
-        "name": "workflowparsers",
-        "repository": null,
-        "version": "1.0"
+        "version": "1.0.8.post1.dev16+gcff2ef8.d20241125"
       }
     }
   },
