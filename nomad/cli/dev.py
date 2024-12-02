@@ -256,12 +256,13 @@ def get_gui_config() -> str:
             return [_sort_dict(v) for v in d]
         return d
 
+    # We save a  single list of enabled entry points
     plugins = _sort_dict(config.plugins.dict(exclude_unset=True))
-
-    for key in plugins['entry_points']['options'].keys():
-        plugins['entry_points']['options'][key] = config.plugins.entry_points.options[
-            key
-        ].dict_safe()
+    entry_points = [
+        entry_point.dict_safe()
+        for entry_point in config.plugins.entry_points.filtered_values()
+    ]
+    plugins['entry_points'] = entry_points
 
     data = {
         'appBase': config.ui.app_base,

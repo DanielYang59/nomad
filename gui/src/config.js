@@ -95,9 +95,9 @@ export const apiBase = `${appBase}/api`
 export const northBase = urlAbs(window.nomadEnv.northBase)
 export const guiBase = process.env.PUBLIC_URL
 export const ui = normalizeConfig(window.nomadEnv.ui)
-export const entry_points = normalizeConfig(window.nomadEnv?.plugins?.entry_points)
+export const entry_points = window.nomadEnv?.plugins?.entry_points
 export const apps = Object.values(ui?.apps?.options || [])
-Object.values(entry_points?.options || [])
+Object.values(entry_points || [])
   .filter(entry_point => entry_point.entry_point_type === 'app')
   .forEach(entry_point => {
     apps.push(entry_point.app)
@@ -125,7 +125,7 @@ export const metainfo = window.nomadArtifacts.metainfo
 export const parserMetadata = window.nomadArtifacts.parserMetadata
 export const toolkitMetadata = window.nomadArtifacts.toolkitMetadata
 export const exampleUploads = {}
-Object.values(entry_points?.options || [])
+Object.values(entry_points || [])
   .filter(entry_point => entry_point.entry_point_type === 'example_upload')
   .forEach(entry_point => {
     exampleUploads[entry_point.category] = {...exampleUploads[entry_point.category], [entry_point.id]: entry_point}
