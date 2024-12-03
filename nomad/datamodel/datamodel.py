@@ -1080,9 +1080,7 @@ class EntryMetadata(MSection):
 
             collect_references(section, property_def, quantity_path)
 
-            if section_path.startswith(('data', 'nexus')) and isinstance(
-                property_def, Quantity
-            ):
+            if section_path.startswith('data') and isinstance(property_def, Quantity):
                 # From each string dtype, we get a truncated sample to put into
                 # the keywords field, unless we are already storing too many unique values.
                 if (isinstance(property_def.type, (MEnum, m_str))) and len(

@@ -383,7 +383,7 @@ def _api_to_es_required(
 
     def includes_dynamic(include):
         for pattern in [] if include is None else include:
-            if pattern.startswith('data') or pattern.startswith('nexus'):
+            if pattern.startswith('data'):
                 return True
         return False
 

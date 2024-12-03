@@ -157,49 +157,48 @@ sub-sections as if they were direct sub-sections.
 """
 
 import math
-from typing import (
-    Union,
-    Any,
-    Dict,
-    cast,
-    Set,
-    List,
-    Callable,
-    Tuple,
-    Optional,
-    DefaultDict,
-)
-from collections import defaultdict
-from pint import Quantity as PintQuantity
 import re
-from elasticsearch_dsl import Q
+from collections import defaultdict
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    DefaultDict,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+    cast,
+)
 
+from elasticsearch_dsl import Q
 from nomad import utils
 from nomad.config import config
-from nomad.config.models.plugins import Schema, Parser, SchemaPackageEntryPoint
-from .data_type import Datatype, to_elastic_type
+from nomad.config.models.plugins import Parser, Schema, SchemaPackageEntryPoint
+from pint import Quantity as PintQuantity
 
-from .metainfo import (
-    MSectionBound,
-    Section,
-    Quantity,
-    MSection,
-    Reference,
-    Definition,
-    QuantityReference,
-    Package,
-)
 from . import DefinitionAnnotation
-
-from typing import TYPE_CHECKING
+from .data_type import Datatype, to_elastic_type
+from .metainfo import (
+    Definition,
+    MSection,
+    MSectionBound,
+    Package,
+    Quantity,
+    QuantityReference,
+    Reference,
+    Section,
+)
 
 if TYPE_CHECKING:
-    from nomad.datamodel.datamodel import SearchableQuantity, EntryArchive
+    from nomad.datamodel.datamodel import EntryArchive, SearchableQuantity
 
 schema_separator = '#'
 dtype_separator = '#'
 yaml_prefix = 'entry_id:'
-nexus_prefix = 'nexus.'
+nexus_prefix = 'pynxtools.nomad.schema.NeXus.'
 
 
 class DocumentType:
@@ -524,7 +523,11 @@ class DocumentType:
         # creating the dynamic quantities, this is the only way to prevent
         # infinite recursion, but it should be made possible in the GUI + search
         # API to query arbitrarily deep into the data structure.
-        def get_all_quantities(m_def, prefix=None, branch=None, repeats=False):
+        def get_all_quantities(
+            m_def, prefix=None, branch=None, repeats=False, max_level=None
+        ):
+            if max_level == 0:
+                return
             if branch is None:
                 branch = set()
             for quantity_name, quantity in m_def.all_quantities.items():
@@ -539,7 +542,11 @@ class DocumentType:
                 repeats = sub_section_def.repeats
                 full_name = f'{prefix}.{name}' if prefix else name
                 for item in get_all_quantities(
-                    sub_section_def.sub_section, full_name, new_branch, repeats
+                    sub_section_def.sub_section,
+                    full_name,
+                    new_branch,
+                    repeats,
+                    max_level - 1,
                 ):
                     yield item
 
@@ -550,15 +557,54 @@ class DocumentType:
                     section.section_cls, EntryData
                 ):
                     schema_name = section.qualified_name()
-                    for quantity_def, path, repeats in get_all_quantities(section):
-                        annotation = create_dynamic_quantity_annotation(quantity_def)
-                        if not annotation:
-                            continue
-                        full_name = f'data.{path}{schema_separator}{schema_name}'
-                        search_quantity = SearchQuantity(
-                            annotation, qualified_name=full_name, repeats=repeats
-                        )
-                        quantities_dynamic[full_name] = search_quantity
+                    if section.name == 'NeXus':
+                        # Allow App searches for specific AppDefs:
+                        selected_path = [
+                            'Root',
+                            'Mpes',
+                            'Mpes_arpes',
+                            'Xps',
+                            'Apm',
+                            'Em',
+                            'Optical_spectroscopy',
+                            'Ellipsometry',
+                            'Raman',
+                        ]
+                        max_level = 3
+                    else:
+                        selected_path = ['']
+                        max_level = -1
+                    for subsection in selected_path:
+                        path_prefix = subsection
+                        if subsection == '':
+                            selected_section = section
+                        else:
+                            selected_section = section.all_sub_sections[
+                                subsection
+                            ].sub_section
+                            path_prefix = path_prefix + '.'
+
+                        for quantity_def, path, repeats in get_all_quantities(
+                            selected_section, max_level=max_level
+                        ):
+                            annotation = create_dynamic_quantity_annotation(
+                                quantity_def
+                            )
+                            if not annotation:
+                                continue
+                            full_name = f'data.{path_prefix}{path}{schema_separator}{schema_name}'
+                            search_quantity = SearchQuantity(
+                                annotation, qualified_name=full_name, repeats=repeats
+                            )
+                            quantities_dynamic[full_name] = search_quantity
+                        # print(
+                        #     'With '
+                        #     + section.name
+                        #     + '.'
+                        #     + path_prefix
+                        #     + ' the number of dynamic quantities: '
+                        #     + str(len(quantities_dynamic))
+                        # )
         self.quantities.update(quantities_dynamic)
 
     def _register(self, annotation, prefix, repeats):
