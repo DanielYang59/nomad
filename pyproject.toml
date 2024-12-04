@@ -23,7 +23,7 @@ dependencies = [
     'elasticsearch-dsl==7.4.0',
     'h5py>=3.6.0',
     'hjson>=3.0.2',
-    'httpx>=0.23.3',
+    'httpx>=0.23.3,<0.28',
     'importlib_metadata~=7.1.0',
     'jmespath>=0.10.0',
     'kaleido==0.2.1',
