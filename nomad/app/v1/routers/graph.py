@@ -18,7 +18,6 @@
 
 from fastapi import Depends, APIRouter, Body, HTTPException
 from fastapi.responses import ORJSONResponse
-from pydantic.json import ENCODERS_BY_TYPE
 
 from nomad.graph.graph_reader import (
     MongoReader,
@@ -26,8 +25,8 @@ from nomad.graph.graph_reader import (
     GeneralReader,
     UserReader,
     Token,
-    LazyUserWrapper,
 )
+from nomad.graph.lazy_wrapper import LazyWrapper
 from .auth import create_user_dependency
 from .entries import EntriesArchive
 from ..models import User
@@ -37,20 +36,16 @@ router = APIRouter()
 default_tag = 'graph'
 
 
-# see /fastapi/encoders.py
-ENCODERS_BY_TYPE[LazyUserWrapper] = lambda v: v.to_json()
-
-
 def unwrap_response(result):
     if isinstance(result, dict):
         for key, value in result.items():
-            if isinstance(value, LazyUserWrapper):
+            if isinstance(value, LazyWrapper):
                 result[key] = value.to_json()
             elif key != Token.ARCHIVE:
                 unwrap_response(value)
     elif isinstance(result, list):
         for idx, value in enumerate(result):
-            if isinstance(value, LazyUserWrapper):
+            if isinstance(value, LazyWrapper):
                 result[idx] = value.to_json()
             else:
                 unwrap_response(value)

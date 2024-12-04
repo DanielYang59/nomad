@@ -30,8 +30,8 @@ from nomad.graph.graph_reader import (
     MongoReader,
     GeneralReader,
     Token,
-    LazyUserWrapper,
 )
+from nomad.graph.lazy_wrapper import LazyWrapper
 from nomad.datamodel import EntryArchive
 from nomad.utils.exampledata import ExampleData
 from tests.normalizing.conftest import simulationworkflowschema
@@ -57,7 +57,7 @@ def assert_time(i, j):
 def assert_list(l1, l2):
     assert len(l1) == len(l2)
     for i, j in zip(l1, l2):
-        if isinstance(i, LazyUserWrapper):
+        if isinstance(i, LazyWrapper):
             i = i.to_json()
         if isinstance(i, dict):
             assert_dict(i, j)
@@ -78,7 +78,7 @@ def assert_dict(d1, d2):
         del d2['m_def']
     assert set(d1.keys()) == set(d2.keys())
     for k, v in d1.items():
-        if isinstance(v, LazyUserWrapper):
+        if isinstance(v, LazyWrapper):
             v = v.to_json()
         if isinstance(v, dict):
             assert_dict(v, d2[k])
