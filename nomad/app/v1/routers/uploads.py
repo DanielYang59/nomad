@@ -2816,10 +2816,13 @@ def _get_upload_with_write_access(
     return upload
 
 
-def upload_to_pydantic(upload: Upload) -> UploadProcData:
+def upload_to_pydantic(
+    upload: Upload, *, include_total_count: bool = True
+) -> UploadProcData:
     """Converts the mongo db object to an UploadProcData object."""
     pydantic_upload = UploadProcData.from_orm(upload)
-    pydantic_upload.entries = upload.total_entries_count
+    if include_total_count:
+        pydantic_upload.entries = upload.total_entries_count
     try:
         pydantic_upload.upload_files_server_path = upload.upload_files.external_os_path
     except KeyError:

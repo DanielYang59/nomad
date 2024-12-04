@@ -57,6 +57,13 @@ from nomad.archive.storage_v2 import ArchiveList as ArchiveListNew
 from nomad.datamodel import ServerContext, User, EntryArchive, Dataset
 from nomad.datamodel.util import parse_path
 from nomad.files import UploadFiles, RawPathInfo
+from nomad.graph.lazy_wrapper import (
+    CachedUpload,
+    LazyUploadFailureCount,
+    LazyUploadSuccessCount,
+    LazyUploadTotalCount,
+    LazyUserWrapper,
+)
 from nomad.graph.model import (
     RequestConfig,
     DefinitionType,
@@ -178,56 +185,16 @@ async def goto_child(container, key: str | int | list):
 async def async_get(container, key, default=None):
     return container.get(key, default)
 
-    if isinstance(container, dict):
-        return container.get(key, default)
-
-    return await asyncio.to_thread(container.get, key, default)
+    # if isinstance(container, dict):
+    #     return container.get(key, default)
+    #
+    # return await asyncio.to_thread(container.get, key, default)
 
 
 async def async_to_json(data):
     return to_json(data)
 
-    return await asyncio.to_thread(to_json, data)
-
-
-class LazyUserWrapper:
-    def __init__(self, user_id: str):
-        self.user_id = user_id
-        self.user = None
-        self.requested = False
-
-    def _resolve(self):
-        if not self.requested:
-            self.requested = True
-
-            try:
-                self.user = User.get(user_id=self.user_id)
-            except Exception:  # noqa
-                self.user = self.user_id
-
-            if self.user is None:
-                self.user = self.user_id
-            else:
-                self.user = self.user.m_to_dict(
-                    with_out_meta=True, include_derived=True
-                )
-
-        return self.user
-
-    def __getitem__(self, item):
-        self._resolve()
-        return self.user.__getitem__(item)
-
-    def __iter__(self):
-        self._resolve()
-        return self.user.__iter__()
-
-    def __len__(self):
-        self._resolve()
-        return self.user.__len__()
-
-    def to_json(self):
-        return self._resolve()
+    # return await asyncio.to_thread(to_json, data)
 
 
 # todo: set slots=True when 3.10 is the minimum version
@@ -461,7 +428,7 @@ def _to_response_config(config: RequestConfig, exclude: list = None, **kwargs):
 
     for item in ('include', 'exclude'):
         if isinstance(x := response_config.pop(item, None), frozenset):
-            response_config[item] = list(x)
+            response_config[item] = list(x)  # type: ignore
 
     response_config.pop('property_name', None)
     if exclude:
@@ -1013,13 +980,14 @@ class GeneralReader:
 
     @staticmethod
     async def _overwrite_upload(item: Upload):
-        plain_dict = orjson.loads(upload_to_pydantic(item).json())
-        if n_entries := plain_dict.pop('entries', None):
-            plain_dict['n_entries'] = n_entries
-        plain_dict['processing_successful'] = item.processed_entries_count
-        plain_dict['processing_failed'] = (
-            item.total_entries_count - item.processed_entries_count
+        plain_dict = orjson.loads(
+            upload_to_pydantic(item, include_total_count=False).json()
         )
+        plain_dict.pop('entries', None)
+        cached_item = CachedUpload(item)
+        plain_dict['n_entries'] = LazyUploadTotalCount(cached_item)
+        plain_dict['processing_successful'] = LazyUploadSuccessCount(cached_item)
+        plain_dict['processing_failed'] = LazyUploadFailureCount(cached_item)
 
         if main_author := plain_dict.pop('main_author', None):
             plain_dict['main_author'] = LazyUserWrapper(main_author)
@@ -1146,7 +1114,14 @@ class GeneralReader:
 
         return node.archive
 
-    async def _resolve_list(self, node: GraphNode, config: RequestConfig):
+    async def _resolve_list(
+        self,
+        node: GraphNode,
+        config: RequestConfig,
+        *,
+        omit_keys=None,
+        wildcard: bool = False,
+    ):
         # the original archive may be an empty list
         # populate an empty list to keep the structure
         await _populate_result(node.result_root, node.current_path, [])
@@ -1158,6 +1133,8 @@ class GeneralReader:
                     current_path=node.current_path + [str(i)],
                 ),
                 new_config,
+                omit_keys=omit_keys,
+                wildcard=wildcard,
             )
 
     async def _walk(
@@ -1295,11 +1272,21 @@ class ArchiveLikeReader(GeneralReader):
 
 
 class MongoReader(GeneralReader):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.entries = None
-        self.uploads = None
-        self.datasets = None
+    @functools.cached_property
+    def entries(self):
+        return Entry.objects(upload_id__in=[v.upload_id for v in self.uploads])
+
+    @functools.cached_property
+    def uploads(self):
+        return Upload.objects(
+            Q(main_author=self.user.user_id)
+            | Q(reviewers=self.user.user_id)
+            | Q(coauthors=self.user.user_id)
+        )
+
+    @functools.cached_property
+    def datasets(self):
+        return Dataset.m_def.a_mongo.objects(user_id=self.user.user_id)
 
     async def _query_es(self, config: RequestConfig):
         search_params: dict = {
@@ -1537,14 +1524,6 @@ class MongoReader(GeneralReader):
         response: dict = {}
 
         self.global_root = response
-
-        self.uploads = Upload.objects(
-            Q(main_author=self.user.user_id)
-            | Q(reviewers=self.user.user_id)
-            | Q(coauthors=self.user.user_id)
-        )
-        self.entries = Entry.objects(upload_id__in=[v.upload_id for v in self.uploads])
-        self.datasets = Dataset.m_def.a_mongo.objects(user_id=self.user.user_id)
 
         await self._walk(
             GraphNode(
@@ -1937,6 +1916,14 @@ class MongoReader(GeneralReader):
 
 
 class UploadReader(MongoReader):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.target_upload_id = None
+
+    @functools.cached_property
+    def entries(self):
+        return Entry.objects(upload_id=self.target_upload_id)
+
     # noinspection PyMethodOverriding
     async def read(self, upload_id: str) -> dict:  # type: ignore
         response: dict = {}
@@ -1949,7 +1936,7 @@ class UploadReader(MongoReader):
 
         # if it is a string, no access
         if isinstance(target_upload := await self.retrieve_upload(upload_id), dict):
-            self.entries = Entry.objects(upload_id=upload_id)
+            self.target_upload_id = upload_id
 
             await self._walk(
                 GraphNode(
@@ -1995,6 +1982,20 @@ class UploadReader(MongoReader):
 
 
 class DatasetReader(MongoReader):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.target_dataset_id = None
+
+    @functools.cached_property
+    def entries(self):
+        return Entry.objects(datasets=self.target_dataset_id)
+
+    @functools.cached_property
+    def uploads(self):
+        return Upload.objects(
+            upload_id__in=list({v['upload_id'] for v in self.entries})
+        )
+
     # noinspection PyMethodOverriding
     async def read(self, dataset_id: str) -> dict:  # type: ignore
         response: dict = {}
@@ -2007,10 +2008,7 @@ class DatasetReader(MongoReader):
 
         # if it is a string, no access
         if isinstance(target_dataset := await self.retrieve_dataset(dataset_id), dict):
-            self.entries = Entry.objects(datasets=dataset_id)
-            self.uploads = Upload.objects(
-                upload_id__in=list({v['upload_id'] for v in self.entries})
-            )
+            self.target_dataset_id = dataset_id
 
             await self._walk(
                 GraphNode(
@@ -2051,6 +2049,14 @@ class DatasetReader(MongoReader):
 
 
 class EntryReader(MongoReader):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.target_entry_id = None
+
+    @functools.cached_property
+    def datasets(self):
+        return Dataset.m_def.a_mongo.objects(entries=self.target_entry_id)
+
     # noinspection PyMethodOverriding
     async def read(self, entry_id: str) -> dict:  # type: ignore
         response: dict = {}
@@ -2063,7 +2069,7 @@ class EntryReader(MongoReader):
 
         # if it is a string, no access
         if isinstance(target_entry := await self.retrieve_entry(entry_id), dict):
-            self.datasets = Dataset.m_def.a_mongo.objects(entries=entry_id)
+            self.target_entry_id = entry_id
 
             await self._walk(
                 GraphNode(
@@ -2136,6 +2142,39 @@ class ElasticSearchReader(EntryReader):
 
 
 class UserReader(MongoReader):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.target_user_id = None
+
+    @functools.cached_property
+    def entries(self):
+        return Entry.objects(upload_id__in=[v.upload_id for v in self.uploads])
+
+    @functools.cached_property
+    def uploads(self):
+        mongo_query = (
+            Q(main_author=self.target_user_id)
+            | Q(reviewers=self.target_user_id)
+            | Q(coauthors=self.target_user_id)
+        )
+        # self.user must have access to the upload
+        if self.target_user_id != self.user.user_id and not self.user.is_admin:
+            mongo_query &= (
+                Q(main_author=self.user.user_id)
+                | Q(reviewers=self.user.user_id)
+                | Q(coauthors=self.user.user_id)
+            )
+
+        return Upload.objects(mongo_query)
+
+    @functools.cached_property
+    def datasets(self):
+        return Dataset.m_def.a_mongo.objects(
+            dataset_id__in=set(
+                v for e in self.entries if e.datasets for v in e.datasets
+            )
+        )
+
     # noinspection PyMethodOverriding
     async def read(self, user_id_or_dict: str | dict | LazyUserWrapper):  # type: ignore
         response: dict = {}
@@ -2169,26 +2208,7 @@ class UserReader(MongoReader):
                 f'User ID {user_id} does not exist.', error_type=QueryError.NOTFOUND
             )
         else:
-            mongo_query = (
-                Q(main_author=user_id) | Q(reviewers=user_id) | Q(coauthors=user_id)
-            )
-            # self.user must have access to the upload
-            if user_id != self.user.user_id and not self.user.is_admin:
-                mongo_query &= (
-                    Q(main_author=self.user.user_id)
-                    | Q(reviewers=self.user.user_id)
-                    | Q(coauthors=self.user.user_id)
-                )
-
-            self.uploads = Upload.objects(mongo_query)
-            self.entries = Entry.objects(
-                upload_id__in=[v.upload_id for v in self.uploads]
-            )
-            self.datasets = Dataset.m_def.a_mongo.objects(
-                dataset_id__in=set(
-                    v for e in self.entries if e.datasets for v in e.datasets
-                )
-            )
+            self.target_user_id = user_id
 
             await self._walk(
                 GraphNode(
@@ -2787,7 +2807,9 @@ class ArchiveReader(ArchiveLikeReader):
                     if self.__if_strip(node, config)
                     else node.archive,
                 )
-            return await self._resolve_list(node, config)
+            return await self._resolve_list(
+                node, config, omit_keys=omit_keys, wildcard=wildcard
+            )
 
         # no matter if to resolve, it is always necessary to replace the definition with potential custom definition
         node = await self._check_definition(node, config)
