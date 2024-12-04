@@ -658,6 +658,7 @@ window.nomadEnv = {
         "description": "Extend NeXus for experiments and characterization in Materials Science and Materials Engineering and serve as a NOMAD parser implementation for NeXus.",
         "documentation": null,
         "entry_points": [
+          "pynxtools.nomad.entrypoints:iv_temp_example",
           "pynxtools.nomad.entrypoints:nexus_data_converter",
           "pynxtools.nomad.entrypoints:nexus_parser",
           "pynxtools.nomad.entrypoints:nexus_schema"
@@ -665,7 +666,74 @@ window.nomadEnv = {
         "homepage": "https://github.com/FAIRmat-NFDI/pynxtools",
         "name": "pynxtools",
         "repository": null,
-        "version": "0.7.0"
+        "version": "0.9.1"
+      },
+      "pynxtools_apm": {
+        "description": "Make atom probe tomography and field-ion microscopy results interoperable via NeXus",
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_apm.nomad.entrypoints:apm_example"
+        ],
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-apm",
+        "name": "pynxtools_apm",
+        "repository": null,
+        "version": "0.2.2"
+      },
+      "pynxtools_ellips": {
+        "description": "A reader for transferring ellipsometry data from vendor formats to NeXus and NOMAD.",
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_ellips.nomad.entrypoints:ellips_example"
+        ],
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-ellips",
+        "name": "pynxtools_ellips",
+        "repository": null,
+        "version": "0.0.7"
+      },
+      "pynxtools_em": {
+        "description": "Make electron microscopy results interoperable via NeXus",
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_em.nomad.entrypoints:em_example"
+        ],
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-em",
+        "name": "pynxtools_em",
+        "repository": null,
+        "version": "0.3.1"
+      },
+      "pynxtools_mpes": {
+        "description": null,
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_mpes.nomad.entrypoints:mpes_example"
+        ],
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-mpes",
+        "name": "pynxtools_mpes",
+        "repository": null,
+        "version": "0.2.1"
+      },
+      "pynxtools_stm": {
+        "description": "A plugin for pynxtools to convert sts and stm files",
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_stm.nomad.entrypoints:stm_example",
+          "pynxtools_stm.nomad.entrypoints:sts_example"
+        ],
+        "homepage": null,
+        "name": "pynxtools_stm",
+        "repository": null,
+        "version": "1.0.9"
+      },
+      "pynxtools_xps": {
+        "description": "A reader for transferring XPS data from vendor formats to NeXus and NOMAD.",
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_xps.nomad.entrypoints:xps_example"
+        ],
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-xps",
+        "name": "pynxtools_xps",
+        "repository": null,
+        "version": "0.4.8"
       },
       "runschema": {
         "description": "Run schema plugin for NOMAD.",
