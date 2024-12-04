@@ -84,7 +84,6 @@ export const ContentButton = React.memo(function ContentButton(props) {
       buttonContent
     )
   }, [ButtonComponent, buttonContent, ButtonProps])
-
   return <React.Fragment>
     {children}
     {tooltip
