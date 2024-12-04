@@ -1616,12 +1616,12 @@ def create_searchable_quantity(
         value = section.m_get(quantity_def)
         if value is None:
             return None
+        try:
+            value_field_name = get_searchable_quantity_value_field(annotation)
+            if value_field_name is None:
+                return None
 
-        def drop_value(value, annotation, searchable_quantity):
-            try:
-                value_field_name = get_searchable_quantity_value_field(annotation)
-                if value_field_name is None:
-                    return None
+            def drop_value(value, mapping):
                 if mapping == 'text':
                     value = str(value)
                 elif mapping == 'date':
@@ -1648,20 +1648,26 @@ def create_searchable_quantity(
                             path_archive=path_archive,
                         )
                         return None
-                setattr(searchable_quantity, value_field_name, value)
-            except Exception as e:
-                logger.error(
-                    'error in indexing dynamic quantity',
-                    path_archive=path_archive,
-                    exc_info=e,
-                )
-                return None
+                return value
 
-        if isinstance(value, dict):
-            for k in value:
-                drop_value(value[k].value, annotation, searchable_quantity)
-        else:
-            drop_value(value, annotation, searchable_quantity)
+            if isinstance(value, dict):
+                for k in value:
+                    value_temp = drop_value(value[k].value, mapping)
+                    if value_temp is not None:
+                        value = value_temp
+            else:
+                value = drop_value(value, mapping)
+            if value is None:
+                return None
+            setattr(searchable_quantity, value_field_name, value)
+
+        except Exception as e:
+            logger.error(
+                'error in indexing dynamic quantity',
+                path_archive=path_archive,
+                exc_info=e,
+            )
+            return None
     return searchable_quantity
 
 
