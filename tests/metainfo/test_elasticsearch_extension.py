@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+from datetime import date
 from typing import List
 import pytest
 import numpy as np
@@ -34,6 +35,7 @@ from nomad.metainfo.elasticsearch_extension import (
     material_entry_type,
     entry_index,
     material_index,
+    create_searchable_quantity,
 )
 
 from tests.fixtures.infrastructure import clear_elastic_infra
@@ -566,3 +568,110 @@ def test_index_materials_capped(elastic_function, indices, monkeypatch, cap, ent
     for material_doc in material_docs:
         assert len(material_doc['entries']) <= cap
         assert material_doc['n_entries'] == entries
+
+
+class Test(MSection):
+    float_value = Quantity(type=float)
+    int_value = Quantity(type=int)
+    str_value = Quantity(type=str)
+    datetime_value = Quantity(type=Datetime)
+    bool_value = Quantity(type=bool)
+
+
+@pytest.mark.parametrize(
+    'quantity_def, path, section, expected',
+    [
+        pytest.param(
+            Test.float_value,
+            'value_float',
+            Test(float_value=1.2),
+            SearchableQuantity(
+                float_value=1.2,
+                id='value_float#test',
+                definition='tests.metainfo.test_elasticsearch_extension.Test.float_value',
+                path_archive='test',
+            ),
+            id='float',
+        ),
+        pytest.param(
+            Test.int_value,
+            'int_value',
+            Test(int_value=3),
+            SearchableQuantity(
+                int_value=3,
+                id='int_value#test',
+                definition='tests.metainfo.test_elasticsearch_extension.Test.int_value',
+                path_archive='test',
+            ),
+            id='int',
+        ),
+        pytest.param(
+            Test.str_value,
+            'str_value',
+            Test(str_value='testing'),
+            SearchableQuantity(
+                str_value='testing',
+                id='str_value#test',
+                definition='tests.metainfo.test_elasticsearch_extension.Test.str_value',
+                path_archive='test',
+            ),
+            id='str',
+        ),
+        pytest.param(
+            Test.datetime_value,
+            'datetime_value',
+            Test(datetime_value=date(2000, 12, 31)),
+            SearchableQuantity(
+                datetime_value=date(2000, 12, 31).isoformat(),
+                id='datetime_value#test',
+                definition='tests.metainfo.test_elasticsearch_extension.Test.datetime_value',
+                path_archive='test',
+            ),
+            id='date',
+        ),
+        pytest.param(
+            Test.bool_value,
+            'bool_value',
+            Test(bool_value=True),
+            SearchableQuantity(
+                bool_value=True,
+                id='bool_value#test',
+                definition='tests.metainfo.test_elasticsearch_extension.Test.bool_value',
+                path_archive='test',
+            ),
+            id='date',
+        ),
+        pytest.param(
+            Test.float_value,
+            'float_value',
+            Test(float_value=float('NaN')),
+            None,
+            id='nan',
+        ),
+        pytest.param(
+            Test.float_value,
+            'float_value',
+            Test(float_value=float('Infinity')),
+            None,
+            id='infinity',
+        ),
+        pytest.param(
+            Test.float_value,
+            'float_value',
+            Test(float_value=float('-Infinity')),
+            None,
+            id='-infinity',
+        ),
+        pytest.param(
+            Test.float_value, 'float_value', Test(float_value=None), None, id='none'
+        ),
+    ],
+)
+def test_create_searchable_quantity(quantity_def, path, section, expected):
+    searchable_quantity = create_searchable_quantity(
+        quantity_def, path, section, 'test', 'test'
+    )
+    if expected is None:
+        assert searchable_quantity is None
+    else:
+        assert searchable_quantity.m_to_dict() == expected.m_to_dict()
