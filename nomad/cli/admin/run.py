@@ -70,6 +70,8 @@ def run_app(
     **kwargs,
 ):
     config.meta.service = 'app'
+    host = host or config.services.api_host
+    port = port or config.services.api_port
 
     if with_gui:
         import os
