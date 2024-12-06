@@ -71,7 +71,8 @@ def run_app(
 ):
     config.meta.service = 'app'
     host = host or config.services.api_host
-    port = port or config.services.api_port
+    # port change causes permissions issues in the kubernetes cluster
+    # port = port or config.services.api_port
 
     if with_gui:
         import os
