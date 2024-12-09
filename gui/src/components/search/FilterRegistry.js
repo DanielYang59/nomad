@@ -451,6 +451,7 @@ registerFilter(
     {name: 'surface_area', ...numberHistogramQuantity, scale: 'log'},
     {name: 'catalyst_name', ...termQuantity},
     {name: 'catalyst_type', ...termQuantity},
+    {name: 'support', ...termQuantity},
     {name: 'preparation_method', ...termQuantity}
   ]
 )
@@ -479,7 +480,7 @@ registerFilter(
   nestedQuantity,
   [
     {name: 'name', ...termQuantityAllNonExclusive},
-    {name: 'gas_concentration_out', ...numberHistogramQuantity, scale: 'linear'},
+    {name: 'mole_fraction_out', ...numberHistogramQuantity, scale: 'linear'},
     {name: 'selectivity', ...numberHistogramQuantity, scale: 'linear'},
     {name: 'space_time_yield', ...numberHistogramQuantity, scale: 'linear'}
   ]
@@ -489,8 +490,8 @@ registerFilter(
   nestedQuantity,
   [
     {name: 'name', ...termQuantityAllNonExclusive},
-    {name: 'gas_concentration_in', ...numberHistogramQuantity, scale: 'linear'},
-    {name: 'gas_concentration_out', ...numberHistogramQuantity, scale: 'linear'},
+    {name: 'mole_fraction_in', ...numberHistogramQuantity, scale: 'linear'},
+    {name: 'mole_fraction_out', ...numberHistogramQuantity, scale: 'linear'},
     {name: 'conversion', ...numberHistogramQuantity, scale: 'linear'}
   ]
 )

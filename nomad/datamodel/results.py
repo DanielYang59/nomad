@@ -3373,21 +3373,22 @@ class Reagent(MSection):
             Elasticsearch(suggestion='default'),
         ],
     )
-    gas_concentration_in = Quantity(
+    mole_fraction_in = Quantity(
         type=np.float64,
         shape=['*'],
         description="""
-        Volumetric concentration (fraction) of the reagent in the feed gas.
+        Amount fraction or mole fraction of the reagent in the initial reaction mixture.
         Should be a value between 0 and 1.
         """,
         a_elasticsearch=Elasticsearch(material_entry_type),
+        links=['https://doi.org/10.1351/goldbook.A00296'],
     )
-    gas_concentration_out = Quantity(
+    mole_fraction_out = Quantity(
         type=np.float64,
         shape=['*'],
         description="""
-        Volumetric concentration (fraction) of the reagent after the reactor.
-        Should be a value between 0 and 1.
+        Amount or mole fraction of the reagent after passing the reactor or at a specified
+        reaction time. Should be a value between 0 and 1.
         """,
         a_elasticsearch=Elasticsearch(material_entry_type),
     )
@@ -3417,7 +3418,7 @@ class Product(Reagent):
     m_def = Section(
         description="""
         A product of a catalytic reaction. A product here is usually identified by having
-        a selectivity, or a gas_concentration_out but no/zero gas_concentration_in.
+        a selectivity, or a fraction_out but no/zero fraction_in.
         """,
         label_quantity='name',
     )
@@ -3759,6 +3760,19 @@ class Catalyst(MSection):
         Multiple values can apply.
         """,
         links=['https://w3id.org/nfdi4cat/voc4cat_0007014'],
+        a_elasticsearch=[
+            Elasticsearch(material_entry_type),
+            Elasticsearch(suggestion='default'),
+        ],
+    )
+
+    support = Quantity(
+        type=str,
+        shape=[],
+        description="""
+        The support material of the catalyst (if any).
+        """,
+        links=['https://w3id.org/nfdi4cat/voc4cat_0007034'],
         a_elasticsearch=[
             Elasticsearch(material_entry_type),
             Elasticsearch(suggestion='default'),

@@ -197,7 +197,8 @@
                       "surface_area": 65.56,
                       "characterization_methods": "BET",
                       "preparation_method": "hydrothermal",
-                      "catalyst_type": "bulk catalyst"
+                      "catalyst_type": "bulk catalyst",
+                      "support": "SiO2"
                     }
                   }
                 }
@@ -1224,7 +1225,8 @@
                       "surface_area": 65.56,
                       "characterization_methods": "BET",
                       "preparation_method": "hydrothermal",
-                      "catalyst_type": "bulk catalyst"
+                      "catalyst_type": "bulk catalyst",
+                      "support": "SiO2"
                     }
                   }
                 }
@@ -3863,24 +3865,24 @@
                 "quantity": "results.properties.catalytic.reaction.reactants.conversion"
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_in:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_in:default_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in"
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in"
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_out:default_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_out"
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_out"
               }
             },
             "results.properties.catalytic.reaction.products.name:scroll": {
@@ -3903,14 +3905,14 @@
                 "quantity": "results.properties.catalytic.reaction.products.selectivity"
               }
             },
-            "results.properties.catalytic.reaction.products.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.products.mole_fraction_out:default_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.products.gas_concentration_out"
+                "quantity": "results.properties.catalytic.reaction.products.mole_fraction_out"
               }
             },
             "results.properties.catalytic.reaction.reaction_conditions.temperature:default_histogram": {
@@ -3931,6 +3933,16 @@
                 "type": "terms",
                 "changed": true,
                 "quantity": "results.properties.catalytic.catalyst.catalyst_type"
+              }
+            },
+            "results.properties.catalytic.catalyst.support:scroll": {
+              "terms": {
+                "exclude_from_search": true,
+                "update": true,
+                "size": 5,
+                "type": "terms",
+                "changed": true,
+                "quantity": "results.properties.catalytic.catalyst.support"
               }
             },
             "results.properties.catalytic.catalyst.preparation_method:scroll": {
@@ -4021,18 +4033,18 @@
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_in:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_in:default_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in",
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_out:default_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_out",
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_out",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
@@ -4057,9 +4069,9 @@
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.products.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.products.mole_fraction_out:default_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.products.gas_concentration_out",
+                "quantity": "results.properties.catalytic.reaction.products.mole_fraction_out",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
@@ -4086,6 +4098,21 @@
                     "count": 2,
                     "nested_count": 2,
                     "value": "bulk catalyst"
+                  }
+                ]
+              }
+            },
+            "results.properties.catalytic.catalyst.support:scroll": {
+              "terms": {
+                "quantity": "results.properties.catalytic.catalyst.support",
+                "exclude_from_search": true,
+                "metrics": [],
+                "size": 5,
+                "data": [
+                  {
+                    "count": 2,
+                    "nested_count": 2,
+                    "value": "SiO2"
                   }
                 ]
               }
@@ -13432,7 +13459,8 @@
                       "surface_area": 65.56,
                       "characterization_methods": "BET",
                       "preparation_method": "hydrothermal",
-                      "catalyst_type": "bulk catalyst"
+                      "catalyst_type": "bulk catalyst",
+                      "support": "SiO2"
                     }
                   }
                 }
@@ -13510,7 +13538,8 @@
                       "surface_area": 65.56,
                       "characterization_methods": "BET",
                       "preparation_method": "hydrothermal",
-                      "catalyst_type": "bulk catalyst"
+                      "catalyst_type": "bulk catalyst",
+                      "support": "SiO2"
                     }
                   }
                 }
@@ -13611,7 +13640,17 @@
                 "quantity": "results.properties.catalytic.catalyst.catalyst_type"
               }
             },
-            "results.properties.catalytic.reaction.reaction_conditions.temperature:6_histogram": {
+            "results.properties.catalytic.catalyst.support:6": {
+              "terms": {
+                "exclude_from_search": true,
+                "update": true,
+                "size": 14,
+                "type": "terms",
+                "changed": true,
+                "quantity": "results.properties.catalytic.catalyst.support"
+              }
+            },
+            "results.properties.catalytic.reaction.reaction_conditions.temperature:7_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
@@ -13621,7 +13660,7 @@
                 "quantity": "results.properties.catalytic.reaction.reaction_conditions.temperature"
               }
             },
-            "results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity:7_histogram": {
+            "results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity:8_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
@@ -13631,17 +13670,17 @@
                 "quantity": "results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity"
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_in:8_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_in:9_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in"
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in"
               }
             },
-            "results.properties.catalytic.reaction.reaction_conditions.pressure:9_histogram": {
+            "results.properties.catalytic.reaction.reaction_conditions.pressure:10_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
@@ -13796,7 +13835,22 @@
                 ]
               }
             },
-            "results.properties.catalytic.reaction.reaction_conditions.temperature:6_histogram": {
+            "results.properties.catalytic.catalyst.support:6": {
+              "terms": {
+                "quantity": "results.properties.catalytic.catalyst.support",
+                "exclude_from_search": true,
+                "metrics": [],
+                "size": 14,
+                "data": [
+                  {
+                    "count": 2,
+                    "nested_count": 2,
+                    "value": "SiO2"
+                  }
+                ]
+              }
+            },
+            "results.properties.catalytic.reaction.reaction_conditions.temperature:7_histogram": {
               "histogram": {
                 "quantity": "results.properties.catalytic.reaction.reaction_conditions.temperature",
                 "exclude_from_search": true,
@@ -13805,7 +13859,7 @@
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity:7_histogram": {
+            "results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity:8_histogram": {
               "histogram": {
                 "quantity": "results.properties.catalytic.reaction.reaction_conditions.weight_hourly_space_velocity",
                 "exclude_from_search": true,
@@ -13814,16 +13868,16 @@
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_in:8_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_in:9_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in",
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reaction_conditions.pressure:9_histogram": {
+            "results.properties.catalytic.reaction.reaction_conditions.pressure:10_histogram": {
               "histogram": {
                 "quantity": "results.properties.catalytic.reaction.reaction_conditions.pressure",
                 "exclude_from_search": true,
@@ -14630,24 +14684,24 @@
                 "quantity": "results.properties.catalytic.reaction.reactants.conversion"
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_in:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_in:default_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in"
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in"
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_out:default_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_out"
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_out"
               }
             },
             "results.properties.catalytic.reaction.products.name:scroll": {
@@ -14670,14 +14724,14 @@
                 "quantity": "results.properties.catalytic.reaction.products.selectivity"
               }
             },
-            "results.properties.catalytic.reaction.products.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.products.mole_fraction_out:default_histogram": {
               "histogram": {
                 "exclude_from_search": true,
                 "update": true,
                 "type": "histogram",
                 "buckets": 30,
                 "changed": true,
-                "quantity": "results.properties.catalytic.reaction.products.gas_concentration_out"
+                "quantity": "results.properties.catalytic.reaction.products.mole_fraction_out"
               }
             },
             "results.properties.catalytic.reaction.reaction_conditions.temperature:default_histogram": {
@@ -14698,6 +14752,16 @@
                 "type": "terms",
                 "changed": true,
                 "quantity": "results.properties.catalytic.catalyst.catalyst_type"
+              }
+            },
+            "results.properties.catalytic.catalyst.support:scroll": {
+              "terms": {
+                "exclude_from_search": true,
+                "update": true,
+                "size": 5,
+                "type": "terms",
+                "changed": true,
+                "quantity": "results.properties.catalytic.catalyst.support"
               }
             },
             "results.properties.catalytic.catalyst.preparation_method:scroll": {
@@ -14800,18 +14864,18 @@
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_in:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_in:default_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in",
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.reactants.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.reactants.mole_fraction_out:default_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_out",
+                "quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_out",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
@@ -14836,9 +14900,9 @@
                 "data": []
               }
             },
-            "results.properties.catalytic.reaction.products.gas_concentration_out:default_histogram": {
+            "results.properties.catalytic.reaction.products.mole_fraction_out:default_histogram": {
               "histogram": {
-                "quantity": "results.properties.catalytic.reaction.products.gas_concentration_out",
+                "quantity": "results.properties.catalytic.reaction.products.mole_fraction_out",
                 "exclude_from_search": true,
                 "metrics": [],
                 "buckets": 30,
@@ -14865,6 +14929,21 @@
                     "count": 2,
                     "nested_count": 2,
                     "value": "bulk catalyst"
+                  }
+                ]
+              }
+            },
+            "results.properties.catalytic.catalyst.support:scroll": {
+              "terms": {
+                "quantity": "results.properties.catalytic.catalyst.support",
+                "exclude_from_search": true,
+                "metrics": [],
+                "size": 5,
+                "data": [
+                  {
+                    "count": 2,
+                    "nested_count": 2,
+                    "value": "SiO2"
                   }
                 ]
               }
@@ -16187,7 +16266,8 @@
                           "surface_area": 65.56,
                           "characterization_methods": "BET",
                           "preparation_method": "hydrothermal",
-                          "catalyst_type": "bulk catalyst"
+                          "catalyst_type": "bulk catalyst",
+                          "support": "SiO2"
                         }
                       }
                     }
@@ -16311,7 +16391,8 @@
                           "surface_area": 65.56,
                           "characterization_methods": "BET",
                           "preparation_method": "hydrothermal",
-                          "catalyst_type": "bulk catalyst"
+                          "catalyst_type": "bulk catalyst",
+                          "support": "SiO2"
                         }
                       }
                     }

@@ -129,6 +129,7 @@ properties_catalysis = {
             'characterization_methods': 'BET',
             'catalyst_name': 'MoVOx',
             'catalyst_type': 'bulk catalyst',
+            'support': 'SiO2',
             'preparation_method': 'hydrothermal',
         },
     }
