@@ -1626,7 +1626,7 @@ export const defaultApp = {
           "type": "histogram",
           "show_input": true,
           "x": {
-          "search_quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_in",
+          "search_quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_in",
           "scale": "linear"
           },
           "y": {
@@ -1641,7 +1641,7 @@ export const defaultApp = {
           "type": "histogram",
           "show_input": true,
           "x": {
-          "search_quantity": "results.properties.catalytic.reaction.reactants.gas_concentration_out",
+          "search_quantity": "results.properties.catalytic.reaction.reactants.mole_fraction_out",
           "scale": "linear"
           },
           "y": {
@@ -1690,7 +1690,7 @@ export const defaultApp = {
           "type": "histogram",
           "show_input": true,
           "x": {
-          "search_quantity": "results.properties.catalytic.reaction.products.gas_concentration_out",
+          "search_quantity": "results.properties.catalytic.reaction.products.mole_fraction_out",
           "scale": "linear"
           },
           "y": {
@@ -1748,6 +1748,17 @@ export const defaultApp = {
         },
         {
           "search_quantity": "results.properties.catalytic.catalyst.catalyst_name",
+          "type": "terms",
+          "scale": "linear",
+          "show_input": true,
+          "width": 12,
+          "show_header": true,
+          "n_columns": 1,
+          "sort_static": true,
+          "show_statistics": true
+        },
+        {
+          "search_quantity": "results.properties.catalytic.catalyst.support",
           "type": "terms",
           "scale": "linear",
           "show_input": true,

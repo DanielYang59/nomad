@@ -1687,10 +1687,10 @@ class App(ConfigBaseModel):
                                         x='results.properties.catalytic.reaction.reactants.conversion',
                                     ),
                                     MenuItemHistogram(
-                                        x='results.properties.catalytic.reaction.reactants.gas_concentration_in',
+                                        x='results.properties.catalytic.reaction.reactants.mole_fraction_in',
                                     ),
                                     MenuItemHistogram(
-                                        x='results.properties.catalytic.reaction.reactants.gas_concentration_out',
+                                        x='results.properties.catalytic.reaction.reactants.mole_fraction_out',
                                     ),
                                 ],
                             ),
@@ -1704,7 +1704,7 @@ class App(ConfigBaseModel):
                                         x='results.properties.catalytic.reaction.products.selectivity',
                                     ),
                                     MenuItemHistogram(
-                                        x='results.properties.catalytic.reaction.products.gas_concentration_out',
+                                        x='results.properties.catalytic.reaction.products.mole_fraction_out',
                                     ),
                                 ],
                             ),
@@ -1716,6 +1716,9 @@ class App(ConfigBaseModel):
                                 items=[
                                     MenuItemTerms(
                                         search_quantity='results.properties.catalytic.catalyst.catalyst_type',
+                                    ),
+                                    MenuItemTerms(
+                                        search_quantity='results.properties.catalytic.catalyst.support',
                                     ),
                                     MenuItemTerms(
                                         search_quantity='results.properties.catalytic.catalyst.preparation_method',

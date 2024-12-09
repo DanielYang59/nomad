@@ -4784,9 +4784,9 @@ window.nomadArtifacts = {
       "repeats": true,
       "suggestion": true
     },
-    "results.properties.catalytic.reaction.reactants.gas_concentration_in": {
-      "name": "gas_concentration_in",
-      "description": "Volumetric concentration (fraction) of the reagent in the feed gas.\nShould be a value between 0 and 1.",
+    "results.properties.catalytic.reaction.reactants.mole_fraction_in": {
+      "name": "mole_fraction_in",
+      "description": "Amount fraction or mole fraction of the reagent in the initial reaction mixture.\nShould be a value between 0 and 1.",
       "type": {
         "type_kind": "numpy",
         "type_data": "float64"
@@ -4798,9 +4798,9 @@ window.nomadArtifacts = {
       "dynamic": false,
       "repeats": true
     },
-    "results.properties.catalytic.reaction.reactants.gas_concentration_out": {
-      "name": "gas_concentration_out",
-      "description": "Volumetric concentration (fraction) of the reagent after the reactor.\nShould be a value between 0 and 1.",
+    "results.properties.catalytic.reaction.reactants.mole_fraction_out": {
+      "name": "mole_fraction_out",
+      "description": "Amount or mole fraction of the reagent after passing the reactor or at a specified\nreaction time. Should be a value between 0 and 1.",
       "type": {
         "type_kind": "numpy",
         "type_data": "float64"
@@ -4839,9 +4839,9 @@ window.nomadArtifacts = {
       "repeats": true,
       "suggestion": true
     },
-    "results.properties.catalytic.reaction.products.gas_concentration_in": {
-      "name": "gas_concentration_in",
-      "description": "Volumetric concentration (fraction) of the reagent in the feed gas.\nShould be a value between 0 and 1.",
+    "results.properties.catalytic.reaction.products.mole_fraction_in": {
+      "name": "mole_fraction_in",
+      "description": "Amount fraction or mole fraction of the reagent in the initial reaction mixture.\nShould be a value between 0 and 1.",
       "type": {
         "type_kind": "numpy",
         "type_data": "float64"
@@ -4853,9 +4853,9 @@ window.nomadArtifacts = {
       "dynamic": false,
       "repeats": true
     },
-    "results.properties.catalytic.reaction.products.gas_concentration_out": {
-      "name": "gas_concentration_out",
-      "description": "Volumetric concentration (fraction) of the reagent after the reactor.\nShould be a value between 0 and 1.",
+    "results.properties.catalytic.reaction.products.mole_fraction_out": {
+      "name": "mole_fraction_out",
+      "description": "Amount or mole fraction of the reagent after passing the reactor or at a specified\nreaction time. Should be a value between 0 and 1.",
       "type": {
         "type_kind": "numpy",
         "type_data": "float64"
@@ -5151,6 +5151,19 @@ window.nomadArtifacts = {
       "shape": [
         "*"
       ],
+      "aggregatable": true,
+      "dynamic": false,
+      "repeats": false,
+      "suggestion": true
+    },
+    "results.properties.catalytic.catalyst.support": {
+      "name": "support",
+      "description": "The support material of the catalyst (if any).",
+      "type": {
+        "type_kind": "python",
+        "type_data": "str"
+      },
+      "shape": [],
       "aggregatable": true,
       "dynamic": false,
       "repeats": false,
@@ -6415,7 +6428,7 @@ window.nomadArtifacts = {
     },
     "results.properties.catalytic.reaction.products": {
       "name": "products",
-      "description": "\n        A product of a catalytic reaction. A product here is usually identified by having\n        a selectivity, or a gas_concentration_out but no/zero gas_concentration_in.\n        ",
+      "description": "\n        A product of a catalytic reaction. A product here is usually identified by having\n        a selectivity, or a fraction_out but no/zero fraction_in.\n        ",
       "nested": true,
       "repeats": true
     },
@@ -39080,11 +39093,14 @@ window.nomadArtifacts = {
                 "m_parent_sub_section": "quantities",
                 "m_annotations": {
                   "elasticsearch": [
-                    "results.properties.catalytic.reaction.products.gas_concentration_in"
+                    "results.properties.catalytic.reaction.products.mole_fraction_in"
                   ]
                 },
-                "name": "gas_concentration_in",
-                "description": "Volumetric concentration (fraction) of the reagent in the feed gas.\nShould be a value between 0 and 1.",
+                "name": "mole_fraction_in",
+                "description": "Amount fraction or mole fraction of the reagent in the initial reaction mixture.\nShould be a value between 0 and 1.",
+                "links": [
+                  "https://doi.org/10.1351/goldbook.A00296"
+                ],
                 "type": {
                   "type_kind": "numpy",
                   "type_data": "float64"
@@ -39099,11 +39115,11 @@ window.nomadArtifacts = {
                 "m_parent_sub_section": "quantities",
                 "m_annotations": {
                   "elasticsearch": [
-                    "results.properties.catalytic.reaction.products.gas_concentration_out"
+                    "results.properties.catalytic.reaction.products.mole_fraction_out"
                   ]
                 },
-                "name": "gas_concentration_out",
-                "description": "Volumetric concentration (fraction) of the reagent after the reactor.\nShould be a value between 0 and 1.",
+                "name": "mole_fraction_out",
+                "description": "Amount or mole fraction of the reagent after passing the reactor or at a specified\nreaction time. Should be a value between 0 and 1.",
                 "type": {
                   "type_kind": "numpy",
                   "type_data": "float64"
@@ -39159,7 +39175,7 @@ window.nomadArtifacts = {
             "m_parent_index": 71,
             "m_parent_sub_section": "section_definitions",
             "name": "Product",
-            "description": "\n        A product of a catalytic reaction. A product here is usually identified by having\n        a selectivity, or a gas_concentration_out but no/zero gas_concentration_in.\n        ",
+            "description": "\n        A product of a catalytic reaction. A product here is usually identified by having\n        a selectivity, or a fraction_out but no/zero fraction_in.\n        ",
             "more": {
               "label_quantity": "name"
             },
@@ -39794,6 +39810,27 @@ window.nomadArtifacts = {
                 "m_parent_sub_section": "quantities",
                 "m_annotations": {
                   "elasticsearch": [
+                    "results.properties.catalytic.catalyst.support",
+                    "results.properties.catalytic.catalyst.support__suggestion"
+                  ]
+                },
+                "name": "support",
+                "description": "The support material of the catalyst (if any).",
+                "links": [
+                  "https://w3id.org/nfdi4cat/voc4cat_0007034"
+                ],
+                "type": {
+                  "type_kind": "python",
+                  "type_data": "str"
+                },
+                "shape": []
+              },
+              {
+                "m_def": "nomad.metainfo.metainfo.Quantity",
+                "m_parent_index": 4,
+                "m_parent_sub_section": "quantities",
+                "m_annotations": {
+                  "elasticsearch": [
                     "results.properties.catalytic.catalyst.characterization_methods",
                     "results.properties.catalytic.catalyst.characterization_methods__suggestion"
                   ]
@@ -39813,7 +39850,7 @@ window.nomadArtifacts = {
               },
               {
                 "m_def": "nomad.metainfo.metainfo.Quantity",
-                "m_parent_index": 4,
+                "m_parent_index": 5,
                 "m_parent_sub_section": "quantities",
                 "m_annotations": {
                   "elasticsearch": [
