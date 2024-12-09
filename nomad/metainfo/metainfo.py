@@ -2699,14 +2699,6 @@ class MSection(metaclass=MObjectMeta):
         return to_dict(result) if dict else result
 
 
-warnings.filterwarnings(
-    'once',
-    'Usage of Category is deprecated and will be removed in the future.',
-    category=DeprecationWarning,
-)
-
-
-@deprecated('Usage of Category is deprecated and will be removed in the future.')
 class MCategory(metaclass=MObjectMeta):
     m_def: Category = None
 
@@ -4148,7 +4140,6 @@ class Package(Definition):
         return self._cached_hash
 
 
-@deprecated('Usage of Category is deprecated and will be removed in the future.')
 class Category(Definition):
     """Categories allow to organize metainfo definitions (not metainfo data like sections do)
 
