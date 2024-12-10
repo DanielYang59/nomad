@@ -64554,7 +64554,7 @@ window.nomadArtifacts = {
     "jupyter": {
       "short_description": "Basic jupyter run with an empty notebook or on given notebook file.",
       "description": "### **Jupyter Notebook**: The Classic Notebook Interface\nThe Jupyter Notebook is the original web application for creating and sharing computational documents. It offers a simple, streamlined, document-centric experience.",
-      "image": "gitlab-registry.mpcdf.mpg.de/nomad-lab/north/jupyter:refactor",
+      "image": "gitlab-registry.mpcdf.mpg.de/nomad-lab/nomad-distro/jupyter:develop",
       "cmd": null,
       "image_pull_policy": "Always",
       "privileged": false,
