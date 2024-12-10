@@ -1017,6 +1017,12 @@ class H5WebAnnotation(AnnotationModel):
         Additional datasets to include in plot as signal.
         """,
     )
+    title: str = Field(
+        None,
+        description="""
+        Title of the plot
+        """,
+    )
     paths: List[str] = Field([], description="""List of section paths to visualize.""")
 
 
