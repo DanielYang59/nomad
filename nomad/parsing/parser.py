@@ -321,6 +321,7 @@ class MatchingParser(Parser):
 
             matches = []
             reference_keys = list(reference.keys())
+            tmp = value.pop('__has_comment', None)
             for key, val in value.items():
                 if key == '__has_key':
                     matches.append(val in reference_keys)
@@ -336,6 +337,8 @@ class MatchingParser(Parser):
                         continue
 
                     matches.append(match(val, reference[key]))
+            if tmp:
+                value.update({'__has_comment': tmp})
             return False not in matches
 
         if self._mainfile_contents_dict is not None:
@@ -362,7 +365,6 @@ class MatchingParser(Parser):
 
                 try:
                     comment = self._mainfile_contents_dict.get('__has_comment', None)
-                    tmp = self._mainfile_contents_dict.pop('__has_comment', None)
                     table_data = read_table_data(
                         filename, comment=comment, filters=self._mainfile_contents_dict
                     )[0]
@@ -373,8 +375,6 @@ class MatchingParser(Parser):
                     )
 
                     is_match = match(self._mainfile_contents_dict, data)
-                    if tmp:
-                        self._mainfile_contents_dict.update({'__has_comment': tmp})
                 except Exception:
                     pass
             if not is_match:
