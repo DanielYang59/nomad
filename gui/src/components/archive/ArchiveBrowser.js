@@ -78,6 +78,7 @@ import PlotlyFigure from './PlotlyFigure'
 import SectionEditor from './SectionEditor'
 import { Matrix, Number } from './visualizations'
 import XYPlot from "./XYPlot"
+import H5WebSectionView, { matchH5Path} from './H5WebSectionView'
 
 export const configState = atom({
   key: 'config',
@@ -775,16 +776,6 @@ QuantityItemPreview.propTypes = ({
   def: PropTypes.object.isRequired
 })
 
-const matchH5Path = (path) => {
-  const h5Path = path.match(/(?:\/uploads\/(?<uploadId>.+?)\/(?<source>.+?)\/)*(?<filename>.+?)#(?<path>.+)/)
-  if (!h5Path) {
-    return {}
-  }
-  const h5File = h5Path.groups.filename
-  const source = h5Path.groups.source || ((h5File.endsWith('.h5') || h5File.endsWith('.nxs')) ? 'raw' : 'archive')
-  return {h5UploadId: h5Path.groups.uploadId, h5File: h5File, h5Source: source, h5Path: h5Path.groups.path}
-}
-
 export const QuantityValue = React.memo(function QuantityValue({value, def}) {
   const {uploadId} = useEntryStore() || {}
   const displayUnit = useDisplayUnit(def)
@@ -964,56 +955,6 @@ export function getAllVisibleProperties(sectionDef) {
   return [...quantities, ...sub_sections]
 }
 
-export function H5WebView({section, def, uploadId, title}) {
-  const h5Web = (section, def) => {
-    const signal = def.m_annotations?.h5web?.[0]?.signal
-    if (!signal || !section[signal]) {
-      return
-    }
-    const {h5UploadId, h5File, h5Source, h5Path} = matchH5Path(section[signal])
-    const sectionPath = h5Path.split('/').slice(0, -1).join('/')
-    return <H5Web key={def.name} upload_id={h5UploadId || uploadId} filename={h5File} initialPath={sectionPath} source={h5Source} sidebarOpen={false}></H5Web>
-  }
-  const resolve = (path, parent, m_def) => {
-    let child = parent
-    for (const segment of path.split('/')) {
-      const properties = child?._properties || child
-      if (!properties) {
-        return
-      }
-      const index = parseInt(segment)
-      child = isNaN(index) ? properties[segment] : properties[index] || child
-      child = child?.sub_section || child
-    }
-    if (m_def && m_def !== child._qualifiedName) {
-      for (const section of child?._allInternalInheritingSections || []) {
-        if (section._qualifiedName === m_def) {
-          return section
-        }
-      }
-    }
-    return child
-  }
-
-  const paths = def.m_annotations?.h5web?.[0].paths || []
-
-  return <Compartment title={title}>
-    {h5Web(section, def)}
-    {paths.map(path => {
-      const subSection = resolve(path, section)
-      const subSectionDef = resolve(path, def, subSection?.m_def)
-      return subSection && subSectionDef && h5Web(subSection, subSectionDef)
-    })}
-  </Compartment>
-}
-
-H5WebView.propTypes = ({
-  section: PropTypes.object.isRequired,
-  def: PropTypes.object.isRequired,
-  uploadId: PropTypes.string.isRequired,
-  title: PropTypes.string
-})
-
 export function Section({section, def, property, parentRelation, sectionIsEditable, sectionIsInEln}) {
   const {handleArchiveChanged, uploadId, entryId} = useEntryStore() || {}
   const config = useRecoilValue(configState)
@@ -1190,7 +1131,13 @@ export function Section({section, def, property, parentRelation, sectionIsEditab
       )}
       {subSectionCompartment}
       {(def.m_annotations?.plot || def._allBaseSections.map(section => section.name).includes('PlotSection')) && <SectionPlots sectionDef={def} section={section} uploadId={uploadId} entryId={entryId}/>}
-      {def.m_annotations?.h5web && <H5WebView section={section} def={def} uploadId={uploadId} title='hdf5'></H5WebView>}
+      {(def?.m_annotations?.h5web || def._allBaseSections.filter(
+        section => section?.m_annotations?.h5web).length > 0) && <H5WebSectionView
+          section={section}
+          def={def}
+          uploadId={uploadId}
+          title='hdf5'
+        ></H5WebSectionView>}
     </React.Fragment>
   } else {
     const attributes = section?.m_attributes || {}
@@ -1209,7 +1156,13 @@ export function Section({section, def, property, parentRelation, sectionIsEditab
         ))}
       </Compartment>}
       {(def.m_annotations?.plot || def._allBaseSections.map(section => section.name).includes('PlotSection')) && <SectionPlots sectionDef={def} section={section} uploadId={uploadId} entryId={entryId}/>}
-      {def.m_annotations?.h5web && <H5WebView section={section} def={def} uploadId={uploadId} title='hdf5'></H5WebView>}
+      {(def?.m_annotations?.h5web || def._allBaseSections.filter(
+        section => section?.m_annotations?.h5web).length > 0) && <H5WebSectionView
+          section={section}
+          def={def}
+          uploadId={uploadId}
+          title='hdf5'
+        ></H5WebSectionView>}
     </React.Fragment>
   }
   const eln = def?.m_annotations?.eln

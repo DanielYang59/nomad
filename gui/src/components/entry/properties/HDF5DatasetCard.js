@@ -22,12 +22,13 @@ import PropTypes from 'prop-types'
 import { resolveNomadUrlNoThrow } from '../../../utils'
 import { useEntryStore } from '../EntryContext'
 import { useMetainfoDef } from '../../archive/metainfo'
-import { H5WebView } from '../../archive/ArchiveBrowser'
 import { PropertyCard } from './PropertyCard'
+import H5WebSectionView from '../../archive/H5WebSectionView'
 
 const HDF5DatasetCard = React.memo(function HDF5DatasetCard({archive}) {
   const {url, uploadId} = useEntryStore()
-  const m_def = archive?.data?.m_def_id ? `${archive.data.m_def}@${archive.data.m_def_id}` : archive?.data?.m_def
+  const root = archive?.data || archive?.workflow2
+  const m_def = root?.m_def_id ? `${root.m_def}@${root.m_def_id}` : root?.m_def
   const dataMetainfoDefUrl = url && resolveNomadUrlNoThrow(m_def, url)
   const dataMetainfoDef = useMetainfoDef(dataMetainfoDefUrl)
 
@@ -37,7 +38,7 @@ const HDF5DatasetCard = React.memo(function HDF5DatasetCard({archive}) {
 
   return (
     <PropertyCard title='HDF5 Data'>
-      <H5WebView section={archive.data} def={dataMetainfoDef} uploadId={uploadId}></H5WebView>
+      <H5WebSectionView section={root} def={dataMetainfoDef} uploadId={uploadId}></H5WebSectionView>
     </PropertyCard>
   )
 })
