@@ -504,7 +504,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-bandstructure",
         "name": "bandstructurenormalizer",
         "repository": null,
-        "version": "1.0"
+        "version": "1.0.2"
       },
       "databaseparsers": {
         "description": "Collection of NOMAD parsers for databases.",
@@ -526,7 +526,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-dos",
         "name": "dosnormalizer",
         "repository": null,
-        "version": "1.0"
+        "version": "1.0.4"
       },
       "eelsdbparser": {
         "description": "NOMAD converter/parser for metadata from EELS database.",
@@ -724,6 +724,22 @@ window.nomadEnv = {
         "repository": null,
         "version": "0.2.1"
       },
+      "pynxtools_spm": {
+        "description": "A plugin of pynxtools to convert exprimental file from STS, STM, and AFM to NeXus format.",
+        "documentation": null,
+        "entry_points": [
+          "pynxtools_spm.nomad.entrypoints:afm_default_example",
+          "pynxtools_spm.nomad.entrypoints:afm_example_with_customization",
+          "pynxtools_spm.nomad.entrypoints:stm_default_example",
+          "pynxtools_spm.nomad.entrypoints:stm_example_with_customization",
+          "pynxtools_spm.nomad.entrypoints:sts_default_example",
+          "pynxtools_spm.nomad.entrypoints:sts_example_with_customization"
+        ],
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-spm",
+        "name": "pynxtools_spm",
+        "repository": null,
+        "version": "0.0.4"
+      },
       "pynxtools_xps": {
         "description": "A reader for transferring XPS data from vendor formats to NeXus and NOMAD.",
         "documentation": null,
@@ -744,7 +760,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-schema-plugin-run.git",
         "name": "runschema",
         "repository": null,
-        "version": "1.0.2"
+        "version": "1.0.3"
       },
       "simulationworkflownormalizer": {
         "description": "Simulation workflow nomad plugin for NOMAD.",
@@ -755,7 +771,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-simulation-workflow",
         "name": "simulationworkflownormalizer",
         "repository": null,
-        "version": "1.0"
+        "version": "1.0.2"
       },
       "simulationworkflowschema": {
         "description": "Simulation workflow schema plugin for NOMAD.",
@@ -766,7 +782,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-schema-simulation-workflow-plugin",
         "name": "simulationworkflowschema",
         "repository": null,
-        "version": "1.0.4"
+        "version": "1.0.5"
       },
       "soapnormalizer": {
         "description": "SOAP nomad plugin for NOMAD.",
@@ -788,7 +804,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-spectra",
         "name": "spectranormalizer",
         "repository": null,
-        "version": "1.0"
+        "version": "1.0.2"
       },
       "systemnormalizer": {
         "description": "System normalizer plugin for NOMAD.",
@@ -799,7 +815,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/nomad-coe/nomad-normalizer-plugin-system",
         "name": "systemnormalizer",
         "repository": null,
-        "version": "1.0"
+        "version": "1.0.2"
       },
       "workflowparsers": {
         "description": "Collection of NOMAD parsers for workflow engines.",
