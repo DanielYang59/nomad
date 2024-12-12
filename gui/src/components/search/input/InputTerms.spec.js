@@ -25,7 +25,9 @@ import { isNumber } from 'lodash'
 import InputTerms from './InputTerms'
 import userEvent from '@testing-library/user-event'
 
-// Use a mocked SearchContext
+// Use a mocked SearchContext where the data returned by useAgg is changed
+// dynamically by each test
+let mockAggData
 const mockSetFilter = jest.fn()
 const mockUseMemo = useMemo
 jest.mock('../SearchContext', () => ({
@@ -35,14 +37,7 @@ jest.mock('../SearchContext', () => ({
       useAgg: (quantity, visible, id, config) => {
         const response = mockUseMemo(() => {
           return visible
-            ? {data: [
-              {value: 'A', count: 6},
-              {value: 'B', count: 5},
-              {value: 'C', count: 4},
-              {value: 'D', count: 3},
-              {value: 'E', count: 2},
-              {value: 'F', count: 1}
-            ].slice(0, config.size)}
+            ? { data: mockAggData.slice(0, config.size) }
             : undefined
         }, [])
         return response
@@ -60,35 +55,66 @@ describe('test options', () => {
   test.each([
     [
       'show all options for enum by default',
+      [
+        {value: 'A', nested_count: 6},
+        {value: 'B', nested_count: 5},
+        {value: 'C', nested_count: 4}
+      ],
       {options: undefined},
       new Filter(undefined, {quantity: 'test', options: {A: {label: 'A'}, B: {label: 'B'}}}),
       [{label: 'A'}, {label: 'B'}]
     ],
     [
       'show 5 options for str by default',
+      [
+        {value: 'A', nested_count: 6},
+        {value: 'B', nested_count: 5},
+        {value: 'C', nested_count: 4},
+        {value: 'D', nested_count: 3},
+        {value: 'E', nested_count: 2},
+        {value: 'F', nested_count: 1}
+      ],
       {options: undefined},
       new Filter(undefined, {quantity: 'test'}),
       [{label: 'A'}, {label: 'B'}, {label: 'C'}, {label: 'D'}, {label: 'E'}]
     ],
     [
+      'bool options',
+      [
+        {value: true, nested_count: 6},
+        {value: false, nested_count: 6}
+      ],
+      {options: undefined},
+      new Filter(undefined, {quantity: 'test'}),
+      [{label: 'true'}, {label: 'false'}]
+    ],
+    [
       'no options',
+      [{value: 'A', nested_count: 6}],
       {options: 0},
       new Filter(undefined, {quantity: 'test'}),
       []
     ],
     [
       'limited options',
+      [
+        {value: 'A', nested_count: 6},
+        {value: 'B', nested_count: 5},
+        {value: 'C', nested_count: 4}
+      ],
       {options: 2},
       new Filter(undefined, {quantity: 'test'}),
       [{label: 'A'}, {label: 'B'}]
     ],
     [
-      'custom options',
+      'custom options, str',
+      [],
       {options: {B: {label: 'B'}}},
-      new Filter(undefined, {quantity: 'test', options: {A: {label: 'A'}, B: {label: 'B'}}}),
+      new Filter(undefined, {quantity: 'test'}),
       [{label: 'B'}]
     ]
-  ])('%s', async (name, config, filter, expected) => {
+  ])('%s', async (name, aggData, config, filter, expected) => {
+    mockAggData = aggData
     renderInputTerms(config, filter)
 
     // Wait for possible placeholder to disappear
@@ -134,6 +160,7 @@ describe('test title', () => {
 })
 
 describe('test showStatistics', () => {
+  beforeAll(() => { mockAggData = [{value: 'A', nested_count: 6}] })
   test.each([
     ['show statistics', {showStatistics: true}],
     ['do not show statistics', {showStatistics: false}]
@@ -165,7 +192,8 @@ describe('test showInput', () => {
   })
 })
 
-test.only('test item selection', async () => {
+test.each('test item selection', async () => {
+  mockAggData = [{value: 'A', nested_count: 6}]
   renderInputTerms({}, new Filter(undefined, {quantity: 'test'}))
 
   // Wait for possible placeholder to disappear
