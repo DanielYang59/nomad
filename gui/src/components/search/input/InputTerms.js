@@ -143,7 +143,7 @@ const InputTerms = React.memo(({
 
     const maxSize = Math.min(requestedAggSize, agg.data.length)
     return agg.data.slice(0, maxSize).reduce((opt, { value }) => {
-      opt[value] = { label: value }
+      opt[value] = { label: `${value}` }
       return opt
     }, {})
   }, [fixedOptions, agg, requestedAggSize])

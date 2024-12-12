@@ -43,7 +43,7 @@ import { DType, pluralize } from '../../../utils'
 import { scales } from '../../plotting/common'
 
 // Predefined in order to not break memoization
-const dtypes = new Set([DType.String, DType.Enum])
+const dtypes = new Set([DType.String, DType.Enum, DType.Boolean])
 
 /**
  * Displays a terms widget.
