@@ -74,13 +74,16 @@ from nomad.metainfo.util import (
     split_python_definition,
     to_dict,
 )
+from nomad.units import ureg as units
 from .annotation import (
     Annotation,
     DefinitionAnnotation,
     SectionAnnotation,
     AnnotationModel,
 )
-from nomad.units import ureg as units
+
+# todo: remove once simulation package does not use it anymore
+_placeholder_quantity = None
 
 m_package: Package | None = None
 
@@ -106,11 +109,6 @@ def _check_definition_id(
         return target_section
 
     raise MetainfoReferenceError(f'Could not resolve {target_id}, id mismatch.')
-
-
-_placeholder_quantity: Quantity = property()  # type: ignore
-if True:
-    _placeholder_quantity: Quantity = None  # type: ignore
 
 
 # Metainfo errors
@@ -2801,19 +2799,19 @@ class Definition(MSection):
             that are defined for all properties of the same kind (sub_section or quantity).
     """
 
-    name: Quantity = _placeholder_quantity
-    label: Quantity = _placeholder_quantity
-    description: Quantity = _placeholder_quantity
-    links: Quantity = _placeholder_quantity
-    categories: Quantity = _placeholder_quantity
-    deprecated: Quantity = _placeholder_quantity
-    aliases: Quantity = _placeholder_quantity
-    variable: Quantity = _placeholder_quantity
-    more: Quantity = _placeholder_quantity
+    name: Quantity = None
+    label: Quantity = None
+    description: Quantity = None
+    links: Quantity = None
+    categories: Quantity = None
+    deprecated: Quantity = None
+    aliases: Quantity = None
+    variable: Quantity = None
+    more: Quantity = None
 
-    attributes: SubSection = None  # type: ignore
+    attributes: SubSection = None
 
-    all_attributes: Quantity = _placeholder_quantity
+    all_attributes: Quantity = None
 
     def __init__(self, *args, **kwargs):
         self._cached_count: int | None = None
@@ -2996,8 +2994,8 @@ class Attribute(Definition):
         shape: The shape of the attribute. Need to be a list, similar to the shape of a quantity.
     """
 
-    type: Quantity = _placeholder_quantity
-    shape: Quantity = _placeholder_quantity
+    type: Quantity = None
+    shape: Quantity = None
 
     @constraint(warning=False)
     def is_primitive(self):
@@ -3168,18 +3166,18 @@ class Quantity(Property):
             It will be set to True if `flexible_unit` is True, or `variable` is True, or it has attributes.
     """
 
-    type: Quantity = _placeholder_quantity
-    shape: Quantity = _placeholder_quantity
-    unit: Quantity = _placeholder_quantity
-    dimensionality: Quantity = _placeholder_quantity
-    default: Quantity = _placeholder_quantity
-    derived: Quantity = _placeholder_quantity
-    cached: Quantity = _placeholder_quantity
-    virtual: Quantity = _placeholder_quantity
+    type: Quantity = None
+    shape: Quantity = None
+    unit: Quantity = None
+    dimensionality: Quantity = None
+    default: Quantity = None
+    derived: Quantity = None
+    cached: Quantity = None
+    virtual: Quantity = None
 
-    is_scalar: Quantity = _placeholder_quantity
-    use_full_storage: Quantity = _placeholder_quantity
-    flexible_unit: Quantity = _placeholder_quantity
+    is_scalar: Quantity = None
+    use_full_storage: Quantity = None
+    flexible_unit: Quantity = None
 
     # TODO derived_from = Quantity(type=Quantity, shape=['0..*'])
     def __init_metainfo__(self):
@@ -3476,9 +3474,9 @@ class SubSection(Property):
 
     used_sections: dict[Section, list[SubSection]] = {}
 
-    sub_section: Quantity = _placeholder_quantity
-    repeats: Quantity = _placeholder_quantity
-    key_quantity: Quantity = _placeholder_quantity
+    sub_section: Quantity = None
+    repeats: Quantity = None
+    key_quantity: Quantity = None
 
     def __get__(self, obj, cls=None):
         if obj is None:
@@ -3728,24 +3726,24 @@ class Section(Definition):
     sub_sections: SubSection = None
     inner_section_definitions: SubSection = None
 
-    base_sections: Quantity = _placeholder_quantity
-    extending_sections: Quantity = _placeholder_quantity
-    extends_base_section: Quantity = _placeholder_quantity
-    inheriting_sections: Quantity = _placeholder_quantity
-    constraints: Quantity = _placeholder_quantity
-    event_handlers: Quantity = _placeholder_quantity
+    base_sections: Quantity = None
+    extending_sections: Quantity = None
+    extends_base_section: Quantity = None
+    inheriting_sections: Quantity = None
+    constraints: Quantity = None
+    event_handlers: Quantity = None
 
-    inherited_sections: Quantity = _placeholder_quantity
-    all_base_sections: Quantity = _placeholder_quantity
-    all_inheriting_sections: Quantity = _placeholder_quantity
-    all_properties: Quantity = _placeholder_quantity
-    all_quantities: Quantity = _placeholder_quantity
-    all_sub_sections: Quantity = _placeholder_quantity
-    all_sub_sections_by_section: Quantity = _placeholder_quantity
-    all_aliases: Quantity = _placeholder_quantity
-    all_inner_section_definitions: Quantity = _placeholder_quantity
-    has_variable_names: Quantity = _placeholder_quantity
-    path: Quantity = _placeholder_quantity
+    inherited_sections: Quantity = None
+    all_base_sections: Quantity = None
+    all_inheriting_sections: Quantity = None
+    all_properties: Quantity = None
+    all_quantities: Quantity = None
+    all_sub_sections: Quantity = None
+    all_sub_sections_by_section: Quantity = None
+    all_aliases: Quantity = None
+    all_inner_section_definitions: Quantity = None
+    has_variable_names: Quantity = None
+    path: Quantity = None
 
     def __init__(self, *args, validate: bool = True, **kwargs):
         self._section_cls: type[MSection] | None = None
@@ -3997,8 +3995,8 @@ class Package(Definition):
     section_definitions: SubSection = None
     category_definitions: SubSection = None
 
-    all_definitions: Quantity = _placeholder_quantity
-    dependencies: Quantity = _placeholder_quantity
+    all_definitions: Quantity = None
+    dependencies: Quantity = None
 
     registry: dict[str, Package] = {}
     """ A static member that holds all currently known packages. """
