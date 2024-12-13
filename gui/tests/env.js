@@ -659,7 +659,6 @@ window.nomadEnv = {
         "documentation": null,
         "entry_points": [
           "pynxtools.nomad.entrypoints:iv_temp_example",
-          "pynxtools.nomad.entrypoints:nexus_app",
           "pynxtools.nomad.entrypoints:nexus_data_converter",
           "pynxtools.nomad.entrypoints:nexus_parser",
           "pynxtools.nomad.entrypoints:nexus_schema"
@@ -667,7 +666,7 @@ window.nomadEnv = {
         "homepage": "https://github.com/FAIRmat-NFDI/pynxtools",
         "name": "pynxtools",
         "repository": null,
-        "version": "0.9.3"
+        "version": "0.9.1"
       },
       "pynxtools_apm": {
         "description": "Make atom probe tomography and field-ion microscopy results interoperable via NeXus",
@@ -702,17 +701,6 @@ window.nomadEnv = {
         "repository": null,
         "version": "0.3.1"
       },
-      "pynxtools_igor": {
-        "description": "pynxtools plugin for reading igor pro waves and packed experiments",
-        "documentation": null,
-        "entry_points": [
-          "pynxtools_igor.nomad.entrypoints:igor_example"
-        ],
-        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-igor",
-        "name": "pynxtools_igor",
-        "repository": null,
-        "version": "0.1.0"
-      },
       "pynxtools_mpes": {
         "description": null,
         "documentation": null,
@@ -724,21 +712,17 @@ window.nomadEnv = {
         "repository": null,
         "version": "0.2.1"
       },
-      "pynxtools_spm": {
-        "description": "A plugin of pynxtools to convert exprimental file from STS, STM, and AFM to NeXus format.",
+      "pynxtools_stm": {
+        "description": "A plugin for pynxtools to convert sts and stm files",
         "documentation": null,
         "entry_points": [
-          "pynxtools_spm.nomad.entrypoints:afm_default_example",
-          "pynxtools_spm.nomad.entrypoints:afm_example_with_customization",
-          "pynxtools_spm.nomad.entrypoints:stm_default_example",
-          "pynxtools_spm.nomad.entrypoints:stm_example_with_customization",
-          "pynxtools_spm.nomad.entrypoints:sts_default_example",
-          "pynxtools_spm.nomad.entrypoints:sts_example_with_customization"
+          "pynxtools_stm.nomad.entrypoints:stm_example",
+          "pynxtools_stm.nomad.entrypoints:sts_example"
         ],
-        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-spm",
-        "name": "pynxtools_spm",
+        "homepage": "https://github.com/FAIRmat-NFDI/pynxtools-stm",
+        "name": "pynxtools_stm",
         "repository": null,
-        "version": "0.0.4"
+        "version": "1.0.11"
       },
       "pynxtools_xps": {
         "description": "A reader for transferring XPS data from vendor formats to NeXus and NOMAD.",
