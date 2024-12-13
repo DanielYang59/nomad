@@ -56538,7 +56538,10 @@ window.nomadArtifacts = {
                 "m_annotations": {
                   "eln": [
                     {
-                      "component": "RichTextEditQuantity"
+                      "component": "RichTextEditQuantity",
+                      "props": {
+                        "height": 200
+                      }
                     }
                   ]
                 },

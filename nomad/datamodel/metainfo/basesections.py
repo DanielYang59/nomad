@@ -203,7 +203,7 @@ class BaseSection(ArchiveSection):
     description = Quantity(
         type=str,
         description='Any information that cannot be captured in the other fields.',
-        a_eln=dict(component='RichTextEditQuantity'),
+        a_eln=dict(component='RichTextEditQuantity', props=dict(height=200)),
     )
 
     def normalize(self, archive, logger: 'BoundLogger') -> None:
