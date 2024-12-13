@@ -232,36 +232,45 @@ export class Metainfo {
    * Gets a definition by its qualified name
    */
   getDefByQualifiedName(qualifiedName) {
-    const defQualifiedNameSegments = qualifiedName.split('.')
-    let def
+    let pathSegments = qualifiedName.split('.')
+    let pkg
 
-    // Nexus inner sections require special handling as they are not stored at
-    // the package root
-    if (qualifiedName.startsWith('nexus.')) {
-      const pkg = this._packageDefs[defQualifiedNameSegments.shift()]
-      const sectionName = defQualifiedNameSegments.shift()
-      for (const section_def of pkg.section_definitions) {
-        if (sectionName === section_def.name) {
-          def = section_def
+    // Find the package by progressively checking `_packageDefs` for the most
+    // specific package. We don't in general know where the package starts, as
+    // it can be quite nested in the Python code.
+    let splitIndex
+    for (let i = pathSegments.length; i > 0; i--) {
+      const candidateName = pathSegments.slice(0, i).join('.')
+      if (this._packageDefs[candidateName]) {
+        pkg = this._packageDefs[candidateName]
+        if (pkg) {
+          splitIndex = i
           break
         }
       }
-      for (const part of defQualifiedNameSegments) {
-        for (const inner_section_def of def.inner_section_definitions) {
-          if (part === inner_section_def.name) {
-            def = inner_section_def
-            break
-          }
+    }
+    if (!pkg) return undefined
+    pathSegments = pathSegments.slice(splitIndex)
+    if (!pathSegments.length) return pkg
+
+    // Try to find the section definition from the package root
+    const sectionName = pathSegments.shift()
+    const def = pkg?._sections?.[sectionName]
+    if (!def) return undefined
+    if (!pathSegments.length) return def
+
+    // If there are still path segments to traverse, try to find the section
+    // definition from the package inner sections. TODO: This is not yet
+    // recursive, implement as necessary.
+    for (const part of pathSegments) {
+      for (const inner_section_def of def.inner_section_definitions) {
+        if (part === inner_section_def.name) {
+          return inner_section_def
         }
       }
-    } else {
-      const packageName = defQualifiedNameSegments.slice(0, -1).join('.')
-      const sectionName = defQualifiedNameSegments[defQualifiedNameSegments.length - 1]
-      const pkg = this._packageDefs[packageName || '*']
-      def = pkg?._sections?.[sectionName]
     }
 
-    return def
+    return undefined
   }
 
   /**
