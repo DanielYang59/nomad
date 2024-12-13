@@ -98,7 +98,7 @@ mako==1.3.8               # via alembic, -r requirements.txt
 markdown==3.7             # via mkdocs, mkdocs-click, mkdocs-material, pymdown-extensions
 markupsafe==3.0.2         # via jinja2, mako, mkdocs, -r requirements.txt, nomad-lab (pyproject.toml)
 matid==2.1.4              # via -r requirements.txt, nomad-lab (pyproject.toml)
-matplotlib==3.9.3         # via ase, pymatgen, -r requirements.txt
+matplotlib==3.9.4         # via ase, pymatgen, -r requirements.txt
 mda-xdrlib==0.2.0         # via pyedr, -r requirements.txt
 mergedeep==1.3.4          # via mkdocs, mkdocs-get-deps
 mistune==3.0.2            # via m2r, -r requirements.txt
@@ -191,7 +191,7 @@ rfc3987==1.3.8            # via jsonschema, -r requirements.txt
 rope==0.21.0              # via nomad-lab (pyproject.toml)
 ruamel-yaml==0.18.6       # via jupyter-telemetry, monty, oauthenticator, pymatgen, -r requirements.txt, nomad-lab (pyproject.toml)
 ruamel-yaml-clib==0.2.12 ; python_full_version < '3.13' and platform_python_implementation == 'CPython'  # via ruamel-yaml, -r requirements.txt
-ruff==0.8.2               # via nomad-lab (pyproject.toml)
+ruff==0.8.3               # via nomad-lab (pyproject.toml)
 runstats==2.0.0           # via -r requirements.txt, nomad-lab (pyproject.toml)
 scikit-learn==1.6.0       # via matid, -r requirements.txt, nomad-lab (pyproject.toml)
 scipy==1.14.1             # via ase, pymatgen, scikit-learn, -r requirements.txt, nomad-lab (pyproject.toml)
@@ -219,7 +219,7 @@ tabulate==0.8.9           # via pymatgen, -r requirements.txt, nomad-lab (pyproj
 tenacity==9.0.0           # via plotly, -r requirements.txt
 termcolor==2.5.0          # via mkdocs-macros-plugin
 threadpoolctl==3.5.0      # via scikit-learn, -r requirements.txt
-tifffile==2024.9.20       # via h5grove, -r requirements.txt
+tifffile==2024.12.12      # via h5grove, -r requirements.txt
 tomli==2.2.1 ; python_full_version <= '3.11'  # via coverage
 toposort==1.10            # via -r requirements.txt, nomad-lab (pyproject.toml)
 tornado==6.4.2            # via jupyterhub, -r requirements.txt
@@ -233,7 +233,7 @@ uncertainties==3.2.2      # via pymatgen, -r requirements.txt
 unidecode==1.3.2          # via -r requirements.txt, nomad-lab (pyproject.toml)
 uri-template==1.3.0       # via jsonschema, -r requirements.txt
 urllib3==1.26.20          # via docker, elasticsearch, requests, -r requirements.txt
-uv==0.5.7                 # via nomad-lab (pyproject.toml)
+uv==0.5.8                 # via nomad-lab (pyproject.toml)
 uvicorn==0.32.1           # via h5grove, -r requirements.txt, nomad-lab (pyproject.toml)
 uvloop==0.21.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'  # via uvicorn, -r requirements.txt
 validators==0.18.2        # via -r requirements.txt, nomad-lab (pyproject.toml)
