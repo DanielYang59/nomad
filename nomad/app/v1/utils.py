@@ -30,7 +30,9 @@ import lzma
 from nomad.files import UploadFiles, StreamedFile, create_zipstream
 
 
-def parameter_dependency_from_model(name: str, model_cls, exclude: List[str] = []):
+def parameter_dependency_from_model(
+    name: str, model_cls, exclude: List[str] = []
+) -> FunctionType:
     """
     Takes a pydantic model class as input and creates a dependency with corresponding
     Query parameter definitions that can be used for GET

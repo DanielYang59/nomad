@@ -16,18 +16,20 @@
 # limitations under the License.
 #
 
-from typing import List, Optional, Set
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
-
+from nomad.app.v1.models.groups import (
+    UserGroup,
+    UserGroupEdit,
+    UserGroupPagination,
+    UserGroupQuery,
+    UserGroupResponse,
+)
+from nomad.app.v1.models.pagination import PaginationResponse
+from nomad.app.v1.utils import parameter_dependency_from_model
 from nomad.datamodel import User as UserDataModel
-from nomad.groups import (
-    UserGroup as MongoUserGroup,
-)
-from nomad.groups import (
-    create_user_group as create_mongo_user_group,
-)
+from nomad.groups import MongoUserGroup
+from nomad.groups import create_user_group as create_mongo_user_group
 from nomad.utils import strip
 
 from ..models import User
@@ -36,39 +38,14 @@ from .auth import create_user_dependency
 router = APIRouter()
 default_tag = 'groups'
 
-group_name_description = 'Name of the group.'
-group_members_description = 'User ids of the group members.'
 
+user_group_query_parameters = parameter_dependency_from_model(
+    'user_group_query_parameters', UserGroupQuery
+)
 
-class UserGroupEdit(BaseModel):
-    group_name: Optional[str] = Field(
-        default=None,
-        description=group_name_description,
-        min_length=3,
-        max_length=32,
-        regex=r'^[a-zA-Z0-9][a-zA-Z0-9 ._\-]+[a-zA-Z0-9]$',
-    )
-    members: Optional[Set[str]] = Field(
-        default=None, description=group_members_description
-    )
-
-
-class UserGroup(BaseModel):
-    group_id: str = Field(description='Unique id of the group.')
-    group_name: str = Field(
-        default='Default Group Name', description=group_name_description
-    )
-    owner: str = Field(description='User id of the group owner.')
-    members: List[str] = Field(
-        default_factory=list, description=group_members_description
-    )
-
-    class Config:
-        orm_mode = True
-
-
-class UserGroups(BaseModel):
-    data: List[UserGroup]
+user_group_pagination_parameters = parameter_dependency_from_model(
+    'user_group_pagination_parameters', UserGroupPagination
+)
 
 
 def get_mongo_user_group(group_id: str) -> MongoUserGroup:
@@ -87,11 +64,11 @@ def check_user_ids(user_ids):
     for user_id in user_ids:
         try:
             UserDataModel.get(user_id=user_id)
-        except KeyError:
+        except KeyError as exc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"User '{user_id}' was not found.",
-            )
+            ) from exc
 
 
 def check_user_may_edit_user_group(user: User, user_group: MongoUserGroup):
@@ -111,36 +88,25 @@ def check_user_may_edit_user_group(user: User, user_group: MongoUserGroup):
     '',
     tags=[default_tag],
     summary='List user groups. Use at most one filter.',
-    response_model=UserGroups,
+    response_model=UserGroupResponse,
 )
 async def get_user_groups(
-    group_id: Optional[List[str]] = Query(
-        None, description='Search groups by their full id.'
-    ),
-    user_id: Optional[str] = Query(
-        None, description='Search groups by their owner or members ids.'
-    ),
-    search_terms: Optional[str] = Query(
-        None, description='Search groups by parts of their name.'
-    ),
+    request: Request,
+    query: UserGroupQuery = Depends(user_group_query_parameters),
+    pagination: UserGroupPagination = Depends(user_group_pagination_parameters),
 ):
     """Get data about user groups."""
-    if sum(param is not None for param in (group_id, user_id, search_terms)) > 1:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Only one of (group_id, user_id, search_terms) may be used at a time.',
-        )
+    db_groups = MongoUserGroup.get_by_query(query)
+    db_groups = pagination.order_result(db_groups)
 
-    if group_id is not None:
-        user_groups = MongoUserGroup.get_by_ids(group_id)
-    elif user_id is not None:
-        user_groups = MongoUserGroup.get_by_user_id(user_id)
-    elif search_terms is not None:
-        user_groups = MongoUserGroup.get_by_search_terms(search_terms)
-    else:
-        user_groups = MongoUserGroup.objects
-    data = [UserGroup.from_orm(user_group) for user_group in user_groups]
-    return {'data': data}
+    total = db_groups.count()
+    pagination_response = PaginationResponse(total=total, **pagination.dict())
+    pagination_response.populate_simple_index_and_urls(request)
+
+    start = pagination.get_simple_index()
+    end = start + pagination.page_size
+    data = [UserGroup.from_orm(group) for group in db_groups[start:end]]
+    return {'pagination': pagination_response, 'data': data}
 
 
 @router.get(

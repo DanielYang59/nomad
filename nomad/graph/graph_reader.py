@@ -24,7 +24,7 @@ import functools
 import itertools
 import os
 import re
-from collections.abc import Iterator, AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from threading import Lock
 from typing import Any, Callable, Type, Union
 
@@ -35,28 +35,43 @@ from mongoengine import Q
 
 from nomad import utils
 from nomad.app.v1.models import (
+    Metadata,
     MetadataPagination,
     Pagination,
     PaginationResponse,
-    Metadata,
+    UserGroupPagination,
+    UserGroupQuery,
 )
 from nomad.app.v1.routers.datasets import DatasetPagination
 from nomad.app.v1.routers.entries import perform_search
 from nomad.app.v1.routers.uploads import (
-    get_upload_with_read_access,
-    upload_to_pydantic,
-    entry_to_pydantic,
-    UploadProcDataQuery,
-    UploadProcDataPagination,
     EntryProcDataPagination,
     RawDirPagination,
+    UploadProcDataPagination,
+    UploadProcDataQuery,
+    entry_to_pydantic,
+    get_upload_with_read_access,
+    upload_to_pydantic,
 )
-from nomad.archive import ArchiveList, ArchiveDict, to_json
-from nomad.archive.storage_v2 import ArchiveDict as ArchiveDictNew
-from nomad.archive.storage_v2 import ArchiveList as ArchiveListNew
-from nomad.datamodel import ServerContext, User, EntryArchive, Dataset
+from nomad.archive import (
+    ArchiveDict,
+    ArchiveList,
+    to_json,
+)
+from nomad.archive.storage_v2 import (
+    ArchiveDict as ArchiveDictNew,
+)
+from nomad.archive.storage_v2 import (
+    ArchiveList as ArchiveListNew,
+)
+from nomad.datamodel import (
+    Dataset,
+    EntryArchive,
+    ServerContext,
+    User,
+)
 from nomad.datamodel.util import parse_path
-from nomad.files import UploadFiles, RawPathInfo
+from nomad.files import RawPathInfo, UploadFiles
 from nomad.graph.lazy_wrapper import (
     CachedUpload,
     LazyUploadFailureCount,
@@ -65,31 +80,30 @@ from nomad.graph.lazy_wrapper import (
     LazyUserWrapper,
 )
 from nomad.graph.model import (
-    RequestConfig,
+    DatasetQuery,
     DefinitionType,
     DirectiveType,
-    ResolveType,
-    DatasetQuery,
     EntryQuery,
-    MetainfoQuery,
     MetainfoPagination,
-    UserGroupQuery,
-    UserGroupPagination,
+    MetainfoQuery,
+    RequestConfig,
+    ResolveType,
 )
-from nomad.groups import UserGroup
+from nomad.groups import MongoUserGroup
 from nomad.metainfo import (
-    SubSection,
+    Definition,
+    Package,
+    Quantity,
     QuantityReference,
     Reference,
-    Quantity,
-    SectionReference,
-    Package,
-    Definition,
     Section,
+    SectionReference,
+    SubSection,
 )
-from nomad.metainfo.data_type import Any as AnyType, JSON, Datatype
-from nomad.metainfo.util import split_python_definition, MSubSectionList
-from nomad.processing import Entry, Upload, ProcessStatus
+from nomad.metainfo.data_type import JSON, Datatype
+from nomad.metainfo.data_type import Any as AnyType
+from nomad.metainfo.util import MSubSectionList, split_python_definition
+from nomad.processing import Entry, ProcessStatus, Upload
 from nomad.utils import timer
 
 logger = utils.get_logger(__name__)
@@ -939,7 +953,7 @@ class GeneralReader:
         return user.m_to_dict(with_out_meta=True, include_derived=True)
 
     @staticmethod
-    async def _overwrite_group(item: UserGroup):
+    async def _overwrite_group(item: MongoUserGroup):
         # todo: this is a quick dirty fix to convert the group object to a dictionary
         # todo: it shall be formalised in the future
         group_dict = item.to_mongo().to_dict()
@@ -961,10 +975,10 @@ class GeneralReader:
         """
 
         def _retrieve():
-            return UserGroup.objects(group_id=group_id).first()
+            return MongoUserGroup.objects(group_id=group_id).first()
 
         try:
-            group: UserGroup = await asyncio.to_thread(_retrieve)
+            group: MongoUserGroup = await asyncio.to_thread(_retrieve)
         except Exception as e:
             self._log(str(e), to_response=False)
             return group_id
@@ -1366,20 +1380,25 @@ class MongoReader(GeneralReader):
         assert isinstance(config.query, UploadProcDataQuery)
 
         mongo_query = Q()
+
         if config.query.upload_id:
             mongo_query &= Q(upload_id__in=config.query.upload_id)
+
         if config.query.upload_name:
             mongo_query &= Q(upload_name__in=config.query.upload_name)
+
         if config.query.process_status is not None:
             mongo_query &= Q(process_status=config.query.process_status)
         elif config.query.is_processing is True:
             mongo_query &= Q(process_status__in=ProcessStatus.STATUSES_PROCESSING)
         elif config.query.is_processing is False:
             mongo_query &= Q(process_status__in=ProcessStatus.STATUSES_NOT_PROCESSING)
+
         if config.query.is_published is True:
             mongo_query &= Q(publish_time__ne=None)
         elif config.query.is_published is False:
             mongo_query &= Q(publish_time=None)
+
         if config.query.is_owned is True:
             mongo_query &= Q(main_author=self.user.user_id)
         elif config.query.is_owned is False:
@@ -1412,23 +1431,12 @@ class MongoReader(GeneralReader):
         return config.query.dict(exclude_unset=True), self.datasets.filter(mongo_query)
 
     async def _query_groups(self, config: RequestConfig):
-        # todo: extend and refine the query
-        if config.query:
-            assert isinstance(config.query, UserGroupQuery)
-            default_query = config.query
+        if isinstance(config.query, UserGroupQuery):
+            query = config.query
         else:
-            default_query = UserGroupQuery(user_id=self.user.user_id)
-
-        # replace shortcut for myself
-        if default_query.user_id in ('me', None):
-            default_query.user_id = self.user.user_id
-
-        mongo_query = Q()
-        if default_query.user_id:
-            mongo_query &= Q(members=default_query.user_id)
-
-        # todo: maybe it is necessary to further refine the scope based on current user's visibility
-        return default_query.dict(exclude_unset=True), UserGroup.objects(mongo_query)
+            query = UserGroupQuery()
+        db_groups = MongoUserGroup.get_by_query(query)
+        return query.dict(exclude_unset=True), db_groups
 
     async def _normalise(
         self, mongo_result, config: RequestConfig, transformer: Callable
@@ -2982,8 +2990,7 @@ class ArchiveReader(ArchiveLikeReader):
             return node.replace(definition=original_def.sub_section.m_resolved())
 
         # todo: those three should be handled differently as they are not references
-        from nomad.datamodel.data import UserReference, AuthorReference
-
+        from nomad.datamodel.data import AuthorReference, UserReference
         from nomad.datamodel.datamodel import DatasetReference
 
         # if not a quantity reference, early return

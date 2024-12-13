@@ -20,7 +20,8 @@ from __future__ import annotations
 from typing import Optional, List, Union, Any, Literal
 from pydantic import BaseModel, Field, Extra
 
-from nomad.groups import UserGroupModel
+from ..groups import UserGroup, UserGroupPagination, UserGroupQuery
+
 from nomad.graph.model import (
     RequestConfig,
     DatasetQuery,
@@ -240,13 +241,25 @@ class GraphMetainfo(BaseModel):
     m_children: MSection
 
 
-class GraphGroup(mapped(UserGroupModel, owner=GraphUser, members=List[GraphUser])):  # type: ignore
+class GraphGroup(mapped(UserGroup, owner=GraphUser, members=List[GraphUser])):  # type: ignore
     m_errors: List[Error]
+
+
+class GroupRequestOptions(BaseModel):
+    pagination: Optional[UserGroupPagination]
+    query: Optional[UserGroupQuery]
+
+
+class GroupResponseOptions(BaseModel):
+    pagination: Optional[PaginationResponse]
+    query: Optional[UserGroupQuery]
 
 
 class GraphGroups(BaseModel):
     m_errors: List[Error]
     m_children: GraphGroup
+    m_request: GroupRequestOptions
+    m_response: GroupResponseOptions
 
 
 class Graph(BaseModel):

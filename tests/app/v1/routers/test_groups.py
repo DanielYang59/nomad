@@ -1,6 +1,6 @@
 import pytest
 from .common import assert_response, perform_get, perform_post
-from nomad.app.v1.routers.groups import UserGroup, UserGroups
+from nomad.app.v1.models.groups import UserGroup, UserGroupResponse
 from nomad.groups import get_user_group, user_group_exists
 
 
@@ -52,7 +52,7 @@ def test_get_groups(
     response = perform_get(client, base_url, auth_headers[user_label])
     assert_response(response, expected_status_code)
 
-    response_groups = UserGroups.parse_raw(response.content)
+    response_groups = UserGroupResponse.parse_raw(response.content)
     for response_group in response_groups.data:
         group = get_user_group(response_group.group_id)
         assert_group(group, response_group)
@@ -93,6 +93,10 @@ def test_get_groups(
         pytest.param(
             {'search_terms': 'Tw'}, ['twin1', 'twin2', 'numerals'], id='tw-partial'
         ),
+        # mixed filters
+        pytest.param(
+            {'user_id': 'user8', 'search_terms': '1'}, ['group18'], id='user8-term1'
+        ),
     ],
 )
 def test_get_filtered_groups(
@@ -107,7 +111,7 @@ def test_get_filtered_groups(
     response = perform_get(client, base_url, auth_headers['user1'], **filters)
     assert_response(response, 200)
 
-    response_groups = UserGroups.parse_raw(response.content)
+    response_groups = UserGroupResponse.parse_raw(response.content)
     response_ids = [group.group_id for group in response_groups.data]
     ref_group_ids = convert_agent_labels_to_ids(ref_group_labels)
     assert_unordered_lists(response_ids, ref_group_ids)
