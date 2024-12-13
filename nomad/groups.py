@@ -18,29 +18,15 @@
 
 from __future__ import annotations
 
-import operator
-from functools import reduce
 from typing import Iterable, Optional, Union
 
-from mongoengine import Document, ListField, StringField
-from mongoengine.queryset.visitor import Q
-from pydantic import BaseModel, Field
+from mongoengine import Document, ListField, Q, QuerySet, StringField
 
+from nomad.app.v1.models.groups import UserGroupQuery
 from nomad.utils import create_uuid
 
 
-# todo: this is just my quick fix to get things glued together
-# todo: UserGroup shall be a MSection just like User so that
-# todo: mongo document and pydantic model can be generated from the same source
-# todo: see also dataset
-class UserGroupModel(BaseModel):
-    group_id: str = Field()
-    group_name: Optional[str] = Field()
-    owner: str = Field()
-    members: Optional[list[str]] = Field()
-
-
-class UserGroup(Document):
+class MongoUserGroup(Document):
     """
     A group of users. One user is the owner, all others are members.
     """
@@ -55,49 +41,66 @@ class UserGroup(Document):
     meta = {'indexes': ['group_name', 'owner', 'members']}
 
     @classmethod
-    def get_by_ids(cls, group_ids: Union[str, Iterable[str]]):
+    def q_by_ids(cls, group_ids: Union[str, Iterable[str]]) -> Q:
         """
-        Returns UserGroup objects with group_ids.
+        Returns UserGroup Q for group_ids.
         """
-        if not isinstance(group_ids, Iterable):
-            group_ids = [group_ids]
-        user_groups = cls.objects(group_id__in=group_ids)
-        return user_groups
+        if isinstance(group_ids, str):
+            return Q(group_id=group_ids)
+        else:
+            return Q(group_id__in=group_ids)
 
     @classmethod
-    def get_by_user_id(cls, user_id: Optional[str]):
+    def q_by_user_id(cls, user_id: Optional[str]) -> Q:
         """
-        Returns UserGroup objects where user_id is owner or member, or None.
-        Does not include special group 'all' because it has no UserGroup object.
+        Returns UserGroup Q where user_id is owner or member, or None.
+
+        Does not imply special group 'all' because it has no UserGroup object.
         """
-        group_query = Q(owner=user_id) | Q(members=user_id)
-        user_groups = cls.objects(group_query)
-        return user_groups
+        return Q(owner=user_id) | Q(members=user_id)
+
+    @classmethod
+    def q_by_search_terms(cls, search_terms: str) -> Q:
+        """
+        Returns UserGroup Q where group_name includes search_terms (no case).
+
+        Each space-separated term must be included in group_name.
+        """
+        q = Q()
+        for term in search_terms.split():
+            q &= Q(group_name__icontains=term)
+
+        return q
+
+    @classmethod
+    def get_by_query(cls, query: UserGroupQuery) -> QuerySet:
+        """
+        Returns UserGroup objects according to query, sub queries are connect by AND.
+        """
+        q = Q()
+        if query.group_id is not None:
+            q &= cls.q_by_ids(query.group_id)
+        if query.user_id is not None:
+            q &= cls.q_by_user_id(query.user_id)
+        if query.search_terms is not None:
+            q &= cls.q_by_search_terms(query.search_terms)
+
+        return cls.objects(q)
 
     @classmethod
     def get_ids_by_user_id(cls, user_id: Optional[str], include_all=True) -> list[str]:
         """
         Returns ids of all user groups where user_id is owner or member.
-        Does include special group 'all', even if user_id is missing or not a user.
+
+        When include_all is true, special group 'all' is included,
+        even if user_id is missing or not a user.
         """
         group_ids = ['all'] if include_all else []
         if user_id is not None:
-            group_ids.extend(group.group_id for group in cls.get_by_user_id(user_id))
+            q = cls.q_by_user_id(user_id)
+            groups = cls.objects(q)
+            group_ids.extend(group.group_id for group in groups)
         return group_ids
-
-    @classmethod
-    def get_by_search_terms(cls, search_terms: str):
-        """
-        Returns UserGroup objects where group_name includes search_terms (no case).
-        """
-        split_terms = str(search_terms).split()
-        if not split_terms:
-            return []
-
-        query = (Q(group_name__icontains=term) for term in split_terms)
-        query = reduce(operator.and_, query)
-        user_groups = cls.objects(query)
-        return user_groups
 
 
 def create_user_group(
@@ -106,8 +109,8 @@ def create_user_group(
     group_name: Optional[str] = None,
     owner: Optional[str] = None,
     members: Optional[Iterable[str]] = None,
-) -> UserGroup:
-    user_group = UserGroup(
+) -> MongoUserGroup:
+    user_group = MongoUserGroup(
         group_id=group_id, group_name=group_name, owner=owner, members=members
     )
     if user_group.group_id is None:
@@ -122,7 +125,8 @@ def create_user_group(
 def get_user_ids_by_group_ids(group_ids: list[str]) -> set[str]:
     user_ids = set()
 
-    groups = UserGroup.objects(group_id__in=group_ids)
+    q = MongoUserGroup.q_by_ids(group_ids)
+    groups = MongoUserGroup.objects(q)
     for group in groups:
         user_ids.add(group.owner)
         user_ids.update(group.members)
@@ -130,8 +134,9 @@ def get_user_ids_by_group_ids(group_ids: list[str]) -> set[str]:
     return user_ids
 
 
-def get_user_group(group_id: str) -> Optional[UserGroup]:
-    return UserGroup.objects(group_id=group_id).first()
+def get_user_group(group_id: str) -> Optional[MongoUserGroup]:
+    q = MongoUserGroup.q_by_ids(group_id)
+    return MongoUserGroup.objects(q).first()
 
 
 def user_group_exists(group_id: str, *, include_all=True) -> bool:
@@ -140,5 +145,5 @@ def user_group_exists(group_id: str, *, include_all=True) -> bool:
     return get_user_group(group_id) is not None
 
 
-def get_group_ids(user_id, include_all=True):
-    return UserGroup.get_ids_by_user_id(user_id, include_all=include_all)
+def get_group_ids(user_id: str, include_all=True) -> list[str]:
+    return MongoUserGroup.get_ids_by_user_id(user_id, include_all=include_all)

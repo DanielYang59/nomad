@@ -2120,7 +2120,7 @@ def test_group_reader(groups_function, user1):
                         f.write(json.dumps(reader.sync_read()))
 
     __ge_print(
-        'general start from group',
+        'general start from group; id: *',
         {
             Token.GROUP: {
                 'GGGGGGGGGGGGGGGGGGGG14': '*',
@@ -2157,7 +2157,7 @@ def test_group_reader(groups_function, user1):
         },
     )
     __ge_print(
-        'general start from group',
+        'general start from group; id: owner.email',
         {
             Token.GROUP: {
                 'GGGGGGGGGGGGGGGGGGGG14': {
@@ -2176,24 +2176,98 @@ def test_group_reader(groups_function, user1):
         },
     )
     __ge_print(
-        'general start from group with query',
+        'general start from group; *: group_name',
         {
             Token.GROUP: {
                 'm_request': {
-                    'query': {'user_id': '00000000-0000-0000-0000-000000000004'}
+                    'pagination': {'page_size': 20},
                 },
-                '*': {
-                    'owner': {
-                        'email': '*',
-                    },
-                },
+                '*': {'group_name': '*'},
             }
         },
         result={
             'group': {
-                'GGGGGGGGGGGGGGGGGGGG14': {
-                    'owner': {'email': 'sheldon.cooper@nomad-coe.eu'}
+                'GGGGGGGGGGGGGGGGGGGGG0': {'group_name': 'Group 0'},
+                'GGGGGGGGGGGGGGGGGGGGG1': {'group_name': 'Group 1'},
+                'GGGGGGGGGGGGGGGGGGGGG2': {'group_name': 'Group 2'},
+                'GGGGGGGGGGGGGGGGGGGGG3': {'group_name': 'Group 3'},
+                'GGGGGGGGGGGGGGGGGGGGG6': {'group_name': 'Group 6'},
+                'GGGGGGGGGGGGGGGGGGGGG8': {'group_name': 'Group 8'},
+                'GGGGGGGGGGGGGGGGGGGGG9': {'group_name': 'Group 9'},
+                'GGGGGGGGGGGGGGGGGGGG14': {'group_name': 'Group 14'},
+                'GGGGGGGGGGGGGGGGGGGG15': {'group_name': 'Group 15'},
+                'GGGGGGGGGGGGGGGGGGGG18': {'group_name': 'Group 18'},
+                'GGGGGGGGGGGGGGGGGGGG19': {'group_name': 'Group 19'},
+                'GGGGGGGGGGGGGGGGGGG123': {'group_name': 'Group 123'},
+                'GGGGGGGGGGGGGGGGGGUniq': {'group_name': 'Group Uniq'},
+                'GGGGGGGGGGGGGGTwin One': {'group_name': 'Group Twin One'},
+                'GGGGGGGGGGGGGGTwin Two': {'group_name': 'Group Twin Two'},
+                'GGGGGGGGGOne Two Three': {'group_name': 'Group One Two Three'},
+            }
+        },
+    )
+    __ge_print(
+        'general start from group; query: [group_id]; *: group_name',
+        {
+            Token.GROUP: {
+                'm_request': {'query': {'group_id': ['GGGGGGGGGGGGGGGGGGG123']}},
+                '*': {'group_name': '*'},
+            }
+        },
+        result={
+            'group': {
+                'GGGGGGGGGGGGGGGGGGG123': {'group_name': 'Group 123'},
+            }
+        },
+    )
+    __ge_print(
+        'general start from group; query: user_id; *: group_name',
+        {
+            Token.GROUP: {
+                'm_request': {
+                    'query': {'user_id': '00000000-0000-0000-0000-000000000008'}
                 },
+                '*': {'group_name': '*'},
+            }
+        },
+        result={
+            'group': {
+                'GGGGGGGGGGGGGGGGGGGGG8': {'group_name': 'Group 8'},
+                'GGGGGGGGGGGGGGGGGGGG18': {'group_name': 'Group 18'},
+            }
+        },
+    )
+    __ge_print(
+        'general start from group; query: search_terms; *: group_name',
+        {
+            Token.GROUP: {
+                'm_request': {'query': {'search_terms': 'win'}},
+                '*': {'group_name': '*'},
+            }
+        },
+        result={
+            'group': {
+                'GGGGGGGGGGGGGGTwin One': {'group_name': 'Group Twin One'},
+                'GGGGGGGGGGGGGGTwin Two': {'group_name': 'Group Twin Two'},
+            }
+        },
+    )
+    __ge_print(
+        'general start from group; query: user_id, search_terms; *: group_name',
+        {
+            Token.GROUP: {
+                'm_request': {
+                    'query': {
+                        'user_id': '00000000-0000-0000-0000-000000000008',
+                        'search_terms': '1',
+                    }
+                },
+                '*': {'group_name': '*'},
+            }
+        },
+        result={
+            'group': {
+                'GGGGGGGGGGGGGGGGGGGG18': {'group_name': 'Group 18'},
             }
         },
     )

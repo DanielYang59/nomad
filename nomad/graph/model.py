@@ -23,16 +23,17 @@ from enum import Enum
 from hashlib import sha1
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, Extra, ValidationError, validator
+from pydantic import BaseModel, Extra, Field, ValidationError, validator
 
-from nomad.app.v1.models import MetadataPagination, Metadata, Pagination, Direction
+from nomad.app.v1.models import Direction, Metadata, MetadataPagination, Pagination
 from nomad.app.v1.routers.datasets import DatasetPagination
 from nomad.app.v1.routers.uploads import (
-    UploadProcDataQuery,
-    UploadProcDataPagination,
     EntryProcDataPagination,
     RawDirPagination,
+    UploadProcDataPagination,
+    UploadProcDataQuery,
 )
+from nomad.app.v1.models.groups import UserGroupQuery, UserGroupPagination
 
 
 class DatasetQuery(BaseModel):
@@ -94,23 +95,6 @@ class MetainfoPagination(Pagination):
         first, last = min(start, total_size), min(end, total_size)
 
         return [] if first == last else result[first:last]
-
-
-class UserGroupQuery(BaseModel):
-    # todo: define query specifics
-    user_id: str = Field(None)
-
-
-class UserGroupPagination(Pagination):
-    # todo: refine pagination logic
-    def order_result(self, result):
-        if self.order_by is None:
-            return result
-
-        prefix: str = '-' if self.order == Direction.desc else '+'
-        order_list: list = [f'{prefix}{self.order_by}', 'group_id']
-
-        return result.order_by(*order_list)
 
 
 class DirectiveType(Enum):

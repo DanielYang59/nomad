@@ -227,11 +227,6 @@ class UploadProcDataPagination(Pagination):
         ), 'order_by must be a valid attribute'
         return order_by
 
-    @validator('page_after_value')
-    def validate_page_after_value(cls, page_after_value, values):  # pylint: disable=no-self-argument
-        # Validation handled elsewhere
-        return page_after_value
-
     def order_result(self, result):
         if self.order_by is None:
             return result
@@ -266,11 +261,6 @@ class EntryProcDataPagination(Pagination):
             'entry_create_time',
         ), 'order_by must be a valid attribute'
         return order_by
-
-    @validator('page_after_value')
-    def validate_page_after_value(cls, page_after_value, values):  # pylint: disable=no-self-argument
-        # Validation handled elsewhere
-        return page_after_value
 
     def order_result(self, result):
         if self.order_by is None:
@@ -407,11 +397,6 @@ class RawDirPagination(Pagination):
     @validator('order_by')
     def validate_order_by(cls, order_by):  # pylint: disable=no-self-argument
         assert not order_by, 'Cannot specify `order_by` for rawdir calls'
-
-    @validator('page_after_value')
-    def validate_page_after_value(cls, page_after_value, values):  # pylint: disable=no-self-argument
-        # Validation handled elsewhere
-        return page_after_value
 
 
 rawdir_pagination_parameters = parameter_dependency_from_model(

@@ -94,7 +94,7 @@ from nomad.datamodel import (
     AuthorReference,
     UserReference,
 )
-from nomad.groups import UserGroup
+from nomad.groups import MongoUserGroup
 from nomad.metainfo import Datetime, Package, Quantity
 from nomad.metainfo.elasticsearch_extension import (
     DocumentType,
@@ -595,7 +595,7 @@ def _owner_es_query(
             q |= query(viewers__user_id=user_id)
 
         if user_id is not None or force_groups:
-            user_group_ids = UserGroup.get_ids_by_user_id(user_id)
+            user_group_ids = MongoUserGroup.get_ids_by_user_id(user_id)
             q |= query('terms', viewer_groups=user_group_ids)
 
         return q
