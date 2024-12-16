@@ -15,18 +15,18 @@ project_dir=$(dirname $(dirname $(realpath $0)))
 cd $project_dir
 
 
-uv pip compile -U --universal -p 3.11 --annotation-style=line \
+uv pip compile -U --universal -p 3.10 --annotation-style=line \
     --extra=infrastructure --extra=parsing \
     --output-file=requirements.txt \
     pyproject.toml
 
-uv pip compile -U --universal -p 3.11 --annotation-style=line \
+uv pip compile -U --universal -p 3.10 --annotation-style=line \
     --extra=dev --extra=infrastructure --extra=parsing \
     --output-file=requirements-dev.txt \
     requirements.txt \
     pyproject.toml
 
-uv pip compile --universal -p 3.11 --annotation-style=line \
+uv pip compile --universal -p 3.10 --annotation-style=line \
     --output-file=requirements-plugins.txt \
     --unsafe-package nomad-lab \
     -c requirements-dev.txt \
