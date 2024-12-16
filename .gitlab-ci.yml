@@ -229,19 +229,38 @@ gui linting:
       when: never
     - when: on_success
 
+generate gui artifacts:
+  stage: test
+  image: ${CI_REGISTRY_IMAGE}/dev_python:${DOCKER_TAG}
+  script:
+    - uv pip install ".[dev,parsing,infrastructure]"
+    - uv pip install -r requirements-plugins.txt -c requirements-dev.txt # remove this after moving to distro
+    - scripts/generate_gui_test_artifacts.sh
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
+  artifacts:
+    paths:
+      - gui/tests/env.js
+      - gui/tests/artifacts.js
+    expire_in: 20 minutes
+
 gui tests:
   stage: test
+  needs: ["generate gui artifacts"]
   image: ${CI_REGISTRY_IMAGE}/dev_node:${DOCKER_TAG}
   variables:
     GIT_STRATEGY: none
   before_script:
+    - cp gui/tests/env.js /app/gui/tests/env.js
+    - cp gui/tests/artifacts.js /app/gui/tests/artifacts.js
     - cd /app/gui
   script:
     - yarn test --ci --collectCoverage --reporters=default --reporters=jest-junit --silent
       --testPathIgnorePatterns=src/components/entry/ArchiveEntryView.spec.js
       --testPathIgnorePatterns=src/components/archive/FileBrowser.spec.js
       --testPathIgnorePatterns=src/components/archive/MetainfoBrowser.spec.js
-
   after_script:
     - cd /app/gui
     - cp junit.xml $CI_PROJECT_DIR
@@ -256,24 +275,6 @@ gui tests:
       coverage_report:
         coverage_format: cobertura
         path: cobertura-coverage.xml
-  rules:
-    - if: $CI_COMMIT_TAG
-      when: never
-    - when: on_success
-
-check gui artifacts:
-  stage: test
-  image: ${CI_REGISTRY_IMAGE}/dev_python:${DOCKER_TAG}
-  script:
-    - uv pip install ".[dev,parsing,infrastructure]"
-    - uv pip install -r requirements-plugins.txt -c requirements-dev.txt # remove this after moving to distro
-    - scripts/check_gui_artifacts.sh
-  after_script:
-    - >
-      if [ $CI_JOB_STATUS == 'failed' ]; then
-        echo 'Make sure that the right GUI artifacts have been regenerated and committed by running'
-        echo './scripts/generate_gui_artifacts.sh'
-      fi
   rules:
     - if: $CI_COMMIT_TAG
       when: never
