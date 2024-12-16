@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import contextmanager
 import copy
 import dataclasses
 import functools
@@ -1173,6 +1174,30 @@ class GeneralReader:
     def validate_config(cls, key: str, config: RequestConfig):
         raise NotImplementedError()
 
+    @contextmanager
+    def _prepare_reading(self):
+        """
+        Prepare the result container for reading.
+        Also populate the error list.
+        """
+        response: dict = {}
+
+        if self.global_root is None:
+            self.global_root = response
+            has_global_root: bool = False
+        else:
+            has_global_root = True
+
+        yield response
+
+        self._populate_error_list(response)
+
+        # if there is a global root, it is a sub-query, no need to clear it
+        # if there is no global root, it is a top-level query, clear it
+        # mainly to make the reader re-entrant, although one reader should not be used multiple times
+        if not has_global_root:
+            self.global_root = None
+
     async def read(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -1529,31 +1554,26 @@ class MongoReader(GeneralReader):
         For example, in a `UploadReader`, it only populates `self.entries`, which implies that from an upload, one can
         only navigate to its entries, using `Token.ENTRIES` token.
         """
-        response: dict = {}
+        with self._prepare_reading() as response:
+            await self._walk(
+                GraphNode(
+                    upload_id='__NOT_NEEDED__',
+                    entry_id='__NOT_NEEDED__',
+                    current_path=[],
+                    result_root=response,
+                    ref_result_root=self.global_root,
+                    archive=None,
+                    archive_root=None,
+                    definition=None,
+                    visited_path=set(),
+                    current_depth=0,
+                    reader=self,
+                ),
+                self.required_query,
+                self.global_config,
+            )
 
-        self.global_root = response
-
-        await self._walk(
-            GraphNode(
-                upload_id='__NOT_NEEDED__',
-                entry_id='__NOT_NEEDED__',
-                current_path=[],
-                result_root=response,
-                ref_result_root=self.global_root,
-                archive=None,
-                archive_root=None,
-                definition=None,
-                visited_path=set(),
-                current_depth=0,
-                reader=self,
-            ),
-            self.required_query,
-            self.global_config,
-        )
-
-        self._populate_error_list(response)
-
-        return response
+            return response
 
     async def _walk(
         self,
@@ -1934,45 +1954,30 @@ class UploadReader(MongoReader):
 
     # noinspection PyMethodOverriding
     async def read(self, upload_id: str) -> dict:  # type: ignore
-        response: dict = {}
+        with self._prepare_reading() as response:
+            # if it is a string, no access
+            if isinstance(target_upload := await self.retrieve_upload(upload_id), dict):
+                self.target_upload_id = upload_id
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
+                await self._walk(
+                    GraphNode(
+                        upload_id=upload_id,
+                        entry_id='__NOT_NEEDED__',
+                        current_path=[],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=target_upload,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    self.required_query,
+                    self.global_config,
+                )
 
-        # if it is a string, no access
-        if isinstance(target_upload := await self.retrieve_upload(upload_id), dict):
-            self.target_upload_id = upload_id
-
-            await self._walk(
-                GraphNode(
-                    upload_id=upload_id,
-                    entry_id='__NOT_NEEDED__',
-                    current_path=[],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=target_upload,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                self.required_query,
-                self.global_config,
-            )
-
-        self._populate_error_list(response)
-
-        # if there is a global root, it is a sub-query, no need to clear it
-        # if there is no global root, it is a top-level query, clear it
-        # mainly to make the reader reentrant, although one reader should not be used multiple times
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     @classmethod
     def validate_config(cls, key: str, config: RequestConfig):
@@ -2006,42 +2011,32 @@ class DatasetReader(MongoReader):
 
     # noinspection PyMethodOverriding
     async def read(self, dataset_id: str) -> dict:  # type: ignore
-        response: dict = {}
+        with self._prepare_reading() as response:
+            # if it is a string, no access
+            if isinstance(
+                target_dataset := await self.retrieve_dataset(dataset_id), dict
+            ):
+                self.target_dataset_id = dataset_id
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
+                await self._walk(
+                    GraphNode(
+                        upload_id='__NOT_NEEDED__',
+                        entry_id='__NOT_NEEDED__',
+                        current_path=[],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=target_dataset,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    self.required_query,
+                    self.global_config,
+                )
 
-        # if it is a string, no access
-        if isinstance(target_dataset := await self.retrieve_dataset(dataset_id), dict):
-            self.target_dataset_id = dataset_id
-
-            await self._walk(
-                GraphNode(
-                    upload_id='__NOT_NEEDED__',
-                    entry_id='__NOT_NEEDED__',
-                    current_path=[],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=target_dataset,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                self.required_query,
-                self.global_config,
-            )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     @classmethod
     def validate_config(cls, key: str, config: RequestConfig):
@@ -2067,42 +2062,30 @@ class EntryReader(MongoReader):
 
     # noinspection PyMethodOverriding
     async def read(self, entry_id: str) -> dict:  # type: ignore
-        response: dict = {}
+        with self._prepare_reading() as response:
+            # if it is a string, no access
+            if isinstance(target_entry := await self.retrieve_entry(entry_id), dict):
+                self.target_entry_id = entry_id
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
+                await self._walk(
+                    GraphNode(
+                        upload_id=target_entry['upload_id'],
+                        entry_id=entry_id,
+                        current_path=[],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=target_entry,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    self.required_query,
+                    self.global_config,
+                )
 
-        # if it is a string, no access
-        if isinstance(target_entry := await self.retrieve_entry(entry_id), dict):
-            self.target_entry_id = entry_id
-
-            await self._walk(
-                GraphNode(
-                    upload_id=target_entry['upload_id'],
-                    entry_id=entry_id,
-                    current_path=[],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=target_entry,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                self.required_query,
-                self.global_config,
-            )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     @classmethod
     def validate_config(cls, key: str, config: RequestConfig):
@@ -2185,63 +2168,51 @@ class UserReader(MongoReader):
 
     # noinspection PyMethodOverriding
     async def read(self, user_id_or_dict: str | dict | LazyUserWrapper):  # type: ignore
-        response: dict = {}
+        with self._prepare_reading() as response:
+            if isinstance(user_id_or_dict, LazyUserWrapper):
+                user_id_or_dict = user_id_or_dict.to_json()
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
-
-        if isinstance(user_id_or_dict, LazyUserWrapper):
-            user_id_or_dict = user_id_or_dict.to_json()
-
-        target_user: str | dict
-        if isinstance(user_id_or_dict, dict):
-            target_user = user_id_or_dict
-            user_id: str = target_user['user_id']
-        elif isinstance(user_id_or_dict, str):
-            if user_id_or_dict == 'me':
-                user_id = self.user.user_id
+            target_user: str | dict
+            if isinstance(user_id_or_dict, dict):
+                target_user = user_id_or_dict
+                user_id: str = target_user['user_id']
+            elif isinstance(user_id_or_dict, str):
+                if user_id_or_dict == 'me':
+                    user_id = self.user.user_id
+                else:
+                    user_id = user_id_or_dict
+                target_user = await self.retrieve_user(user_id)
             else:
-                user_id = user_id_or_dict
-            target_user = await self.retrieve_user(user_id)
-        else:
-            # should not reach here
-            raise NotImplementedError
+                # should not reach here
+                raise NotImplementedError
 
-        if isinstance(target_user, str):
-            # does not exist
-            self._log(
-                f'User ID {user_id} does not exist.', error_type=QueryError.NOTFOUND
-            )
-        else:
-            self.target_user_id = user_id
+            if isinstance(target_user, str):
+                # does not exist
+                self._log(
+                    f'User ID {user_id} does not exist.', error_type=QueryError.NOTFOUND
+                )
+            else:
+                self.target_user_id = user_id
 
-            await self._walk(
-                GraphNode(
-                    upload_id='__NOT_NEEDED__',
-                    entry_id='__NOT_NEEDED__',
-                    current_path=[],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=target_user,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                self.required_query,
-                self.global_config,
-            )
+                await self._walk(
+                    GraphNode(
+                        upload_id='__NOT_NEEDED__',
+                        entry_id='__NOT_NEEDED__',
+                        current_path=[],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=target_user,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    self.required_query,
+                    self.global_config,
+                )
 
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     @classmethod
     def validate_config(cls, key: str, config: RequestConfig):
@@ -2256,44 +2227,33 @@ class UserReader(MongoReader):
 class UserGroupReader(MongoReader):
     # noinspection PyMethodOverriding
     async def read(self, group_id: str):  # type: ignore
-        response: dict = {}
+        with self._prepare_reading() as response:
+            if isinstance(target_group := await self.retrieve_group(group_id), str):
+                # does not exist
+                self._log(
+                    f'Group ID {group_id} does not exist.',
+                    error_type=QueryError.NOTFOUND,
+                )
+            else:
+                await self._walk(
+                    GraphNode(
+                        upload_id='__NOT_NEEDED__',
+                        entry_id='__NOT_NEEDED__',
+                        current_path=[],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=target_group,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    self.required_query,
+                    self.global_config,
+                )
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
-
-        if isinstance(target_group := await self.retrieve_group(group_id), str):
-            # does not exist
-            self._log(
-                f'Group ID {group_id} does not exist.', error_type=QueryError.NOTFOUND
-            )
-        else:
-            await self._walk(
-                GraphNode(
-                    upload_id='__NOT_NEEDED__',
-                    entry_id='__NOT_NEEDED__',
-                    current_path=[],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=target_group,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                self.required_query,
-                self.global_config,
-            )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     @classmethod
     def validate_config(cls, key: str, config: RequestConfig):
@@ -2316,48 +2276,36 @@ class FileSystemReader(GeneralReader):
     async def read(self, upload_id: str, path: str = None) -> dict:
         self._root_path = [v for v in path.split('/') if v] if path else []
 
-        response: dict = {}
+        with self._prepare_reading() as response:
+            try:
+                upload: Upload = get_upload_with_read_access(
+                    upload_id, self.user, include_others=True
+                )
+            except HTTPException:
+                self._log(
+                    f'Current user does not have access to upload {upload_id}.',
+                    error_type=QueryError.NOACCESS,
+                )
+            else:
+                await self._walk(
+                    GraphNode(
+                        upload_id=upload_id,
+                        entry_id='__NOT_NEEDED__',
+                        current_path=[],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=upload.upload_files,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    self.required_query,
+                    self.global_config,
+                )
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
-
-        try:
-            upload: Upload = get_upload_with_read_access(
-                upload_id, self.user, include_others=True
-            )
-        except HTTPException:
-            self._log(
-                f'Current user does not have access to upload {upload_id}.',
-                error_type=QueryError.NOACCESS,
-            )
-        else:
-            await self._walk(
-                GraphNode(
-                    upload_id=upload_id,
-                    entry_id='__NOT_NEEDED__',
-                    current_path=[],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=upload.upload_files,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                self.required_query,
-                self.global_config,
-            )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     @staticmethod
     def _to_abs_path(rel_path: list) -> list:
@@ -2621,38 +2569,26 @@ class ArchiveReader(ArchiveLikeReader):
 
         metadata = await goto_child(archive, 'metadata')
 
-        response: dict = {}
+        with self._prepare_reading() as response:
+            await self._walk(
+                GraphNode(
+                    upload_id=await goto_child(metadata, 'upload_id'),
+                    entry_id=await goto_child(metadata, 'entry_id'),
+                    current_path=[],
+                    result_root=response,
+                    ref_result_root=self.global_root,
+                    archive=archive,
+                    archive_root=archive,
+                    definition=EntryArchive.m_def,
+                    visited_path=set(),
+                    current_depth=0,
+                    reader=self,
+                ),
+                self.required_query,
+                self.global_config,
+            )
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
-
-        await self._walk(
-            GraphNode(
-                upload_id=await goto_child(metadata, 'upload_id'),
-                entry_id=await goto_child(metadata, 'entry_id'),
-                current_path=[],
-                result_root=response,
-                ref_result_root=self.global_root,
-                archive=archive,
-                archive_root=archive,
-                definition=EntryArchive.m_def,
-                visited_path=set(),
-                current_depth=0,
-                reader=self,
-            ),
-            self.required_query,
-            self.global_config,
-        )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     async def _walk(
         self,
@@ -3056,38 +2992,28 @@ class ArchiveReader(ArchiveLikeReader):
 
 class DefinitionReader(ArchiveLikeReader):
     async def read(self, archive: Definition) -> dict:
-        response: dict = {Token.DEF: {}}
+        with self._prepare_reading() as response:
+            response[Token.DEF] = {}
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
+            await self._walk(
+                GraphNode(
+                    upload_id='__NONE__',
+                    entry_id='__NONE__',
+                    current_path=[Token.DEF],
+                    result_root=response,
+                    ref_result_root=self.global_root,
+                    archive=archive,
+                    archive_root=None,
+                    definition=None,
+                    visited_path=set(),
+                    current_depth=0,
+                    reader=self,
+                ),
+                self.required_query,
+                self.global_config,
+            )
 
-        await self._walk(
-            GraphNode(
-                upload_id='__NONE__',
-                entry_id='__NONE__',
-                current_path=[Token.DEF],
-                result_root=response,
-                ref_result_root=self.global_root,
-                archive=archive,
-                archive_root=None,
-                definition=None,
-                visited_path=set(),
-                current_depth=0,
-                reader=self,
-            ),
-            self.required_query,
-            self.global_config,
-        )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        return response
+            return response
 
     async def _walk(
         self,
@@ -3552,53 +3478,41 @@ class MetainfoBrowser(DefinitionReader):
                         self._log(f'Failed to retrieve definition: {e}')
 
     async def read(self) -> dict:  # type: ignore # noqa
-        response: dict = {}
+        with self._prepare_reading() as response:
+            current_config = self.global_config
+            if isinstance(self.required_query, dict):
+                current_config = self.required_query.get(
+                    GeneralReader.__CONFIG__, current_config
+                )
 
-        if self.global_root is None:
-            self.global_root = response
-            has_global_root: bool = False
-        else:
-            has_global_root = True
+            async for pkg_name, pkg_definition, pkg_query in self._generate_package():
+                response.setdefault(pkg_name, {})
+                await self._walk(
+                    GraphNode(
+                        upload_id='__NONE__',
+                        entry_id='__NONE__',
+                        current_path=[pkg_name],
+                        result_root=response,
+                        ref_result_root=self.global_root,
+                        archive=pkg_definition,
+                        archive_root=None,
+                        definition=None,
+                        visited_path=set(),
+                        current_depth=0,
+                        reader=self,
+                    ),
+                    pkg_query,
+                    current_config,
+                )
 
-        current_config = self.global_config
-        if isinstance(self.required_query, dict):
-            current_config = self.required_query.get(
-                GeneralReader.__CONFIG__, current_config
-            )
+            if self._pagination_response is not None:
+                await _populate_result(
+                    response, [Token.RESPONSE, 'pagination'], self._pagination_response
+                )
+                # reset the cache to ensure re-entrance
+                self._pagination_response = None
 
-        async for pkg_name, pkg_definition, pkg_query in self._generate_package():
-            response.setdefault(pkg_name, {})
-            await self._walk(
-                GraphNode(
-                    upload_id='__NONE__',
-                    entry_id='__NONE__',
-                    current_path=[pkg_name],
-                    result_root=response,
-                    ref_result_root=self.global_root,
-                    archive=pkg_definition,
-                    archive_root=None,
-                    definition=None,
-                    visited_path=set(),
-                    current_depth=0,
-                    reader=self,
-                ),
-                pkg_query,
-                current_config,
-            )
-
-        self._populate_error_list(response)
-
-        if not has_global_root:
-            self.global_root = None
-
-        if self._pagination_response is not None:
-            await _populate_result(
-                response, [Token.RESPONSE, 'pagination'], self._pagination_response
-            )
-            # reset the cache to ensure re-entrance
-            self._pagination_response = None
-
-        return response
+            return response
 
     @classmethod
     def validate_config(cls, key: str, config: RequestConfig):
