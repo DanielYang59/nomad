@@ -216,7 +216,11 @@ def upload(
 @client.command(help='Run processing locally.')
 @click.argument('ENTRY_ID', nargs=1, required=True, type=str)
 @click.option('--override', is_flag=True, help='Override existing local entry data.')
-@click.option('--show-archive', is_flag=True, help='Print the archive data.')
+@click.option(
+    '--show-archive/--no-archive',
+    default=True,
+    help='Whether to print out the archive data into stdout.',
+)
 @click.option(
     '--show-metadata', is_flag=True, help='Print the extracted repo metadata.'
 )

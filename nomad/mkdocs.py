@@ -33,7 +33,7 @@ from markdown.extensions.toc import slugify
 
 from nomad.utils import strip
 from nomad.config import config
-from nomad.config.models.plugins import Parser, EntryPointType
+from nomad.config.models.plugins import ParserEntryPoint, EntryPointType
 from nomad.app.v1.models import query_documentation, owner_documentation
 from nomad.app.v1.routers.entries import archive_required_documentation
 from nomad import utils
@@ -382,15 +382,17 @@ def define_env(env):
         parsers = [
             plugin
             for _, plugin in config.plugins.entry_points.filtered_items()
-            if isinstance(plugin, Parser)
+            if isinstance(plugin, ParserEntryPoint) and hasattr(plugin, 'code_name')
         ]
+        packages = config.plugins.plugin_packages
 
-        def render_parser(parser: Parser) -> str:
+        def render_parser(parser) -> str:
             # TODO this should be added, once the metadata typography gets
             # fixed. At the moment the MD is completely broken in most cases.
             # more_description = None
             # if parser.metadata and 'parserSpecific' in parser.metadata:
             #     more_description = strip(parser.metadata['parserSpecific'])
+            repo_url = packages[parser.plugin_package].homepage
 
             metadata = strip(
                 f"""
@@ -398,13 +400,11 @@ def define_env(env):
 
                 {parser.description or ''}
 
-                |parser|{parser.code_name}|
-                |-|-|
-                |format homepage|[{parser.code_homepage}]({parser.code_homepage})|
-                |plugin name|{parser.name}|
-                |package|{parser.python_package}|
-                |parser class|{parser.parser_class_name}|
-                |parser code|[{parser.plugin_source_code_url}]({parser.plugin_source_code_url})|
+                - format homepage: [{parser.code_homepage}]({parser.code_homepage})
+                - parser name: `{parser.id}`
+                - plugin: `{parser.plugin_package}`
+                - parser class: `{parser.parser_class_name}`
+                - parser code: [{repo_url}]({repo_url})
             """
             )
 
@@ -416,12 +416,13 @@ def define_env(env):
 
             return metadata
 
-        categories: Dict[str, List[Parser]] = {}
+        categories: Dict[str, List[ParserEntryPoint]] = {}
         for parser in parsers:
-            category = categories.setdefault(parser.code_category, [])
+            category_name = getattr(parser, 'code_category', None)
+            category = categories.setdefault(category_name, [])
             category.append(parser)
 
-        def render_category(name: str, category: List[Parser]) -> str:
+        def render_category(name: str, category: List[ParserEntryPoint]) -> str:
             return f'## {name}s\n\n' + '\n\n'.join(
                 [render_parser(parser) for parser in category]
             )
