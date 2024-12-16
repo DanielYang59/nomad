@@ -29,16 +29,16 @@ const HDF5DatasetCard = React.memo(function HDF5DatasetCard({archive}) {
   const {url, uploadId} = useEntryStore()
   const root = archive?.data || archive?.workflow2
   const m_def = root?.m_def_id ? `${root.m_def}@${root.m_def_id}` : root?.m_def
-  const dataMetainfoDefUrl = url && resolveNomadUrlNoThrow(m_def, url)
-  const dataMetainfoDef = useMetainfoDef(dataMetainfoDefUrl)
+  const mDefUrl = url && resolveNomadUrlNoThrow(m_def, url)
+  const mDef = useMetainfoDef(mDefUrl)
 
-  if (!dataMetainfoDef || !dataMetainfoDef.m_annotations?.h5web) {
+  if (!mDef?.m_annotations?.h5web) {
     return null
   }
 
   return (
     <PropertyCard title='HDF5 Data'>
-      <H5WebSectionView section={root} def={dataMetainfoDef} uploadId={uploadId}></H5WebSectionView>
+      <H5WebSectionView section={root} def={mDef} uploadId={uploadId}></H5WebSectionView>
     </PropertyCard>
   )
 })

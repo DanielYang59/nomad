@@ -30,9 +30,10 @@ const ElectronicPropertiesCard = React.memo(({index, properties, archive}) => {
   const hasBs = properties.has('band_structure_electronic')
   const hasBandGap = properties.has('electronic.band_structure_electronic.band_gap')
   const hasGf = properties.has('greens_functions_electronic')
+  const hasDensityCharge = properties.has('density_charge')
 
   // Do not show the card if none of the properties are available
-  if (!hasDosNew && !hasDosOld && !hasBs && !hasBandGap && !hasGf) return null
+  if (!hasDosNew && !hasDosOld && !hasBs && !hasBandGap && !hasGf && !hasDensityCharge) return null
 
   let bsReferences = archive?.results?.properties?.electronic?.band_structure_electronic || []
   const pattern = '\\.\\./(?:entries|upload/archive|uploads.+?archive)/(.+?)(?:/archive#|#)(.+)'
@@ -106,6 +107,11 @@ const ElectronicPropertiesCard = React.memo(({index, properties, archive}) => {
   // Resolve Greens functions data
   const gf = resolveGreensFunctions(properties, archive, pattern)
 
+  // Resolve charge density h5Path
+  let densityCharge = hasDensityCharge ? undefined : false
+  const h5Path = archive?.results?.properties?.electronic?.density_charge?.slice(-1)?.[0]?.value_hdf5
+  densityCharge = h5Path || densityCharge
+
   return <PropertyCard title="Electronic properties">
     <ElectronicProperties
       bs={bs}
@@ -113,6 +119,7 @@ const ElectronicPropertiesCard = React.memo(({index, properties, archive}) => {
       brillouin_zone={bz}
       band_gap={bg}
       gf={gf}
+      density_charge={densityCharge}
       index={index}
     />
   </PropertyCard>

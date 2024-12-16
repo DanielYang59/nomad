@@ -642,7 +642,8 @@ registerFilterOptions(
     band_structure_electronic: {label: 'Band structure'},
     dos_electronic: {label: 'Density of states'},
     greens_functions_electronic: {label: 'Green\u0027s functions'},
-    eels: {label: 'Electron energy loss spectrum'}
+    eels: {label: 'Electron energy loss spectrum'},
+    density_charge: {label: 'Charge density'}
   }
 )
 

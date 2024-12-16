@@ -28,6 +28,7 @@ import GreensFunctions from './GreensFunctions'
 import { makeStyles } from '@material-ui/core/styles'
 import { electronicRange } from '../../config'
 import { PropertyGrid, PropertyItem } from '../entry/properties/PropertyCard'
+import H5Web from './H5Web'
 
 // Styles
 const useStyles = makeStyles((theme) => {
@@ -49,6 +50,7 @@ const ElectronicProperties = React.memo(({
   brillouin_zone,
   band_gap,
   gf,
+  density_charge,
   index,
   classes
 }) => {
@@ -77,15 +79,32 @@ const ElectronicProperties = React.memo(({
     dosYSubject.next(update)
   }, [dosYSubject])
 
+  // Create the charge density component
+  let densityChargeComp = null
+  if (density_charge !== false) {
+    if (density_charge === undefined) {
+      return null
+    }
+    const sectionPath = density_charge.split('/').slice(0, -1).join('/')
+    densityChargeComp = <H5Web
+      key={density_charge}
+      upload_id={index.upload_id}
+      filename={index.entry_id}
+      initialPath={sectionPath}
+      source='archive'
+      sidebarOpen={false}
+    />
+  }
+
   // Custom layout if only band gaps are available
-  if (bs === false && dos === false && brillouin_zone === false && gf === false) {
+  if (bs === false && dos === false && brillouin_zone === false && gf === false && density_charge === false) {
     return <PropertyGrid>
       <PropertyItem title="Band gaps" xs={12} height="auto">
         <BandGap data={band_gap}/>
       </PropertyItem>
     </PropertyGrid>
   // Custom layout if only DOS is available
-  } else if (bs === false && band_gap === false && brillouin_zone === false && gf === false) {
+  } else if (bs === false && band_gap === false && brillouin_zone === false && gf === false && density_charge === false) {
     return <PropertyGrid>
       <PropertyItem title="Band structure" xs={8}>
         <BandStructure
@@ -113,13 +132,20 @@ const ElectronicProperties = React.memo(({
       </PropertyItem>
     </PropertyGrid>
   // Custom layout if only Greens functions are available
-  } else if (bs === false && dos === false && band_gap === false && brillouin_zone === false) {
+  } else if (bs === false && dos === false && band_gap === false && brillouin_zone === false && density_charge === false) {
     return <PropertyGrid>
       <PropertyItem title="Green's functions" xs={12} height='auto'>
         <GreensFunctions
           data={gf}
           provenance={dmftprovenance}
         />
+      </PropertyItem>
+    </PropertyGrid>
+  // Custom layout if only charge density are available
+  } else if (bs === false && dos === false && band_gap === false && brillouin_zone === false && gf === false) {
+    return <PropertyGrid>
+      <PropertyItem title="Charge density" xs={12} height="auto">
+        {densityChargeComp}
       </PropertyItem>
     </PropertyGrid>
   // Layout when all properties can be present
@@ -166,6 +192,11 @@ const ElectronicProperties = React.memo(({
           />
         </PropertyItem>
       }
+      {density_charge !== false &&
+        <PropertyItem title="Charge density" xs={12} height="auto">
+          {densityChargeComp}
+        </PropertyItem>
+      }
     </PropertyGrid>
   }
 })
@@ -176,6 +207,7 @@ ElectronicProperties.propTypes = {
   brillouin_zone: PropTypes.any,
   band_gap: PropTypes.any,
   gf: PropTypes.any,
+  density_charge: PropTypes.string,
   classes: PropTypes.object,
   index: PropTypes.object
 }

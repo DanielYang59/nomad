@@ -1024,7 +1024,7 @@ class StagingUploadFiles(UploadFiles):
 
             is_dir = os.path.isdir(path)
             compression_format = get_compression_format(path)
-            if compression_format is 'error':
+            if compression_format == 'error':
                 # Unknown / bad file format
                 assert False, 'Cannot extract file. Bad file format or file extension?'
             elif compression_format is not None:
