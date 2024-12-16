@@ -36,6 +36,9 @@ const H5WebSectionView = React.memo(function H5WebSectionView({section, def, upl
       if (!signal || !sec[0][signal]) return null
 
       const {h5UploadId, h5File, h5Source, h5Path} = matchH5Path(sec[0][signal])
+
+      if (!h5Path) return null
+
       const sectionPath = h5Path.split('/').slice(0, -1).join('/')
 
       return <H5Web
@@ -84,8 +87,15 @@ const H5WebSectionView = React.memo(function H5WebSectionView({section, def, upl
       if (!parent || !def) return []
       parent = await resolveSection(parent)
       def = await resolveDef(parent, def)
-      if (!pathSegments.length) return [[parent, def]]
-
+      if (!pathSegments.length) {
+        const signal = def.m_annotations?.h5web?.[0]?.signal
+        // resolve if signal is reference
+        if (def?._properties[signal]?.type?.type_kind === 'reference') {
+          const resolvedSignal = await resolveSection(parent[signal])
+          return [[{[signal]: resolvedSignal}, def]]
+        }
+        return [[parent, def]]
+      }
       const getDef = (def, key) => {
         const properties = def?._properties[key]
         return properties?.type?._referencedDefinition || properties?.sub_section

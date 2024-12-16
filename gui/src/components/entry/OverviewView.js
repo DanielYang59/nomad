@@ -127,7 +127,8 @@ const required = {
           }
         },
         band_structure_electronic: 'include-resolved',
-        band_gap: '*'
+        band_gap: '*',
+        density_charge: 'include-resolved'
       },
       mechanical: 'include-resolved',
       spectroscopic: 'include-resolved',

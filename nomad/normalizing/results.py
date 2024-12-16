@@ -18,7 +18,7 @@
 
 import re
 import numpy as np
-from typing import List, Union, Any, Optional, Dict
+from typing import Union, Any, Optional
 import ase.data
 from matid import SymmetryAnalyzer  # pylint: disable=import-error
 import matid.geometry  # pylint: disable=import-error
@@ -79,7 +79,18 @@ from nomad.datamodel.results import (
     MagneticSusceptibility,
     ElectricFieldGradient,
     SpinSpinCoupling,
+    DensityCharge,
 )
+
+try:
+    import runschema
+
+    runschema.run_schema_entry_point.load()
+    import runschema.method
+    import runschema.calculation
+    import runschema.system
+except Exception as e:
+    runschema, simulationworkflowschema = None, None
 
 re_label = re.compile('^([a-zA-Z][a-zA-Z]?)[^a-zA-Z]*')
 elements = set(ase.data.chemical_symbols)
@@ -277,26 +288,25 @@ class ResultsNormalizer(Normalizer):
             else:
                 self.entry_archive.metadata.entry_name = f'{type_tag}'
 
-    def resolve_band_gap(self, path: list[str]) -> List[BandGap]:
+    def resolve_band_gap(self) -> list[BandGap]:
         """Extract all band gaps from the given `path` and return them in a list along
         with their provenance.
         """
-        band_gaps = traverse_reversed(self.entry_archive, path)
-        if not band_gaps:
-            return None
+        path = ['run', 'calculation', 'band_gap']
         bg_root: list[BandGap] = []
-        for bg in band_gaps:
-            bg_results = BandGap()
-            bg_results.index = bg.index
-            bg_results.value = bg.value
-            bg_results.type = bg.type
-            bg_results.energy_highest_occupied = bg.energy_highest_occupied
-            bg_results.energy_lowest_unoccupied = bg.energy_lowest_unoccupied
-            bg_results.provenance = bg.provenance
-            bg_root.insert(0, bg_results)
+        if band_gaps := traverse_reversed(self.entry_archive, path):
+            for bg in band_gaps:
+                bg_results = BandGap()
+                bg_results.index = bg.index
+                bg_results.value = bg.value
+                bg_results.type = bg.type
+                bg_results.energy_highest_occupied = bg.energy_highest_occupied
+                bg_results.energy_lowest_unoccupied = bg.energy_lowest_unoccupied
+                bg_results.provenance = bg.provenance
+                bg_root.insert(0, bg_results)
         return bg_root
 
-    def resolve_band_structure(self, path: list[str]) -> List[BandStructureElectronic]:
+    def resolve_band_structure(self) -> list[BandStructureElectronic]:
         """Returns a new section containing an electronic band structure. In
         the case of multiple valid band structures, only the latest one is
         considered.
@@ -305,37 +315,38 @@ class ResultsNormalizer(Normalizer):
             - There is a non-empty array of kpoints.
             - There is a non-empty array of energies.
         """
-        band_structures = traverse_reversed(self.entry_archive, path)
-        if not band_structures:
-            return None
-        bs_root: List[BandStructureElectronic] = []
-        for bs in band_structures:
-            if not bs.segment:
-                continue
-            valid = True
-            for segment in bs.segment:
-                energies = segment.energies
-                k_points = segment.kpoints
-                if not valid_array(energies) or not valid_array(k_points):
-                    valid = False
-                    break
-            if valid:
-                # Fill band structure data to the newer, improved data layout
-                bs_results = BandStructureElectronic()
-                bs_results.reciprocal_cell = bs
-                bs_results.segment = bs.segment
-                bs_results.spin_polarized = bs_results.segment[0].energies.shape[0] > 1
-                bs_results.energy_fermi = bs.energy_fermi
-
-                for info in bs.band_gap:
-                    info_new = BandGapDeprecated().m_from_dict(info.m_to_dict())
-                    bs_results.m_add_sub_section(
-                        BandStructureElectronic.band_gap, info_new
+        path = ['run', 'calculation', 'band_structure_electronic']
+        bs_root: list[BandStructureElectronic] = []
+        if band_structures := traverse_reversed(self.entry_archive, path):
+            for bs in band_structures:
+                if not bs.segment:
+                    continue
+                valid = True
+                for segment in bs.segment:
+                    energies = segment.energies
+                    k_points = segment.kpoints
+                    if not valid_array(energies) or not valid_array(k_points):
+                        valid = False
+                        break
+                if valid:
+                    # Fill band structure data to the newer, improved data layout
+                    bs_results = BandStructureElectronic()
+                    bs_results.reciprocal_cell = bs
+                    bs_results.segment = bs.segment
+                    bs_results.spin_polarized = (
+                        bs_results.segment[0].energies.shape[0] > 1
                     )
-                bs_root.insert(0, bs_results)
+                    bs_results.energy_fermi = bs.energy_fermi
+
+                    for info in bs.band_gap:
+                        info_new = BandGapDeprecated().m_from_dict(info.m_to_dict())
+                        bs_results.m_add_sub_section(
+                            BandStructureElectronic.band_gap, info_new
+                        )
+                    bs_root.insert(0, bs_results)
         return bs_root
 
-    def resolve_dos_deprecated(self, path: list[str]) -> List[DOSElectronic]:
+    def resolve_dos_deprecated(self) -> list[DOSElectronic]:
         """Returns a reference to the section containing an electronic dos. In
         the case of multiple valid DOSes, only the latest one is reported.
 
@@ -347,9 +358,12 @@ class ResultsNormalizer(Normalizer):
         to an old schema which will be deleted. The new function `resolve_dos` should be the
         one which persists over time.
         """
+        path = ['run', 'calculation', 'dos_electronic']
         dos_sections = extract_section(self.entry_archive, path, full_list=True)
         # The old mapping does not work for the new spin-polarized schema
-        if not dos_sections or len(dos_sections) == 2:
+        if (
+            not dos_sections or len(dos_sections) == 2
+        ):  # ? shouldn't len(dos_sections) < 2 to pass
             return []
         dos = dos_sections[0]
         energies = dos.energies
@@ -362,7 +376,7 @@ class ResultsNormalizer(Normalizer):
             dos_results.energy_fermi = dos.energy_fermi
         return [dos_results] if dos_results else []
 
-    def resolve_dos(self, path: list[str]) -> List[DOSElectronicNew]:
+    def resolve_dos(self) -> list[DOSElectronicNew]:
         """Returns a section containing the references for an electronic DOS. This section
         is then stored under `archive.results.properties.electronic.dos_electronic_new`.
 
@@ -379,54 +393,53 @@ class ResultsNormalizer(Normalizer):
         Returns:
             List[DOSElectronicNew]: the mapped DOS.
         """
-        dos_sections = extract_section(self.entry_archive, path, full_list=True)
-        if not dos_sections:
-            return []
-        dos_results = None  # this is done to avoid problems of generating empty sections if no valid_arrays
-        for dos_section in dos_sections:
-            energies = dos_section.energies
-            values = np.array([d.value.magnitude for d in dos_section.total])
-            if valid_array(energies) and valid_array(values):
-                dos_results = DOSElectronicNew() if not dos_results else dos_results
-                dos_data = dos_results.m_create(DOSNew)
-                dos_data.energies = dos_section
-                dos_data.total = dos_section.total[-1]
-                dos_data.energy_fermi = dos_section.energy_fermi
-                dos_data.energy_ref = dos_section.energy_ref
-                # Storing deprecated BandGap info
-                for info in dos_section.band_gap:
-                    info_new = BandGapDeprecated().m_from_dict(info.m_to_dict())
-                    dos_data.m_add_sub_section(DOSNew.band_gap, info_new)
-                # Spin-polarized
-                dos_results.spin_polarized = len(dos_sections) == 2
-                dos_data.spin_channel = dos_section.spin_channel
-                # Projected DOS
-                has_projected = False
-                _projected_sections = {
-                    key: value
-                    for key, value in dos_section.m_def.all_sub_sections.items()
-                    if 'projected' in key
-                }
-                _projected_data = {
-                    key: value
-                    for key, value in dos_data.m_def.all_quantities.items()
-                    if 'projected' in key
-                }
-                for key, value in _projected_sections.items():
-                    dos_projected = dos_section.m_get(value)
-                    if dos_projected is not None and len(dos_projected) > 0:
-                        dos_data.m_set(_projected_data.get(key), dos_projected)
-                        has_projected = True
-                dos_results.has_projected = has_projected
-        return [dos_results] if dos_results else []
+        path = ['run', 'calculation', 'dos_electronic']
+        dos_result = None  # only instantiate `dos_results` if the tests below pass
+        if dos_sections := extract_section(self.entry_archive, path, full_list=True):
+            for dos_section in dos_sections:
+                energies = dos_section.energies
+                values = np.array([d.value.magnitude for d in dos_section.total])
+                if valid_array(energies) and valid_array(values):
+                    dos_result = DOSElectronicNew() if not dos_result else dos_result
+                    dos_data = dos_result.m_create(DOSNew)
+                    dos_data.energies = dos_section
+                    dos_data.total = dos_section.total[-1]
+                    dos_data.energy_fermi = dos_section.energy_fermi
+                    dos_data.energy_ref = dos_section.energy_ref
+                    # Storing deprecated BandGap info
+                    for info in dos_section.band_gap:
+                        info_new = BandGapDeprecated().m_from_dict(info.m_to_dict())
+                        dos_data.m_add_sub_section(DOSNew.band_gap, info_new)
+                    # Spin-polarized
+                    dos_result.spin_polarized = len(dos_sections) == 2
+                    dos_data.spin_channel = dos_section.spin_channel
+                    # Projected DOS
+                    has_projected = False
+                    _projected_sections = {
+                        key: value
+                        for key, value in dos_section.m_def.all_sub_sections.items()
+                        if 'projected' in key
+                    }
+                    _projected_data = {
+                        key: value
+                        for key, value in dos_data.m_def.all_quantities.items()
+                        if 'projected' in key
+                    }
+                    for key, value in _projected_sections.items():
+                        dos_projected = dos_section.m_get(value)
+                        if dos_projected is not None and len(dos_projected) > 0:
+                            dos_data.m_set(_projected_data.get(key), dos_projected)
+                            has_projected = True
+                    dos_result.has_projected = has_projected
+        return [dos_result] if dos_result else []
 
     def resolve_greens_functions(
         self, path: list[str]
-    ) -> List[GreensFunctionsElectronic]:
+    ) -> list[GreensFunctionsElectronic]:
         """Returns a section containing the references of the electronic Greens functions.
         This section is then stored under `archive.results.properties.electronic`.
 
-        This section is only populated if there are non-zero values of the tau, matsubara_freq,
+        This section is only populated if there are non-zero values of the tau, Matsubara_freq,
         or frequencies, and its respective greens_function quantities.
 
         Args:
@@ -436,58 +449,66 @@ class ResultsNormalizer(Normalizer):
         Returns:
             List[GreensFunctionsElectronic]: the mapped Greens functions.
         """
-        greens_functions = extract_section(self.entry_archive, path, full_list=True)
-        if not greens_functions:
-            return []
-        gfs_root: List[GreensFunctionsElectronic] = []
-        for gfs in greens_functions:
-            gfs_results = GreensFunctionsElectronic()
-            # tau-axes quantities
-            tau = gfs.tau
-            if valid_array(tau):
-                gfs_results.tau = gfs
-                gfs_results.greens_function_tau = (
-                    gfs if valid_array(gfs.greens_function_tau) else None
+        gfs_root: list[GreensFunctionsElectronic] = []
+        if greens_functions := traverse_reversed(self.entry_archive, path):
+            for gfs in greens_functions:
+                gfs_results = GreensFunctionsElectronic()
+                # tau-axes quantities
+                tau = gfs.tau
+                if valid_array(tau):
+                    gfs_results.tau = gfs
+                    gfs_results.greens_function_tau = (
+                        gfs if valid_array(gfs.greens_function_tau) else None
+                    )
+                # matsubara_freq-axes quantities
+                matsubara_freq = gfs.matsubara_freq
+                if valid_array(matsubara_freq):
+                    gfs_results.matsubara_freq = gfs
+                    gfs_results.greens_function_iw = (
+                        gfs if valid_array(gfs.greens_function_iw) else None
+                    )
+                    gfs_results.self_energy_iw = (
+                        gfs if valid_array(gfs.self_energy_iw) else None
+                    )
+                # frequencies-axes quantities
+                frequencies = gfs.frequencies
+                if valid_array(frequencies):
+                    gfs_results.frequencies = gfs
+                    gfs_results.greens_function_freq = (
+                        gfs if valid_array(gfs.greens_function_freq) else None
+                    )
+                    gfs_results.self_energy_freq = (
+                        gfs if valid_array(gfs.self_energy_freq) else None
+                    )
+                    gfs_results.hybridization_function_freq = (
+                        gfs if valid_array(gfs.hybridization_function_freq) else None
+                    )
+                # Other GFs quantities
+                gfs_results.orbital_occupations = (
+                    gfs if valid_array(gfs.orbital_occupations) else None
                 )
-            # matsubara_freq-axes quantities
-            matsubara_freq = gfs.matsubara_freq
-            if valid_array(matsubara_freq):
-                gfs_results.matsubara_freq = gfs
-                gfs_results.greens_function_iw = (
-                    gfs if valid_array(gfs.greens_function_iw) else None
+                gfs_results.quasiparticle_weights = (
+                    gfs if valid_array(gfs.quasiparticle_weights) else None
                 )
-                gfs_results.self_energy_iw = (
-                    gfs if valid_array(gfs.self_energy_iw) else None
-                )
-            # frequencies-axes quantities
-            frequencies = gfs.frequencies
-            if valid_array(frequencies):
-                gfs_results.frequencies = gfs
-                gfs_results.greens_function_freq = (
-                    gfs if valid_array(gfs.greens_function_freq) else None
-                )
-                gfs_results.self_energy_freq = (
-                    gfs if valid_array(gfs.self_energy_freq) else None
-                )
-                gfs_results.hybridization_function_freq = (
-                    gfs if valid_array(gfs.hybridization_function_freq) else None
-                )
-            # Other GFs quantities
-            gfs_results.orbital_occupations = (
-                gfs if valid_array(gfs.orbital_occupations) else None
-            )
-            gfs_results.quasiparticle_weights = (
-                gfs if valid_array(gfs.quasiparticle_weights) else None
-            )
-            if gfs.chemical_potential:
-                gfs_results.chemical_potential = gfs
-            gfs_results.type = gfs.type if gfs.type else None
-            gfs_root.append(gfs_results)
+                if gfs.chemical_potential:
+                    gfs_results.chemical_potential = gfs
+                gfs_results.type = gfs.type if gfs.type else None
+                gfs_root.append(gfs_results)
         return gfs_root
 
-    def resolve_electric_field_gradient(
-        self, path: list[str]
-    ) -> Union[List[ElectricFieldGradient], None]:
+    def fetch_charge_density(self) -> list[DensityCharge]:
+        path = ['run', 'calculation', 'density_charge', 'value_hdf5']
+        return_list: list[DensityCharge] = []
+        if runschema and (
+            hdf5_wrappers := list(traverse_reversed(self.entry_archive, path))
+        ):
+            for hdf5_wrapper in hdf5_wrappers:
+                d = DensityCharge()
+                d.m_set('value_hdf5', hdf5_wrapper.path)
+                return_list.append(d)
+        return return_list
+
+    def resolve_electric_field_gradient(self) -> list[ElectricFieldGradient]:
         """Returns a section containing the references for the Electric Field Gradient.
         This section is then stored under `archive.results.properties.electronic`.
 
@@ -499,23 +520,22 @@ class ResultsNormalizer(Normalizer):
             from the self.entry_archive.
 
         Returns:
-            List[ElectricFieldGradient]: the mapped Electric Field Gradient.
+            list[ElectricFieldGradient]: the mapped Electric Field Gradient.
         """
-        stored_data = traverse_reversed(self.entry_archive, path)
-        if not stored_data:
-            return None
-        mapped_data: List[ElectricFieldGradient] = []
-        for data in stored_data:
-            contribution = data.contribution
-            value = data.value
-            if valid_array(value):
-                results_data = ElectricFieldGradient(
-                    contribution=contribution, value=data
-                )
-                mapped_data.insert(0, results_data)
+        path = ['run', 'calculation', 'electric_field_gradient']
+        mapped_data: list[ElectricFieldGradient] = []
+        if stored_data := traverse_reversed(self.entry_archive, path):
+            for data in stored_data:
+                contribution = data.contribution
+                value = data.value
+                if valid_array(value):
+                    results_data = ElectricFieldGradient(
+                        contribution=contribution, value=data
+                    )
+                    mapped_data.insert(0, results_data)
         return mapped_data
 
-    def resolve_spectra(self, path: list[str]) -> Union[List[Spectra], None]:
+    def resolve_spectra(self, path: list[str]) -> Optional[list[Spectra]]:
         """Returns a section containing the references for a Spectra. This section is then
         stored under `archive.results.properties.spectroscopic`.
 
@@ -526,12 +546,12 @@ class ResultsNormalizer(Normalizer):
                 self.entry_archive.
 
         Returns:
-            List[Spectra]: the mapped Spectra.
+            list[Spectra]: the mapped Spectra.
         """
         spectra = traverse_reversed(self.entry_archive, path)
         if not spectra:
             return None
-        spectra_root: List[Spectra] = []
+        spectra_root: list[Spectra] = []
         for spectrum in spectra:
             n_energies = spectrum.n_energies
             if n_energies and n_energies > 0:
@@ -552,7 +572,7 @@ class ResultsNormalizer(Normalizer):
 
     def resolve_magnetic_shielding(
         self, path: list[str]
-    ) -> Union[List[MagneticShielding], None]:
+    ) -> Optional[list[MagneticShielding]]:
         """Returns a section containing the references for the (atomic) Magnetic Shielding.
         This section is then stored under `archive.results.properties.magnetic`.
 
@@ -569,7 +589,7 @@ class ResultsNormalizer(Normalizer):
         stored_data = traverse_reversed(self.entry_archive, path)
         if not stored_data:
             return None
-        mapped_data: List[MagneticShielding] = []
+        mapped_data: list[MagneticShielding] = []
         for data in stored_data:
             value = data.value
             if valid_array(value):
@@ -579,7 +599,7 @@ class ResultsNormalizer(Normalizer):
 
     def resolve_spin_spin_coupling(
         self, path: list[str]
-    ) -> Union[List[SpinSpinCoupling], None]:
+    ) -> Optional[list[SpinSpinCoupling]]:
         """Returns a section containing the references for the Spin Spin Coupling.
         This section is then stored under `archive.results.properties.magnetic`.
 
@@ -591,12 +611,12 @@ class ResultsNormalizer(Normalizer):
             from the self.entry_archive.
 
         Returns:
-            List[SpinSpinCoupling]: the mapped Spin Spin Coupling.
+            list[SpinSpinCoupling]: the mapped Spin Spin Coupling.
         """
         stored_data = traverse_reversed(self.entry_archive, path)
         if not stored_data:
             return None
-        mapped_data: List[SpinSpinCoupling] = []
+        mapped_data: list[SpinSpinCoupling] = []
         for data in stored_data:
             contribution = data.contribution
             value = data.value
@@ -613,7 +633,7 @@ class ResultsNormalizer(Normalizer):
 
     def resolve_magnetic_susceptibility(
         self, path: list[str]
-    ) -> Union[List[MagneticSusceptibility], None]:
+    ) -> Optional[list[MagneticSusceptibility]]:
         """Returns a section containing the references for the Magnetic Susceptibility.
         This section is then stored under `archive.results.properties.magnetic`.
 
@@ -625,12 +645,12 @@ class ResultsNormalizer(Normalizer):
             from the self.entry_archive.
 
         Returns:
-            List[MagneticSusceptibility]: the mapped Magnetic Susceptibility.
+            list[MagneticSusceptibility]: the mapped Magnetic Susceptibility.
         """
         stored_data = traverse_reversed(self.entry_archive, path)
         if not stored_data:
             return None
-        mapped_data: List[MagneticSusceptibility] = []
+        mapped_data: list[MagneticSusceptibility] = []
         for data in stored_data:
             scale_dimension = data.scale_dimension
             value = data.value
@@ -692,7 +712,7 @@ class ResultsNormalizer(Normalizer):
         methods = ['dft', 'tb']
         self._resolve_workflow_gs_properties(methods, properties)
         # Resolving DMFT Greens functions
-        gfs_electronic: List[GreensFunctionsElectronic] = (
+        gfs_electronic: list[GreensFunctionsElectronic] = (
             self.electronic_properties.get('greens_functions')  # type: ignore
         )
         gfs_electronic_dmft = self.resolve_greens_functions(
@@ -710,7 +730,7 @@ class ResultsNormalizer(Normalizer):
         methods = ['maxent']
         self._resolve_workflow_gs_properties(methods, properties)
         # Resolving DMFT Greens functions
-        gfs_electronic: List[GreensFunctionsElectronic] = (
+        gfs_electronic: list[GreensFunctionsElectronic] = (
             self.electronic_properties.get('greens_functions')  # type: ignore
         )
         for method in ['dmft', 'maxent']:
@@ -727,17 +747,17 @@ class ResultsNormalizer(Normalizer):
                 item.label = name
                 gfs_electronic.append(item)
 
-    def get_xs_workflow_properties(self, spectra: List[Spectra]) -> List[Spectra]:
+    def get_xs_workflow_properties(self, spectra: list[Spectra]) -> list[Spectra]:
         """Gets the XS workflow (DFT+GW+BSE) workflow properties and stores them in self.electronic_properties
         and in spectra. Then it returns the new Spectra section with the resolved data
 
         Args:
-            spectra (Union[List[Spectra], None]): the input Spectra section resolved from
+            spectra (Union[list[Spectra], None]): the input Spectra section resolved from
                 `archive.run`.
 
         Returns:
             Union[List[Spectra], None]: the mapped Spectra from `workflow2.results`.
-        """
+        """  # ! TODO: double-check typing
         properties = ['band_gap', 'band_structure', 'dos']
         methods = ['dft', 'gw']
         self._resolve_workflow_gs_properties(methods, properties)
@@ -897,7 +917,7 @@ class ResultsNormalizer(Normalizer):
                 pass
         return md
 
-    def trajectory(self) -> List[Trajectory]:
+    def trajectory(self) -> list[Trajectory]:
         """Returns a list of trajectories."""
         path = ['workflow2']
         trajs = []
@@ -965,7 +985,7 @@ class ResultsNormalizer(Normalizer):
                 trajs.append(traj)
         return trajs
 
-    def rdf(self) -> List[RadialDistributionFunction]:
+    def rdf(self) -> list[RadialDistributionFunction]:
         """Returns a list of radial distribution functions."""
         workflow = self.entry_archive.workflow2
         if workflow is None or workflow.m_def.name != 'MolecularDynamics':
@@ -1000,10 +1020,10 @@ class ResultsNormalizer(Normalizer):
 
         return rdfs
 
-    def rg(self) -> List[RadiusOfGyration]:
+    def rg(self) -> list[RadiusOfGyration]:
         """Returns a list of Radius of gyration trajectories."""
         path_workflow = ['workflow2']
-        rgs: List[RadiusOfGyration] = []
+        rgs: list[RadiusOfGyration] = []
         for workflow in traverse_reversed(self.entry_archive, path_workflow):
             # Check validity
             if workflow.m_def.name == 'MolecularDynamics' and workflow.results:
@@ -1044,7 +1064,7 @@ class ResultsNormalizer(Normalizer):
                     rgs.append(rg_results)
         return rgs
 
-    def msd(self) -> List[MeanSquaredDisplacement]:
+    def msd(self) -> list[MeanSquaredDisplacement]:
         """Returns a list of mean squared displacements."""
         workflow = self.entry_archive.workflow2
         if workflow is None or workflow.m_def.name != 'MolecularDynamics':
@@ -1120,36 +1140,17 @@ class ResultsNormalizer(Normalizer):
                 elif structural_type == '1D':
                     conv_atoms, _ = self.structures_1d(original_atoms)
 
-        # Electronic and Spectroscopic
-        #   electronic properties list
-        ElectronicPropertyTypes = Dict[
-            str,
-            Union[
-                List[BandGap],
-                List[BandStructureElectronic],
-                List[DOSElectronic],
-                List[DOSElectronicNew],
-                List[GreensFunctionsElectronic],
-                List[ElectricFieldGradient],
-            ],
-        ]
-        electronic_properties: ElectronicPropertyTypes = {
-            'band_gap': self.resolve_band_gap(['run', 'calculation', 'band_gap']),
-            'band_structure': self.resolve_band_structure(
-                ['run', 'calculation', 'band_structure_electronic']
-            ),
-            'dos_deprecated': self.resolve_dos_deprecated(
-                ['run', 'calculation', 'dos_electronic']
-            ),
-            'dos': self.resolve_dos(['run', 'calculation', 'dos_electronic']),
-            'greens_functions': self.resolve_greens_functions(
+        self.electronic_properties: dict[str, list[Any]] = {
+            'band_gap': self.resolve_band_gap(),
+            'dos_electronic': self.resolve_dos_deprecated(),
+            'dos_electronic_new': self.resolve_dos(),
+            'band_structure_electronic': self.resolve_band_structure(),
+            'greens_functions_electronic': self.resolve_greens_functions(
                 ['run', 'calculation', 'greens_functions']
             ),
-            'electric_field_gradient': self.resolve_electric_field_gradient(
-                ['run', 'calculation', 'electric_field_gradient']
-            ),
+            'density_charge': self.fetch_charge_density(),
+            'electric_field_gradient': self.resolve_electric_field_gradient(),
         }
-        self.electronic_properties = electronic_properties
         #   spectroscopic properties list
         spectra = self.resolve_spectra(['run', 'calculation', 'spectra'])
         # Resolving GW, XS workflow properties
@@ -1171,16 +1172,16 @@ class ResultsNormalizer(Normalizer):
             elif workflow_name == 'XS':
                 spectra = self.get_xs_workflow_properties(spectra)
 
-        method_def = {
-            value.sub_section.name: value
-            for _, value in ElectronicProperties.m_def.all_sub_sections.items()
-        }
+        # check if a property in `ElectronicProperties` is present
         if any(len(value) > 0 for value in self.electronic_properties.values()):
             electronic = ElectronicProperties()
-            for electronic_property in self.electronic_properties.values():
+            for (
+                property_name,
+                electronic_property,
+            ) in self.electronic_properties.items():
                 if len(electronic_property) > 0:
                     for prop in electronic_property:
-                        electronic.m_add_sub_section(method_def[prop.m_def.name], prop)
+                        electronic.m_append(property_name, prop)
             properties.electronic = electronic
 
         # Spectroscopic
@@ -1370,10 +1371,10 @@ class ResultsNormalizer(Normalizer):
             )
         return conv_atoms, prim_atoms
 
-    def energy_volume_curves(self) -> List[EnergyVolumeCurve]:
+    def energy_volume_curves(self) -> list[EnergyVolumeCurve]:
         """Returns a list containing the found EnergyVolumeCurves."""
         workflow = self.entry_archive.workflow2
-        ev_curves: List[EnergyVolumeCurve] = []
+        ev_curves: list[EnergyVolumeCurve] = []
         # workflow must be equation of state
         if (
             workflow is None
@@ -1419,10 +1420,10 @@ class ResultsNormalizer(Normalizer):
 
         return ev_curves
 
-    def bulk_modulus(self) -> List[BulkModulus]:
+    def bulk_modulus(self) -> list[BulkModulus]:
         """Returns a list containing the found BulkModulus."""
         workflow = self.entry_archive.workflow2
-        bulk_modulus: List[BulkModulus] = []
+        bulk_modulus: list[BulkModulus] = []
         if (
             workflow is None
             or not hasattr(workflow, 'results')
@@ -1478,10 +1479,10 @@ class ResultsNormalizer(Normalizer):
 
         return bulk_modulus
 
-    def shear_modulus(self) -> List[ShearModulus]:
+    def shear_modulus(self) -> list[ShearModulus]:
         """Returns a list containing the found ShearModulus."""
         workflow = self.entry_archive.workflow2
-        shear_modulus: List[ShearModulus] = []
+        shear_modulus: list[ShearModulus] = []
         if (
             workflow is None
             or not hasattr(workflow, 'results')
