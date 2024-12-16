@@ -19,6 +19,8 @@ gui/junit.xml
 nomad.yaml
 gui/public/env.js
 gui/public/artifacts.js
+gui/tests/env.js
+gui/tests/artifacts.js
 !gui/tests/nomad.yaml
 !ops/docker-compose/nomad-oasis/configs/nomad.yaml
 !ops/docker-compose/nomad-oasis-with-keycloak/configs/nomad.yaml

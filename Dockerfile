@@ -149,7 +149,7 @@ COPY .coveragerc \
      setup.py \
      ./
 
-# Files requiered for artifact generation/testing
+# Files required for artifact generation/testing
 COPY ops/docker-compose ./ops/docker-compose
 
 # Build documentation with static version
@@ -161,10 +161,6 @@ RUN ./scripts/generate_docs_artifacts.sh \
  && cp -r site/* nomad/app/static/docs
 
 RUN RUN_DOCS_TEST=1 python -m pytest tests/app/test_app.py
-
-COPY gui/tests/nomad.yaml ./gui/tests/nomad.yaml
-COPY gui/tests/env.js ./gui/tests/env.js
-COPY gui/tests/artifacts.js ./gui/tests/artifacts.js
 
 # Copy the built gui code
 COPY --from=build_node /app/gui/build nomad/app/static/gui
