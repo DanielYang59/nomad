@@ -24,7 +24,9 @@ from .cli import cli
 @cli.command(help='Run parsing and normalizing locally.', name='parse')
 @click.argument('MAINFILE', nargs=1, required=True, type=str)
 @click.option(
-    '--show-archive', is_flag=True, default=False, help='Print the archive data.'
+    '--show-archive/--no-archive',
+    default=True,
+    help='Whether to print out the archive data into stdout.',
 )
 @click.option(
     '--archive-with-meta',

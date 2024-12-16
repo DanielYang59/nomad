@@ -462,7 +462,7 @@ export default function About() {
         </p>
         <p>NOMAD supports most community codes and file formats: <CodeList/></p>
         <p>
-        To use NOMAD&apos;s parsers and normalizers outside of NOMAD read <Link href={`${appBase}/docs/local_parsers.html`}>here</Link>.
+        To use NOMAD&apos;s parsers and normalizers outside of NOMAD read <Link href={`${appBase}/docs/howto/plugins/parsers.html#running-a-parser`}>here</Link>.
         Read <Link href={`${appBase}/docs/pythonlib.html`}>here</Link> on how to install
         our software and how to use NOMAD processing in your Python environment.
         </p>

@@ -26,7 +26,6 @@ nav:
           - Publish data using python: howto/programmatic/publish_python.md
           - Install nomad-lab: howto/programmatic/pythonlib.md
           - Access processed data: howto/programmatic/archive_query.md
-          - Run a parser: howto/programmatic/local_parsers.md
       - NOMAD Oasis:
           - Install an Oasis: howto/oasis/install.md
           - Customize an Oasis: howto/oasis/customize.md
