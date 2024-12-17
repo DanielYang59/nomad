@@ -17,7 +17,9 @@
 #
 import datetime
 import os
+import random
 import re
+import time
 from typing import TYPE_CHECKING, Dict, Iterable, List
 
 import h5py
@@ -50,6 +52,18 @@ CAS_API_PATH = 'https://commonchemistry.cas.org/api'
 EXTERNAL_API_TIMEOUT = 5
 
 
+def throttle_wait():
+    """Function for waiting before an API request to prevent throttling."""
+    time.sleep(random.randint(1, 3))
+
+
+def pub_chem_add_throttle_header(response: requests.Response, message: str = '') -> str:
+    """Function for adding the PubChem PUG API throttling control header to a message."""
+    if 'X-Throttling-Control' in response.headers:
+        message += f' (Throttling-Control: {response.headers["X-Throttling-Control"]})'
+    return message
+
+
 def pub_chem_api_get_properties(
     cid: int, properties: Iterable[str]
 ) -> requests.Response:
@@ -64,6 +78,7 @@ def pub_chem_api_get_properties(
     Returns:
         requests.Response: The response as returned from the PubChem PUG API.
     """
+    throttle_wait()
     return requests.get(
         url=f'{PUB_CHEM_PUG_PATH}/cid/{cid}/property/{str.join(",", properties)}/JSON',
         timeout=EXTERNAL_API_TIMEOUT,
@@ -81,6 +96,7 @@ def pub_chem_api_get_synonyms(cid: int) -> requests.Response:
     Returns:
         requests.Response: The response as returned from the PubChem PUG API.
     """
+    throttle_wait()
     return requests.get(
         url=f'{PUB_CHEM_PUG_PATH}/cid/{cid}/synonyms/JSON',
         timeout=EXTERNAL_API_TIMEOUT,
@@ -99,6 +115,7 @@ def pub_chem_api_search(path: str, search: str) -> requests.Response:
     Returns:
         requests.Response: The response as returned from the PubChem PUG API.
     """
+    throttle_wait()
     return requests.get(
         url=f'{PUB_CHEM_PUG_PATH}/{path}/{search}/cids/JSON',
         timeout=EXTERNAL_API_TIMEOUT,
@@ -1481,7 +1498,8 @@ class PubChemPureSubstanceSection(PureSubstanceSection):
             cid=self.pub_chem_cid, properties=properties
         )
         if not response.ok:
-            logger.warn(f'Property request to PubChem responded with: {response}')
+            msg = f'Property request to PubChem responded with: {response}'
+            logger.warn(pub_chem_add_throttle_header(response, msg))
             return
         self.pub_chem_link = (
             f'https://pubchem.ncbi.nlm.nih.gov/compound/{self.pub_chem_cid}'
@@ -1513,7 +1531,8 @@ class PubChemPureSubstanceSection(PureSubstanceSection):
         if self.cas_number is None:
             response = pub_chem_api_get_synonyms(cid=self.pub_chem_cid)
             if not response.ok:
-                logger.warn(f'Synonyms request to PubChem responded with: {response}')
+                msg = f'Synonyms request to PubChem responded with: {response}'
+                logger.warn(pub_chem_add_throttle_header(response, msg))
                 return
             response_dict = response.json()
             try:
@@ -1545,7 +1564,8 @@ class PubChemPureSubstanceSection(PureSubstanceSection):
             logger.info(f'No results for PubChem search for {path}="{search}".')
             return False
         elif not response.ok:
-            logger.warn(f'PubChem search for {path}="{search}" yielded: {response}')
+            msg = f'PubChem search for {path}="{search}" responded with: {response}'
+            logger.warn(pub_chem_add_throttle_header(response, msg))
             return False
         try:
             cids = response.json()['IdentifierList']['CID']
@@ -1592,6 +1612,7 @@ class PubChemPureSubstanceSection(PureSubstanceSection):
         ):
             if search and self._pub_chem_search_unique(search, path, logger):
                 self._populate_from_cid(logger)
+                return
 
     def normalize(self, archive, logger: 'BoundLogger') -> None:
         """
