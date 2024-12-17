@@ -472,6 +472,7 @@ class EntryMetadata(MSection):
             an embargo.
         reviewer_groups: List of reviewer groups, cf. `reviewers`.
         datasets: Ids of all datasets that this entry appears in
+        readonly: It indicates that no manual editing should happen
     """
 
     m_def = Section(label='Metadata')
@@ -932,6 +933,13 @@ class EntryMetadata(MSection):
         sub_section=SearchableQuantity,
         repeats=True,
         a_elasticsearch=Elasticsearch(nested=True),
+    )
+
+    readonly = Quantity(
+        type=bool,
+        default=False,
+        description='Indicates if the entry shall not be edited manually',
+        a_elasticsearch=Elasticsearch(material_entry_type),
     )
 
     def apply_archive_metadata(self, archive):
