@@ -45,6 +45,7 @@ const shownColumns = [
 const rows = context?.rows
 const columns = (context?.columns || [])
   .map((column) => ({...column, selected: shownColumns.includes(column.search_quantity)}))
+rows.selection = {enabled: false}
 rows.details = {enabled: false}
 rows.actions = {enabled: false}
 
@@ -105,18 +106,18 @@ function SearchDialog({open, filters, pageSize, onCancel, onQueryChanged}) {
 
   return <Dialog
     open={open}
+    disableG
     PaperProps={{
       style: {
         maxWidth: '1800px',
-        maxHeight: '1200px',
         width: '1800px',
-        height: '1200px'
+        height: '95%'
       }
     }}
     data-testid='search-dialog'
     onClose={handleSearchDialogClose}
   >
-    <DialogContent>
+    <DialogContent style={{padding: 0}}>
       <SearchPage/>
     </DialogContent>
     <DialogActions>
