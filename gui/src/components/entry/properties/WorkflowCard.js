@@ -837,7 +837,7 @@ const Graph = React.memo(({
 
       // set ids and size
       const maxLength = Math.max(...source.nodes
-        .filter(node => node.type === 'tasks').map(node => node.nChildren || 0))
+        .filter(node => node.type === 'tasks').map(node => node.nChildren || 1))
       source.size = source.nChildren / maxLength
       source.id = id
       id = id + 1
