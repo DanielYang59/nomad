@@ -244,7 +244,7 @@ generate gui artifacts:
     paths:
       - gui/tests/env.js
       - gui/tests/artifacts.js
-    expire_in: 20 minutes
+    expire_in: 1h
 
 gui tests:
   stage: test
