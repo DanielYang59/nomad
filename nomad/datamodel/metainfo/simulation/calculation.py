@@ -33,7 +33,6 @@ from nomad.metainfo import (  # pylint: disable=unused-import
     Reference,
     MEnum,
     derived,
-    HDF5Reference,
 )
 from nomad.datamodel.metainfo.common import ProvenanceTracker, PropertySection
 from nomad.datamodel.metainfo.simulation.system import System, AtomsGroup
@@ -1710,7 +1709,7 @@ class Density(Volumetric):
     # TODO rename this to value or restructure metainfo def for densities and perhaps
     # rename density_charge to charge_density if no other densities are to be added.
     value_hdf5 = Quantity(
-        type=HDF5Reference,
+        type=str,
         shape=[],
         description="""
         Specifies the HDF5 file and the path to the value in the file .

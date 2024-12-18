@@ -26,7 +26,7 @@ between sections, and additional quantity categories.
 NOMAD uses the meta-info to define all archive data, repository meta-data, (and encyclopedia
 data). The meta-info provides a convenient Python interface to create,
 manipulate, and access data. We also use it to map data to various storage formats,
-including JSON, (HDF5), mongodb, and elastic search.
+including JSON, mongodb, and elastic search.
 """
 
 from .metainfo import (
@@ -59,7 +59,6 @@ from .metainfo import (
     JSON,
     Dimension,
     Bytes,
-    HDF5Reference,
     Context,
     m_package,
     SectionProxy,

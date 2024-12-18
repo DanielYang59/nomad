@@ -58,7 +58,6 @@ from nomad.metainfo.data_type import (
     URL as URLType,
     Dimension as DimensionType,
     File as FileType,
-    HDF5Reference as HDF5ReferenceType,
     Any as AnyType,
     check_dimensionality,
     ExactNumber,
@@ -665,7 +664,6 @@ Callable = CallableType
 URL = URLType
 Dimension = DimensionType
 File = FileType
-HDF5Reference = HDF5ReferenceType
 
 
 # Metainfo data storage and reflection interface
