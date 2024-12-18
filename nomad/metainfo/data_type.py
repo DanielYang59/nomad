@@ -913,13 +913,6 @@ class JSON(NonPrimitive):
         return 'dict'
 
 
-class HDF5Reference(NonPrimitive):
-    __slots__ = ()
-
-    def _normalize_impl(self, value, **kwargs):
-        return value
-
-
 class Dimension(NonPrimitive):
     __slots__ = ()
 
