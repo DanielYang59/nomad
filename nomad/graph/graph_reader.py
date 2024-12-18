@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import asyncio
-from contextlib import contextmanager
 import copy
 import dataclasses
 import functools
@@ -26,6 +25,7 @@ import itertools
 import os
 import re
 from collections.abc import AsyncIterator, Iterator
+from contextlib import contextmanager
 from threading import Lock
 from typing import Any, Callable, Type, Union
 
@@ -101,8 +101,8 @@ from nomad.metainfo import (
     SectionReference,
     SubSection,
 )
-from nomad.metainfo.data_type import JSON, Datatype
 from nomad.metainfo.data_type import Any as AnyType
+from nomad.metainfo.data_type import JSON, Datatype
 from nomad.metainfo.util import MSubSectionList, split_python_definition
 from nomad.processing import Entry, ProcessStatus, Upload
 from nomad.utils import timer
@@ -1455,13 +1455,14 @@ class MongoReader(GeneralReader):
 
         return config.query.dict(exclude_unset=True), self.datasets.filter(mongo_query)
 
-    async def _query_groups(self, config: RequestConfig):
-        if isinstance(config.query, UserGroupQuery):
-            query = config.query
-        else:
-            query = UserGroupQuery()
-        db_groups = MongoUserGroup.get_by_query(query)
-        return query.dict(exclude_unset=True), db_groups
+    @staticmethod
+    async def _query_groups(config: RequestConfig):
+        query: UserGroupQuery = (
+            config.query
+            if isinstance(config.query, UserGroupQuery)
+            else UserGroupQuery()
+        )
+        return query.dict(exclude_unset=True), MongoUserGroup.get_by_query(query)
 
     async def _normalise(
         self, mongo_result, config: RequestConfig, transformer: Callable
@@ -2497,6 +2498,20 @@ class FileSystemReader(GeneralReader):
         return {}
 
 
+def _is_quantity_reference(definition) -> bool:
+    # todo: those three should be handled differently as they are not references
+    from nomad.datamodel.data import AuthorReference, UserReference
+    from nomad.datamodel.datamodel import DatasetReference
+
+    return (
+        isinstance(definition, Quantity)
+        and isinstance(definition.type, Reference)
+        and not isinstance(
+            definition.type, (UserReference, AuthorReference, DatasetReference)
+        )
+    )
+
+
 class ArchiveReader(ArchiveLikeReader):
     """
     This class provides functionalities to read an archive with the required fields.
@@ -2765,10 +2780,21 @@ class ArchiveReader(ArchiveLikeReader):
         if not isinstance(node.archive, GenericDict):  # type: ignore
             # primitive type data is always included
             # this is not affected by size limit nor by depth limit
+            if (
+                _is_quantity_reference(node.definition)
+                and config.always_rewrite_references
+            ):
+                try:
+                    result_to_write = _convert_ref_to_path_string(
+                        node.archive, node.upload_id
+                    )
+                except Exception:  # noqa
+                    result_to_write = await self._apply_resolver(node, config)
+            else:
+                result_to_write = await self._apply_resolver(node, config)
+
             return await _populate_result(
-                node.result_root,
-                node.current_path,
-                await self._apply_resolver(node, config),
+                node.result_root, node.current_path, result_to_write
             )
 
         if isinstance(node.definition, Quantity) or isinstance(
@@ -2823,10 +2849,7 @@ class ArchiveReader(ArchiveLikeReader):
                     }
                 )
 
-                # todo: this shortcircuit most likely yields incorrect response
-                # todo: since any potential references are not rewritten
-                # todo: this is thus disabled for the moment
-                if child_config.is_plain() and False:
+                if child_config.is_plain():
                     await _populate_result(
                         node.result_root, child_node.current_path, child_node.archive
                     )
@@ -2925,18 +2948,8 @@ class ArchiveReader(ArchiveLikeReader):
         if isinstance(original_def, SubSection):
             return node.replace(definition=original_def.sub_section.m_resolved())
 
-        # todo: those three should be handled differently as they are not references
-        from nomad.datamodel.data import AuthorReference, UserReference
-        from nomad.datamodel.datamodel import DatasetReference
-
         # if not a quantity reference, early return
-        if not (
-            isinstance(original_def, Quantity)
-            and isinstance(original_def.type, Reference)
-            and not isinstance(
-                original_def.type, (UserReference, AuthorReference, DatasetReference)
-            )
-        ):
+        if not _is_quantity_reference(original_def):
             return node
 
         # for quantity references, early return if no need to resolve

@@ -226,6 +226,13 @@ class RequestConfig(BaseModel):
         Set to `False` to definitions per section basis.
         """,
     )
+    always_rewrite_references: bool = Field(
+        False,
+        description="""
+        Set to `True` to always rewrite references.
+        This yields a more consistent output but has a performance penalty.
+        """,
+    )
     include_definition: DefinitionType = Field(
         DefinitionType.none,
         description="""
@@ -365,6 +372,7 @@ class RequestConfig(BaseModel):
         return (
             self.directive == DirectiveType.plain
             and self.include_definition == DefinitionType.none
+            and self.always_rewrite_references is False
             and self.index is None
             and self.depth is None
             and self.max_list_size is None

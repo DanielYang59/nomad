@@ -1519,6 +1519,54 @@ def test_remote_reference(json_dict, example_data_with_reference, user1):
                 },
             },
         )
+        __entry_print(
+            'plain without rewriting references',
+            {
+                Token.ARCHIVE: {
+                    'workflow2': {
+                        'm_request': {
+                            'directive': 'plain',
+                        }
+                    }
+                }
+            },
+            result={
+                'archive': {
+                    'workflow2': {
+                        'tasks': [
+                            {
+                                'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference',
+                                'task': '../entries/id_01/archive#/workflow2',
+                            }
+                        ]
+                    }
+                }
+            },
+        )
+        __entry_print(
+            'plain with rewriting references',
+            {
+                Token.ARCHIVE: {
+                    'workflow2': {
+                        'm_request': {
+                            'directive': 'plain',
+                            'always_rewrite_references': True,
+                        }
+                    }
+                }
+            },
+            result={
+                'archive': {
+                    'workflow2': {
+                        'tasks': [
+                            {
+                                'task': 'uploads/id_published_with_ref/entries/id_01/archive/workflow2'
+                            }
+                        ]
+                    }
+                }
+            },
+        )
 
     __entry_print(
         'go to upload, resolve explicitly',
