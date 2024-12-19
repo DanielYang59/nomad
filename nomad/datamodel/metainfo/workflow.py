@@ -78,6 +78,10 @@ class Task(ArchiveSection):
             'All the links to sections that represent the outputs for this task.'
         ),
     )
+    section = Quantity(
+        type=ArchiveSection,
+        description=('A reference to the section this task is composed of.'),
+    )
 
 
 class TaskReference(Task):

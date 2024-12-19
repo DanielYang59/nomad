@@ -341,7 +341,8 @@ class ActivityStep(ArchiveSection):
         Returns:
             Task: The activity step as a workflow task.
         """
-        return Task(name=self.name)
+        task = Task(name=self.name, section=self)
+        return task
 
 
 class Activity(BaseSection):
