@@ -1655,6 +1655,7 @@ def create_searchable_quantity(
                     value_temp = drop_value(value[k].value, mapping)
                     if value_temp is not None:
                         value = value_temp
+                        break
             else:
                 value = drop_value(value, mapping)
             if value is None:
