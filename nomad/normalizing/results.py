@@ -1047,6 +1047,8 @@ class ResultsNormalizer(Normalizer):
                                     molecular_dynamics=md
                                 )
                             for calc in results.calculations_ref:
+                                if not calc.system_ref:
+                                    continue
                                 sec_rg = calc.radius_of_gyration[rg_index]
                                 rg_results.kind = sec_rg.kind
                                 time = calc.time
