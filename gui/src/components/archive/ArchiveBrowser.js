@@ -446,11 +446,9 @@ class ArchiveAdaptor extends Adaptor {
   async initialize(api, dataStore) {
     this.api = api
     this.dataStore = dataStore
-    const {editable} = await dataStore.getEntryAsync(
+    const {editable, archive: {metadata: {readonly}}} = await dataStore.getEntryAsync(
       this.parsedObjUrl.deploymentUrl, this.parsedObjUrl.entryId, false, '*')
-    const archive = await dataStore.getEntryAsync(
-      this.parsedObjUrl.deploymentUrl, this.parsedObjUrl.entryId, false, '*')
-    this.entryIsEditable = editable && !archive.readonly
+    this.entryIsEditable = editable && !readonly
   }
 
   async adaptorFactory(objUrl, obj, property) {
