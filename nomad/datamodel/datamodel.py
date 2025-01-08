@@ -213,8 +213,11 @@ class DatasetReference(Reference):
             return value
 
         if isinstance(value, str):
-            if (target := Dataset.m_def.a_mongo.get(dataset_id=value)) is not None:
-                return target
+            try:
+                if (target := Dataset.m_def.a_mongo.get(dataset_id=value)) is not None:
+                    return target
+            except Exception:  # noqa
+                pass
             return value
 
         raise ValueError(f'Cannot normalize {value}.')
