@@ -159,12 +159,16 @@ class DOI(Document):
         mds_resource.attrib['xsi:schemaLocation'] = (
             'http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3.1/metadata.xsd'
         )
-        mds_resource.attrib['xmlns'] = 'http://datacite.org/schema/kernel-3'
+        mds_resource.attrib['xmlns'] = 'http://datacite.org/schema/kernel-4'
         mds_resource.attrib['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
 
         mds_identifier = ET.SubElement(mds_resource, 'identifier')
         mds_identifier.text = doi_str
         mds_identifier.attrib['identifierType'] = 'DOI'
+
+        mds_resource_type = ET.SubElement(mds_resource, 'resourceType')
+        mds_resource_type.text = 'Materials Science Data'
+        mds_resource_type.attrib['resourceTypeGeneral'] = 'Dataset'
 
         mds_creator = _xml(mds_resource, 'creators/creator')
         _xml(mds_creator, 'creatorName', user.name)
