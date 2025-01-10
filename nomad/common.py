@@ -188,3 +188,66 @@ def extract_file(
 def is_url(path) -> bool:
     """Utility function for determining whether a filepath represents a URL."""
     return path.startswith('http://') or path.startswith('https://')
+
+
+def is_safe_basename(basename: str) -> bool:
+    """
+    Checks if `basename` is a *safe* base name (file/folder name). We consider it safe if
+    it is not empty, does not contain any '/', and is not equal to '.' or '..'
+    """
+    if not basename or '/' in basename or basename == '.' or basename == '..':
+        return False
+    return True
+
+
+def is_safe_path(path: str, safe_path: str, is_directory=True) -> bool:
+    """Returns whether the given path ultimately points to a known safe
+    location. Can be used to prevent path traversal attacks, such as relative
+    paths or symlinks.
+
+        Args:
+            path: The path to check
+            safe_path: A safe location. Can be a folder or a file.
+            is_directory: Whether the safe path is a directory or not. If True,
+                a trailing slash is added and only the common prefix is tested.
+                If False, the whole path must match. Otherwise users may access
+                other locations with the same name prefix (e.g. /safe2 when
+                safe_path was /safe).
+    """
+    real_path = os.path.realpath(path)
+    if is_directory:
+        if not safe_path.endswith(os.path.sep):
+            safe_path += os.path.sep
+        return os.path.commonprefix((real_path, safe_path)) == safe_path
+
+    return real_path == safe_path
+
+
+def is_safe_relative_path(path: str) -> bool:
+    """
+    Checks if path is a *safe* relative path. We consider it safe if it does not start with
+    '/' or use '.' or '..' elements (which could be open for security leaks if allowed).
+    It may end with a single '/', indicating that a folder is referred. For referring to
+    the base folder, the empty string should be used (not '.' etc).
+    """
+    if not isinstance(path, str):
+        return False
+    if path == '':
+        return True
+    if path.startswith('/') or '//' in path or '\n' in path:
+        return False
+
+    depth = 0
+    for element in path.split(os.sep):
+        if element == '.':
+            continue
+        if element == '..':
+            depth -= 1
+        else:
+            depth += 1
+        # If depth at any point goes negative, it means the path goes outside
+        # the base folder
+        if depth < 0:
+            return False
+
+    return True
