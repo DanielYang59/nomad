@@ -40,12 +40,11 @@ from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
 
 from nomad import utils, files
+from nomad.common import is_safe_relative_path, is_safe_basename
 from nomad.config import config
 from nomad.config.models.plugins import ExampleUploadEntryPoint
 from nomad.files import (
     StagingUploadFiles,
-    is_safe_relative_path,
-    is_safe_basename,
     PublicUploadFiles,
 )
 from nomad.bundles import BundleExporter, BundleImporter

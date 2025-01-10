@@ -76,6 +76,7 @@ from nomad import (
     client,
 )
 from nomad.config import config
+from nomad.common import is_safe_relative_path
 from nomad.config.models.plugins import ExampleUploadEntryPoint
 
 from nomad.datamodel.datamodel import RFC3161Timestamp
@@ -86,7 +87,6 @@ from nomad.files import (
     PublicUploadFiles,
     StagingUploadFiles,
     create_tmp_dir,
-    is_safe_relative_path,
 )
 from nomad.groups import user_group_exists, get_group_ids
 from nomad.metainfo.data_type import Datatype, Datetime

@@ -24,7 +24,7 @@ import importlib
 from typing import Optional, Dict, Union, List, Literal, cast, TYPE_CHECKING
 from pydantic import BaseModel, Field, root_validator
 
-from nomad.common import get_package_path, download_file, is_url
+from nomad.common import get_package_path, download_file, is_url, is_safe_relative_path
 
 from .common import Options
 from .ui import App
@@ -260,7 +260,6 @@ class ExampleUploadEntryPoint(EntryPoint):
             upload_path: The root folder for the upload where the data should be
                 stored.
         """
-        from nomad.files import is_safe_relative_path
 
         # Perform initial checks
         url = False
@@ -329,7 +328,6 @@ class ExampleUploadEntryPoint(EntryPoint):
                         if os.path.isdir(src_path):
                             shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
                         else:
-                            print(src_path, dest_path)
                             shutil.copyfile(src_path, dest_path)
                 else:
                     shutil.copytree(source, target, dirs_exist_ok=True)
