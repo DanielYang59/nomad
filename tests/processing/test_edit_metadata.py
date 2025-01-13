@@ -141,9 +141,9 @@ def assert_metadata_edited(
                         quantity, value_expected, 'request', user
                     )
                     # Verify mongo value
-                    assert (
-                        cmp_value_mongo == cmp_value_expected
-                    ), f'Wrong mongo value for {quantity_name}'
+                    assert cmp_value_mongo == cmp_value_expected, (
+                        f'Wrong mongo value for {quantity_name}'
+                    )
                     # Verify ES value
                     if quantity_name == 'license':
                         continue  # Not stored indexed by ES
@@ -160,9 +160,9 @@ def assert_metadata_edited(
                             + cmp_value_expected
                         ), f'Wrong es value for {quantity_name}'
                     else:
-                        assert (
-                            cmp_value_es == cmp_value_expected
-                        ), f'Wrong es value for {quantity_name}'
+                        assert cmp_value_es == cmp_value_expected, (
+                            f'Wrong es value for {quantity_name}'
+                        )
 
 
 def convert_to_comparable_value(quantity, value, from_format, user):

@@ -428,8 +428,8 @@ if __name__ == '__main__':
     import os
     import sys
 
-    assert len(sys.argv) == 2 and os.path.isdir(
-        sys.argv[1]
-    ), 'One argument with an directory path is required.'
+    assert len(sys.argv) == 2 and os.path.isdir(sys.argv[1]), (
+        'One argument with an directory path is required.'
+    )
 
     parser_in_dir(sys.argv[1])

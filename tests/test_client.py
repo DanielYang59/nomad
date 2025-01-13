@@ -15,17 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import os
 from typing import List, Tuple
 
 from httpx import AsyncClient
 import pytest
+import json
+
+from pydantic import ValidationError
 
 from nomad.app.main import app
 from nomad.client.archive import ArchiveQuery
 from nomad.datamodel import EntryArchive, User
 from nomad.datamodel.metainfo import runschema, SCHEMA_IMPORT_ERROR
+from nomad.datamodel.metainfo.annotations import (
+    Rule,
+    Rules,
+)
 from nomad.metainfo import MSection, SubSection
+from nomad.utils.json_transformer import Transformer
 from tests.fixtures.users import users
 from tests.processing import test_data as test_processing
 
@@ -148,3 +156,168 @@ def test_async_query_parallel(async_api_v1, many_uploads, monkeypatch):
     async_query = ArchiveQuery(required=dict(run='*'), page_size=1)
 
     assert_results(async_query.download(), total=4)
+
+
+def load_example(path: str):
+    current_dir = os.getcwd()
+    rules_path = os.path.join(
+        current_dir, 'examples', 'data', 'json_transformer', path + '.json'
+    )
+    expected_path = os.path.join(
+        current_dir, 'examples', 'data', 'json_transformer', 'expected.json'
+    )
+    with open(rules_path, 'r') as file:
+        rules_data = json.load(file)
+    with open(expected_path, 'r') as f:
+        expected = json.load(f)
+
+    transformation_dict = {}
+    try:
+        rules = Rules(**rules_data['schema'])
+        transformation_dict[path] = rules
+    except ValidationError as ve:
+        pytest.fail(f"Validation error in transformation '{path}': {ve}")
+    data = rules_data['data']
+    expected = expected[path]
+    return transformation_dict, data, expected
+
+
+def load_transformer(transformation_rules):
+    """
+    Fixture to provide a Transformer instance with predefined rules.
+    """
+    return Transformer(mapping_dict=transformation_rules)
+
+
+@pytest.mark.parametrize(
+    'transformation_name,target',
+    [
+        ('basic_transformation', {}),
+        ('list_transformation', {}),
+        ('dict_to_list_transformation', []),
+        ('list_to_list_transformation', []),
+        ('dict_to_list_with_none_transformation', []),
+        ('dict_with_regex_transformation', {}),
+        ('dict_with_regex_transformation_no_match', {}),
+        ('dict_with_default_transformation', {}),
+        (
+            'dict_with_default_transformation_missing_b',
+            {},
+        ),
+        (
+            'dict_with_default_transformation_missing_a_and_b',
+            {},
+        ),
+        ('nested_transformation', {}),
+        ('complex_transformation', {}),
+        ('conditional_transformation_not_met', {}),
+        ('conditional_transformation_met', {}),
+    ],
+)
+def test_transform(transformation_name, target):
+    """
+    General test for Transformer.transform method.
+    """
+
+    transformation_rules, source, expected = load_example(transformation_name)
+    transformer = load_transformer(transformation_rules)
+
+    assert source is not None, (
+        f"'source' key missing in test data for '{transformation_name}'"
+    )
+    assert target is not None, (
+        f"'target' key missing in test data for '{transformation_name}'"
+    )
+    assert expected is not None, (
+        f"'expected' key missing in test data for '{transformation_name}'"
+    )
+
+    result = transformer.transform(source, transformation_name, target)
+    assert result == expected, f"Failed for transformation '{transformation_name}''"
+
+
+def test_transform_with_invalid_mapping_name():
+    """
+    Test that transforming with a non-existent transformation name raises a ValueError.
+    """
+    transformation_rules, test_data, expected = load_example('basic_transformation')
+    transformer = load_transformer(transformation_rules)
+    with pytest.raises(ValueError) as exc_info:
+        transformer.transform(test_data, 'non_existent_transformation')
+    assert (
+        "Mapping name 'non_existent_transformation' not found in the transformation dictionary"
+        in str(exc_info.value)
+    )
+
+
+def test_transform_with_complex_nested_structure():
+    """
+    Test transforming a deeply nested structure.
+    """
+    _, test_data, _ = load_example('nested_transformation')
+    mapping = Rules(
+        rules={'rule_f_nested_key': Rule(source='f.nested.key', target='result')}
+    )
+    transformer = load_transformer({'deep_nested': mapping})
+    result = transformer.transform(test_data, 'deep_nested', {})
+    assert result == {'result': 'value'}, 'Failed for deep_nested transformation'
+
+
+def test_transform_with_default_null_values():
+    """
+    Test that setting values in lists with indices beyond current length inserts nulls appropriately.
+    """
+    target = {'new_list': []}
+    Transformer.set_value('new_list[2]', 3, target)
+    assert target['new_list'] == [
+        None,
+        None,
+        3,
+    ], 'Failed to insert None values correctly'
+
+
+def test_transform_with_default_value():
+    """
+    Test that default_value is correctly set when source paths are missing.
+    """
+    transformation_rules, source_default_with_a, expected_default_with_a = load_example(
+        'default_test_transformation_with_a'
+    )
+    transformer = load_transformer(transformation_rules)
+    target_default_with_a = {}
+    result = transformer.transform(
+        source_default_with_a,
+        'default_test_transformation_with_a',
+        target_default_with_a,
+    )
+    assert result == expected_default_with_a, (
+        'Failed default_test_transformation_with_a'
+    )
+
+    transformation_rules, source_default_without_a, expected_default_without_a = (
+        load_example('default_test_transformation_without_a')
+    )
+    transformer = load_transformer(transformation_rules)
+    target_default_without_a = {}
+    result = transformer.transform(
+        source_default_without_a,
+        'default_test_transformation_without_a',
+        target_default_without_a,
+    )
+    assert result == expected_default_without_a, (
+        'Failed default_test_transformation_without_a'
+    )
+
+    transformation_rules, source_default_without_a_b, expected_default_without_a_b = (
+        load_example('default_test_transformation_without_a_and_b')
+    )
+    transformer = load_transformer(transformation_rules)
+    target_default_without_a_b = {}
+    result = transformer.transform(
+        source_default_without_a_b,
+        'default_test_transformation_without_a_and_b',
+        target_default_without_a_b,
+    )
+    assert result == expected_default_without_a_b, (
+        'Failed default_test_transformation_without_a_and_b'
+    )

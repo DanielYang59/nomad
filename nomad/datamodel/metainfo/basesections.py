@@ -28,6 +28,7 @@ import requests
 from ase.data import atomic_masses, atomic_numbers, chemical_symbols
 from unidecode import unidecode
 
+from nomad.datamodel import EntryArchive
 from nomad.datamodel.metainfo.workflow import Link, Task, TaskReference, Workflow
 from nomad.metainfo.data_type import m_str
 
@@ -39,7 +40,10 @@ if TYPE_CHECKING:
 from nomad import utils
 from nomad.atomutils import Formula
 from nomad.datamodel.data import ArchiveSection, EntryData
-from nomad.datamodel.metainfo.annotations import ELNAnnotation, HDF5Annotation
+from nomad.datamodel.metainfo.annotations import (
+    ELNAnnotation,
+    HDF5Annotation,
+)
 from nomad.datamodel.results import ELN, Material, Results
 from nomad.datamodel.results import ElementalComposition as ResultsElementalComposition
 from nomad.datamodel.util import create_custom_mapping
@@ -2122,7 +2126,7 @@ class PublicationReference(ArchiveSection):
                     if self.DOI_number.startswith('10.'):
                         self.DOI_number = 'https://doi.org/' + self.DOI_number
                     self.publication_authors = [
-                        f"{v['given']} {v['family']}"
+                        f'{v["given"]} {v["family"]}'
                         for v in temp_dict['message']['author']
                     ]
                     self.journal = temp_dict['message']['container-title'][0]

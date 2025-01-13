@@ -166,7 +166,7 @@ class GenerateRandomParser(TemplateParser):
         'DFT+U',
         'full-CI',
         'CIS',
-        'CISD' 'CCS',
+        'CISDCCS',
         'CCS(D)',
         'CCSD',
         'CCSD(T)',

@@ -251,12 +251,12 @@ class UploadFilesContract(UploadFilesFixtures):
                 if 't' in mode:
                     with upload_files.raw_file(file_path, mode, encoding='utf-8') as f:
                         content = f.read()
-                        assert isinstance(
-                            content, str
-                        ), 'Content should be a string in text mode'
-                        assert (
-                            len(content) > 0
-                        ), f'File {file_path} with utf-8 encoding should not be empty'
+                        assert isinstance(content, str), (
+                            'Content should be a string in text mode'
+                        )
+                        assert len(content) > 0, (
+                            f'File {file_path} with utf-8 encoding should not be empty'
+                        )
 
     def test_rawfile_size(self, test_upload: UploadWithFiles):
         _, entries, upload_files = test_upload
@@ -408,13 +408,13 @@ class TestStagingUploadFiles(UploadFilesContract):
             try:
                 pf = upload_files.raw_file('examples_template/' + filename)
                 pf.read()
-                assert filename.endswith(
-                    '.stripped'
-                ), 'Non-stripped POTCAR file could be read'
+                assert filename.endswith('.stripped'), (
+                    'Non-stripped POTCAR file could be read'
+                )
             except KeyError:
-                assert not filename.endswith(
-                    '.stripped'
-                ), 'Only non-stripped file should be removed'
+                assert not filename.endswith('.stripped'), (
+                    'Only non-stripped file should be removed'
+                )
 
     @pytest.mark.parametrize('with_mainfile', [True, False])
     def test_entry_files(self, test_upload: StagingUploadWithFiles, with_mainfile):
@@ -560,18 +560,18 @@ class TestPublicUploadFiles(UploadFilesContract):
                 assert access not in os.path.basename(file_name)
             elif access in os.path.basename(file_name):
                 if 'archive' in file_name:
-                    assert (
-                        os.path.getsize(file_name) > 100
-                    ), 'Archive files should have been packed'
+                    assert os.path.getsize(file_name) > 100, (
+                        'Archive files should have been packed'
+                    )
                 else:
-                    assert (
-                        os.path.getsize(file_name) == 50
-                    ), 'Raw file should not have been changed'
+                    assert os.path.getsize(file_name) == 50, (
+                        'Raw file should not have been changed'
+                    )
             else:
                 # other access
-                assert (
-                    os.path.getsize(file_name) <= empty_archive_file_size
-                ), 'Files with other access should be empty'
+                assert os.path.getsize(file_name) <= empty_archive_file_size, (
+                    'Files with other access should be empty'
+                )
 
         assert upload_files.to_staging_upload_files() is None
 
@@ -734,9 +734,9 @@ def create_test_upload_files(
         # create a copy of the given template files for each archive
         mainfile = archive.metadata.mainfile
         mainfile_key = archive.metadata.mainfile_key
-        assert (
-            mainfile is not None
-        ), 'Archives to create test upload must have a mainfile'
+        assert mainfile is not None, (
+            'Archives to create test upload must have a mainfile'
+        )
         target = upload_raw_files.join_file(os.path.dirname(mainfile)).os_path
         if not mainfile_key:
             if os.path.exists(target):
@@ -751,9 +751,9 @@ def create_test_upload_files(
 
         # create an archive "file" for each archive
         entry_id = archive.metadata.entry_id
-        assert (
-            entry_id is not None
-        ), 'Archives to create test upload must have an entry_id'
+        assert entry_id is not None, (
+            'Archives to create test upload must have an entry_id'
+        )
         upload_files.write_archive(entry_id, archive.m_to_dict())
 
     # remove the template

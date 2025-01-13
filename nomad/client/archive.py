@@ -21,7 +21,6 @@ import asyncio
 from asyncio import Semaphore
 from itertools import islice
 from typing import Any, Union
-from math import floor
 from time import monotonic
 import threading
 

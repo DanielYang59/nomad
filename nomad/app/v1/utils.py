@@ -217,9 +217,9 @@ async def create_download_stream_raw_file(
             raw_file = lzma.open(filename=raw_file, mode='rb')
 
     assert offset >= 0, 'Invalid offset provided'
-    assert (
-        length > 0 or length == -1
-    ), 'Invalid length provided. Should be > 0 or equal to -1.'
+    assert length > 0 or length == -1, (
+        'Invalid length provided. Should be > 0 or equal to -1.'
+    )
     if offset > 0:
         raw_file.seek(offset)
 

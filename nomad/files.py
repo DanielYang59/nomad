@@ -233,12 +233,12 @@ class FileSource(metaclass=ABCMeta):
         Generates a zip file from the files in this FileSource and stores it to disk. The
         zipfile content is created by calling :func:`to_zipstream`.
         """
-        assert not os.path.isdir(
-            path
-        ), 'Exporting to zip file requires a file path, not directory.'
-        assert overwrite or not os.path.exists(
-            path
-        ), '`path` already exists. Use `overwrite` to overwrite.'
+        assert not os.path.isdir(path), (
+            'Exporting to zip file requires a file path, not directory.'
+        )
+        assert overwrite or not os.path.exists(path), (
+            '`path` already exists. Use `overwrite` to overwrite.'
+        )
         with open(path, 'wb') as f:
             for chunk in self.to_zipstream():
                 f.write(chunk)
@@ -256,9 +256,9 @@ class FileSource(metaclass=ABCMeta):
             os.makedirs(destination_dir)
         assert os.path.isdir(destination_dir), '`destination_dir` is not a directory'
         for streamed_file in self.to_streamed_files():
-            assert is_safe_relative_path(
-                streamed_file.path
-            ), 'Unsafe relative path encountered'
+            assert is_safe_relative_path(streamed_file.path), (
+                'Unsafe relative path encountered'
+            )
             os_path = os.path.join(destination_dir, streamed_file.path)
             dir_path = os.path.dirname(os_path)
             if os.path.exists(os_path):
@@ -361,9 +361,9 @@ class DiskFileSource(BrowsableFileSource):
         destination_parent = os.path.dirname(destination_path)
         os.makedirs(destination_parent, exist_ok=True)
         if os.path.exists(destination_path):
-            assert (
-                overwrite
-            ), f'Target {destination_path} already exists and `overwrite` is False'
+            assert overwrite, (
+                f'Target {destination_path} already exists and `overwrite` is False'
+            )
             PathObject(destination_path).delete()
         # All looks good. Copy or move the source to the destination
         if move_files:
@@ -432,9 +432,9 @@ class ZipFileSource(BrowsableFileSource):
     def sub_source(self, path: str) -> 'ZipFileSource':
         assert is_safe_relative_path(path), 'Unsafe path provided'
         if self.sub_path:
-            assert path.startswith(
-                self.sub_path + os.path.sep
-            ), 'Provided `path` is not a sub path.'
+            assert path.startswith(self.sub_path + os.path.sep), (
+                'Provided `path` is not a sub path.'
+            )
         return ZipFileSource(self.zip_file, path)
 
     def close(self):
@@ -689,9 +689,9 @@ class UploadFiles(DirectoryObject, metaclass=ABCMeta):
         raise NotImplementedError()
 
     def raw_file_mime_type(self, file_path: str) -> str:
-        assert self.raw_path_is_file(
-            file_path
-        ), 'Provided path does not specify a file, or is invalid.'
+        assert self.raw_path_is_file(file_path), (
+            'Provided path does not specify a file, or is invalid.'
+        )
         raw_file = self.raw_file(file_path, 'br')
         buffer = raw_file.read(2048)
         mime_type = magic.from_buffer(buffer, mime=True)
@@ -1008,7 +1008,9 @@ class StagingUploadFiles(UploadFiles):
                         if os.path.isfile(element_target_path) != os.path.isfile(
                             element_source_path
                         ):
-                            assert False, f'Cannot merge a file with a directory or vice versa: {element_relative_path}'
+                            assert False, (
+                                f'Cannot merge a file with a directory or vice versa: {element_relative_path}'
+                            )
 
                     # Copy or move the element
                     if os.path.isdir(element_source_path):
@@ -1189,9 +1191,9 @@ class StagingUploadFiles(UploadFiles):
         )
         if os.listdir(target_dir.os_path):
             # Target dir contains files. Check that the target access is identical
-            assert (
-                PublicUploadFiles(self.upload_id).access == access
-            ), 'Inconsistent access'
+            assert PublicUploadFiles(self.upload_id).access == access, (
+                'Inconsistent access'
+            )
 
         # zip archives
         if include_archive:

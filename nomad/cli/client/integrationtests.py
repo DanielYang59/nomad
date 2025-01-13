@@ -73,9 +73,9 @@ def integrationtests(
         )
         assert response.status_code == 200, response.text
         response_json = response.json()
-        assert (
-            len(response_json['data']) == 1
-        ), 'exactly one test upload must be on the server'
+        assert len(response_json['data']) == 1, (
+            'exactly one test upload must be on the server'
+        )
         upload = response_json['data'][0]
 
         print('observe the upload process to be finished')
@@ -132,9 +132,9 @@ def integrationtests(
                 for key in response.json()['data']['archive'].keys()
                 if not key.startswith('m_')
             ]
-            assert (
-                response_archive_keys == ['processing_logs']
-            ), f'Archive keys {response_archive_keys} should only contain processing_logs'
+            assert response_archive_keys == ['processing_logs'], (
+                f'Archive keys {response_archive_keys} should only contain processing_logs'
+            )
 
         query_request_params = dict(
             owner='staging', query={'upload_id': upload['upload_id']}

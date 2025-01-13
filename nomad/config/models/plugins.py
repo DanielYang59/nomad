@@ -275,21 +275,21 @@ class ExampleUploadEntryPoint(EntryPoint):
                 source = source[: -len(content_suffix)]
 
             # Check that only safe relative paths are given as target
-            assert is_safe_relative_path(
-                target
-            ), f'Upload resource target "{resource.target}" in example upload "{self.id}" is targeting files outside the upload directory.'
+            assert is_safe_relative_path(target), (
+                f'Upload resource target "{resource.target}" in example upload "{self.id}" is targeting files outside the upload directory.'
+            )
 
             # Check that only safe relative paths are given as source
-            assert is_safe_relative_path(
-                source
-            ), f'Upload resource path "{resource.path}" in example upload "{self.id}" is targeting files outside the Python package directory.'
+            assert is_safe_relative_path(source), (
+                f'Upload resource path "{resource.path}" in example upload "{self.id}" is targeting files outside the Python package directory.'
+            )
 
             source = os.path.join(self.get_package_path(), source)
 
             # Validate that files/folders exist
-            assert os.path.exists(
-                source
-            ), f'Upload resource path "{resource.path}" in example upload "{self.id}" could not be found.'
+            assert os.path.exists(source), (
+                f'Upload resource path "{resource.path}" in example upload "{self.id}" could not be found.'
+            )
 
         # Determine file target location and create missing folder structures.
         # If no target is given, the file/folder is copied as it is to the

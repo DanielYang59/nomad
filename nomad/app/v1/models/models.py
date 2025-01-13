@@ -369,9 +369,9 @@ def _validate_query(query: Query):
         for key, value in list(query.items()):
             quantity, value = _validate_criteria_value(key, value)
             if quantity != key:
-                assert (
-                    quantity not in query
-                ), 'a quantity can only appear once in a query'
+                assert quantity not in query, (
+                    'a quantity can only appear once in a query'
+                )
                 del query[key]
             query[quantity] = value
 
@@ -608,9 +608,9 @@ class MetadataPagination(MetadataBasedPagination):
     def validate_page(cls, page, values):  # pylint: disable=no-self-argument
         if page is not None:
             assert page > 0, 'Page has to be larger than 1.'
-            assert (
-                page * values.get('page_size', 10) < 10000
-            ), 'Pagination by `page` is limited to 10.000 entries.'
+            assert page * values.get('page_size', 10) < 10000, (
+                'Pagination by `page` is limited to 10.000 entries.'
+            )
 
         return page
 
@@ -618,9 +618,9 @@ class MetadataPagination(MetadataBasedPagination):
     def validate_page_offset(cls, page_offset, values):  # pylint: disable=no-self-argument
         if page_offset is not None:
             assert page_offset >= 0, 'Page offset has to be larger than 0.'
-            assert (
-                page_offset + values.get('page_size', 10) < 10000
-            ), 'Page offset plus page size has to be smaller thant 10.0000.'
+            assert page_offset + values.get('page_size', 10) < 10000, (
+                'Page offset plus page size has to be smaller thant 10.0000.'
+            )
 
         return page_offset
 
@@ -656,16 +656,16 @@ class AggregationPagination(MetadataBasedPagination):
 
     @validator('page')
     def validate_page(cls, page, values):  # pylint: disable=no-self-argument
-        assert (
-            page is None
-        ), 'Pagination by `page` is not possible for aggregations, use `page_after_value`'
+        assert page is None, (
+            'Pagination by `page` is not possible for aggregations, use `page_after_value`'
+        )
         return page
 
     @validator('page_size')
     def validate_page_size(cls, page_size, values):  # pylint: disable=no-self-argument
-        assert (
-            page_size > 0
-        ), '0 or smaller page sizes are not allowed for aggregations.'
+        assert page_size > 0, (
+            '0 or smaller page sizes are not allowed for aggregations.'
+        )
         return page_size
 
 

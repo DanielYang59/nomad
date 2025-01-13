@@ -38,11 +38,10 @@ Depending on the configuration all logs will also be send to a central logstash.
 .. autofunc::nomad.utils.strip
 """
 
-from typing import List, Iterable, Union, Any, Dict
+from typing import List, Iterable, Union, Any, Dict, Optional
 from collections import OrderedDict
 from functools import reduce
 from itertools import takewhile
-import fnmatch
 import base64
 from contextlib import contextmanager
 import json
@@ -54,6 +53,7 @@ from datetime import timedelta
 import collections
 import logging
 import inspect
+
 import orjson
 import os
 import unicodedata

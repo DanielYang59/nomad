@@ -47,21 +47,21 @@ def assert_path(data: BaseModel, path: str):
         else:
             value = current
 
-        assert (
-            value is not None
-        ), f'{failed_message} Key {segment} in {current} does not exist.'
+        assert value is not None, (
+            f'{failed_message} Key {segment} in {current} does not exist.'
+        )
 
         current = value
 
     if isinstance(current, BaseModel):
         type_name = current.__class__.__name__
-        assert (
-            type_name == type_or_value
-        ), f'{failed_message} Wrong type; got {type_name} expected {type_or_value}'
+        assert type_name == type_or_value, (
+            f'{failed_message} Wrong type; got {type_name} expected {type_or_value}'
+        )
     else:
-        assert (
-            str(current) == type_or_value
-        ), f'{failed_message} Wrong value; got {str(current)} expected {type_or_value}'
+        assert str(current) == type_or_value, (
+            f'{failed_message} Wrong value; got {str(current)} expected {type_or_value}'
+        )
 
 
 def test_module():
@@ -176,9 +176,9 @@ def test_validation(request_yaml: str, paths: List[str], error_path: str):
         loc = [loc for loc in error.errors()[0]['loc'] if loc != '__root__']
         assert loc == error_path.split('.')
     else:
-        assert (
-            not error_path
-        ), f'Expected validation error in {error_path}, but data passed validation.'
+        assert not error_path, (
+            f'Expected validation error in {error_path}, but data passed validation.'
+        )
         export_kwargs = dict(
             exclude_unset=True, exclude_defaults=False, exclude_none=False
         )

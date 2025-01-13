@@ -422,7 +422,7 @@ def export(ctx, uploads, required, output: str):
 
             if total_count % 100 == 0:
                 print(
-                    f'{upload_count:5}/{len(uploads)} {entry_count:5}/{len(entry_ids)} {total_count:5} {((get_rss() - start_time))} {upload_id}'
+                    f'{upload_count:5}/{len(uploads)} {entry_count:5}/{len(entry_ids)} {total_count:5} {(get_rss() - start_time)} {upload_id}'
                 )
 
         upload_files.close()

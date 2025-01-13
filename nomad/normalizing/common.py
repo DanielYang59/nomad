@@ -258,9 +258,9 @@ def ase_atoms_from_structure(system: Structure) -> Atoms:
     """
     symbol_map = {}
     for species in system.species:
-        assert (
-            len(species.chemical_symbols) == 1
-        ), 'Unable to transform system with multi-species sites as ASE.Atoms.'
+        assert len(species.chemical_symbols) == 1, (
+            'Unable to transform system with multi-species sites as ASE.Atoms.'
+        )
         symbol_map[species.name] = species.chemical_symbols[0]
     symbols = [symbol_map[x] for x in system.species_at_sites]
 
