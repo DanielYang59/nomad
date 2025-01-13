@@ -50,7 +50,7 @@ def get_figure_layout(annotation):
     return label, index, figure_open
 
 
-def resolve_plot_references(annotations, archive, logger):
+def resolve_plot_references(annotations, section, archive, logger):
     kwargs = {}
     for key, value in annotations.items():
         if isinstance(value, list):
@@ -59,7 +59,9 @@ def resolve_plot_references(annotations, archive, logger):
                 if isinstance(item, str) and item.startswith('#'):
                     resolved_value = None
                     try:
-                        resolved_value = archive.m_resolve(f'/data/{item[1:]}')
+                        resolved_value = archive.m_resolve(
+                            f'{section.m_path()}/{item[1:]}'
+                        )
                         if (
                             resolved_value
                             and resolved_value[0]
@@ -78,7 +80,9 @@ def resolve_plot_references(annotations, archive, logger):
             if value.startswith('#'):
                 resolved_value = None
                 try:
-                    resolved_value = archive.m_resolve(f'/data/{value[1:]}')
+                    resolved_value = archive.m_resolve(
+                        f'{section.m_path()}/{value[1:]}'
+                    )
                     if (
                         resolved_value
                         and resolved_value[0]
@@ -93,7 +97,7 @@ def resolve_plot_references(annotations, archive, logger):
     return kwargs
 
 
-def express_do_plot(plotly_express_annotation, archive, logger):
+def express_do_plot(plotly_express_annotation, section, archive, logger):
     method_name = plotly_express_annotation.pop('method')
     layout = plotly_express_annotation.get('layout', None)
     if layout:
@@ -102,7 +106,9 @@ def express_do_plot(plotly_express_annotation, archive, logger):
     if traces:
         plotly_express_annotation.pop('traces')
     method = getattr(px, method_name)
-    kwargs = resolve_plot_references(plotly_express_annotation, archive, logger)
+    kwargs = resolve_plot_references(
+        plotly_express_annotation, section, archive, logger
+    )
     try:
         figure = method(**kwargs)
         return figure, layout, traces
@@ -269,7 +275,7 @@ class PlotSection(ArchiveSection):
                         plotly_express_annotation
                     )
                     fig, layout, traces = express_do_plot(
-                        plotly_express_annotation, archive, logger
+                        plotly_express_annotation, self, archive, logger
                     )
                     try:
                         all_traces = go.Figure(fig.data[0])
@@ -277,7 +283,9 @@ class PlotSection(ArchiveSection):
                     except Exception as e:
                         raise PlotlyError(e)
                     for trace in traces:
-                        trace_fig, layout, _ = express_do_plot(trace, archive, logger)
+                        trace_fig, layout, _ = express_do_plot(
+                            trace, self, archive, logger
+                        )
                         try:
                             all_traces.add_trace(trace_fig.data[0])
                         except Exception as e:
@@ -349,7 +357,10 @@ class PlotSection(ArchiveSection):
                                             plotly_express_list.pop(0)
                                         )
                                         fig, sub_layout, traces = express_do_plot(
-                                            plotly_express_annotation, archive, logger
+                                            plotly_express_annotation,
+                                            self,
+                                            archive,
+                                            logger,
                                         )
                                         try:
                                             if sub_layout:
@@ -365,7 +376,7 @@ class PlotSection(ArchiveSection):
                                             )
                                             for trace in traces:
                                                 trace_fig, layout, _ = express_do_plot(
-                                                    trace, archive, logger
+                                                    trace, self, archive, logger
                                                 )
                                                 try:
                                                     figure.add_trace(
