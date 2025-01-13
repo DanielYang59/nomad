@@ -153,7 +153,10 @@ def _parse(
                     fig_kwargs = {}
                     for k, v in fig.figure.items():
                         fig_kwargs[k] = (
-                            resolve_plot_references(v, entry_archive, logger) or v
+                            resolve_plot_references(
+                                v, entry_archive.data, entry_archive, logger
+                            )
+                            or v
                         )
                     if preview_plots:
                         pio.show(fig_kwargs, **config)
