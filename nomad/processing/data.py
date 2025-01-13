@@ -309,9 +309,9 @@ class MetadataEditRequestHandler:
     ):
         # Initialization
         assert user, 'Must specify `user`'
-        assert isinstance(
-            edit_request, (StagingUploadFiles, dict)
-        ), '`edit_request` must be either a json dictionary or a :class:`StagingUploadfiles` object'
+        assert isinstance(edit_request, (StagingUploadFiles, dict)), (
+            '`edit_request` must be either a json dictionary or a :class:`StagingUploadfiles` object'
+        )
         self.logger = logger
         self.user = user
         self.edit_request = edit_request
@@ -596,9 +596,9 @@ class MetadataEditRequestHandler:
                     # The raw value is a dict - expected to contain keys add/remove/set
                     assert raw_value, 'No operation specified'
                     for key in raw_value:
-                        assert (
-                            key in ('set', 'add', 'remove')
-                        ), f'Allowed operations are `set`, `add`, and `remove`, got {key}'
+                        assert key in ('set', 'add', 'remove'), (
+                            f'Allowed operations are `set`, `add`, and `remove`, got {key}'
+                        )
                     assert 'set' not in raw_value or (
                         'add' not in raw_value and 'remove' not in raw_value
                     ), 'Cannot specify both `set` and `add`/`remove` operations'
@@ -657,9 +657,9 @@ class MetadataEditRequestHandler:
             elif definition.name == 'references':
                 assert validators.url(value), 'Please enter a valid URL ...'
             elif definition.name == 'coauthor_groups':
-                assert (
-                    value != 'all'
-                ), "Special group 'all' is invalid for field coauthor_groups."
+                assert value != 'all', (
+                    "Special group 'all' is invalid for field coauthor_groups."
+                )
                 assert_user_group_exists(value)
             elif definition.name == 'reviewer_groups':
                 assert_user_group_exists(value)
@@ -701,12 +701,12 @@ class MetadataEditRequestHandler:
             elif reference_type == datamodel.Dataset:
                 dataset = self._get_dataset(value)
                 assert dataset is not None, f'Dataset reference not found: `{value}`'
-                assert (
-                    self.user.is_admin or dataset.user_id == self.user.user_id
-                ), f'Dataset `{value}` does not belong to you'
-                assert (
-                    op == 'add' or not dataset.doi
-                ), f'Dataset `{value}` has a doi, can only add entries to it'
+                assert self.user.is_admin or dataset.user_id == self.user.user_id, (
+                    f'Dataset `{value}` does not belong to you'
+                )
+                assert op == 'add' or not dataset.doi, (
+                    f'Dataset `{value}` has a doi, can only add entries to it'
+                )
                 return dataset.dataset_id
         else:
             assert False, 'Unhandled value type'  # Should not happen
@@ -1109,9 +1109,9 @@ class Entry(Proc):
         Loads entry metadata from mongo (that is: from `self` and the provided `upload` object)
         and applies the values to `entry_metadata`.
         """
-        assert (
-            upload.upload_id == self.upload_id
-        ), 'Could not apply metadata: upload_id mismatch'
+        assert upload.upload_id == self.upload_id, (
+            'Could not apply metadata: upload_id mismatch'
+        )
         # Upload metadata
         for quantity_name in mongo_upload_metadata:
             setattr(entry_metadata, quantity_name, getattr(upload, quantity_name))
@@ -1149,13 +1149,13 @@ class Entry(Proc):
         Sets the entry level metadata in mongo. Expects either a positional argument
         which is an instance of :class:`EntryMetadata` or keyword arguments with data to set.
         """
-        assert not (
-            args and kwargs
-        ), 'Cannot provide both keyword arguments and a positional argument'
+        assert not (args and kwargs), (
+            'Cannot provide both keyword arguments and a positional argument'
+        )
         if args:
-            assert len(args) == 1 and isinstance(
-                args[0], EntryMetadata
-            ), 'Expected exactly one keyword argument of type `EntryMetadata`'
+            assert len(args) == 1 and isinstance(args[0], EntryMetadata), (
+                'Expected exactly one keyword argument of type `EntryMetadata`'
+            )
             self._apply_metadata_to_mongo_entry(args[0])
         else:
             for key, value in kwargs.items():
@@ -1274,9 +1274,9 @@ class Entry(Proc):
     def _process_entry_local(self):
         logger = self.get_logger()
         assert self.upload is not None, 'upload does not exist'
-        assert (
-            self.mainfile_key is None
-        ), 'cannot process a child entry, only the parent entry'
+        assert self.mainfile_key is None, (
+            'cannot process a child entry, only the parent entry'
+        )
 
         # Get child entries, if any
         self._child_entries = list(
@@ -1874,9 +1874,9 @@ class Upload(Proc):
         logger.info('started to publish')
 
         if embargo_length is not None:
-            assert (
-                0 <= embargo_length <= 36
-            ), 'Invalid embargo length, must be between 0 and 36 months'
+            assert 0 <= embargo_length <= 36, (
+                'Invalid embargo length, must be between 0 and 36 months'
+            )
             self.embargo_length = embargo_length
 
         with utils.lnr(logger, 'publish failed'):
@@ -1907,12 +1907,12 @@ class Upload(Proc):
         to push uploads from an OASIS to the central NOMAD. Makes use of the upload bundle
         functionality.
         """
-        assert (
-            self.published
-        ), 'Only published uploads can be published to the central NOMAD.'
-        assert (
-            config.oasis.central_nomad_deployment_url not in self.published_to
-        ), 'Upload is already published to the central NOMAD.'
+        assert self.published, (
+            'Only published uploads can be published to the central NOMAD.'
+        )
+        assert config.oasis.central_nomad_deployment_url not in self.published_to, (
+            'Upload is already published to the central NOMAD.'
+        )
 
         tmp_dir = create_tmp_dir('export_' + self.upload_id)
         bundle_path = os.path.join(tmp_dir, self.upload_id + '.zip')
@@ -2065,9 +2065,9 @@ class Upload(Proc):
         # Sanity checks
         if path_filter:
             assert is_safe_relative_path(path_filter), 'Invalid `path_filter`'
-        assert not (
-            path_filter and only_updated_files
-        ), 'Cannot specify both `path_filter` and `only_updated_files`'
+        assert not (path_filter and only_updated_files), (
+            'Cannot specify both `path_filter` and `only_updated_files`'
+        )
         if self.published:
             assert not file_operations, 'Upload is published, cannot update files'
             assert settings.rematch_published or settings.reprocess_existing_entries, (  # pylint: disable=no-member
@@ -2101,9 +2101,9 @@ class Upload(Proc):
         target_path = os.path.join(target_dir, os.path.basename(path))
         staging_upload_files = self.staging_upload_files
         if staging_upload_files.raw_path_exists(target_path):
-            assert staging_upload_files.raw_path_is_file(
-                target_path
-            ), 'Target path is a directory'
+            assert staging_upload_files.raw_path_is_file(target_path), (
+                'Target path is a directory'
+            )
 
         if reprocess_settings:
             self.reprocess_settings = reprocess_settings.dict()
@@ -2598,9 +2598,9 @@ class Upload(Proc):
         """
         Used when parsers add/modify raw files during processing.
         """
-        assert self.upload_files.raw_path_is_file(
-            path
-        ), 'Provided path does not denote a file'
+        assert self.upload_files.raw_path_is_file(path), (
+            'Provided path does not denote a file'
+        )
         logger = self.get_logger()
         metadata_handler = None
 
@@ -2773,7 +2773,7 @@ class Upload(Proc):
         # send email about process finish
         if not self.publish_directly and self.main_author_user.email:
             user = self.main_author_user
-            upload_name_str = f'{self.upload_name }' if self.upload_name else ''
+            upload_name_str = f'{self.upload_name}' if self.upload_name else ''
             author_name = f'{user.first_name} {user.last_name}'
             upload_time_string = self.upload_create_time.isoformat()  # pylint: disable=no-member
             message = utils.strip(
@@ -2936,16 +2936,18 @@ class Upload(Proc):
             ):
                 mongo_result = Entry._get_collection().bulk_write(entry_mongo_writes)
             mongo_errors = mongo_result.bulk_api_result.get('writeErrors')
-            assert not mongo_errors, f'Failed to update mongo! {len(mongo_errors)} failures, first is {mongo_errors[0]}'
+            assert not mongo_errors, (
+                f'Failed to update mongo! {len(mongo_errors)} failures, first is {mongo_errors[0]}'
+            )
         # Update ES
         if updated_metadata:
             with utils.timer(logger, 'ES updated', nupdates=len(updated_metadata)):
                 failed_es = es_update_metadata(
                     updated_metadata, update_materials=True, refresh=True
                 )
-                assert (
-                    not failed_es
-                ), f'Failed to update ES, there were {failed_es} fails'
+                assert not failed_es, (
+                    f'Failed to update ES, there were {failed_es} fails'
+                )
 
     def entry_ids(self) -> List[str]:
         return [entry.entry_id for entry in Entry.objects(upload_id=self.upload_id)]

@@ -90,19 +90,19 @@ class BundleExporter:
     def export_bundle(self) -> Iterable[bytes]:
         # Safety checks
         if self.export_as_stream:
-            assert (
-                self.export_path is None
-            ), 'Cannot have `export_path` set when exporting as a stream.'
-            assert (
-                self.zipped
-            ), 'Must have `zipped` set to True when exporting as stream.'
+            assert self.export_path is None, (
+                'Cannot have `export_path` set when exporting as a stream.'
+            )
+            assert self.zipped, (
+                'Must have `zipped` set to True when exporting as stream.'
+            )
         else:
-            assert (
-                self.export_path is not None
-            ), 'You must specify either `export_as_stream = True` or `export_path`.'
-            assert self.overwrite or not os.path.exists(
-                self.export_path
-            ), '`export_path` already exists.'
+            assert self.export_path is not None, (
+                'You must specify either `export_as_stream = True` or `export_path`.'
+            )
+            assert self.overwrite or not os.path.exists(self.export_path), (
+                '`export_path` already exists.'
+            )
         assert (
             not self.upload.process_running
             or self.upload.current_process == 'publish_externally'
@@ -249,9 +249,9 @@ class BundleImporter:
         if os.path.isdir(bundle_path):
             self.bundle = DiskFileSource(bundle_path)
         else:
-            assert zipfile.is_zipfile(
-                bundle_path
-            ), '`path` must define a folder or a zipfile.'
+            assert zipfile.is_zipfile(bundle_path), (
+                '`path` must define a folder or a zipfile.'
+            )
             zip_file = zipfile.ZipFile(bundle_path, 'r')
             self.bundle = ZipFileSource(zip_file)
 
@@ -371,9 +371,9 @@ class BundleImporter:
     def _check_bundle_and_settings(self, running_locally: bool):
         """Perform various initial sanity checks."""
         # Sanity checks of the settings
-        assert not (
-            self.import_settings.trigger_processing and running_locally
-        ), 'Cannot use `trigger_processing` when running locally.'
+        assert not (self.import_settings.trigger_processing and running_locally), (
+            'Cannot use `trigger_processing` when running locally.'
+        )
         # Sanity checks of the bundle
         required_keys_root_level = (
             'upload_id',
@@ -418,9 +418,9 @@ class BundleImporter:
         ), 'Inconsisten upload id information'
         published = upload_dict.get('publish_time') is not None
         if published:
-            assert self.bundle_info[
-                'entries'
-            ], 'Upload published but no entries in bundle_info.json'
+            assert self.bundle_info['entries'], (
+                'Upload published but no entries in bundle_info.json'
+            )
         # Check user references
         check_user_ids([upload_dict['main_author']], 'Invalid main_author: {id}')
         check_user_ids(
@@ -466,9 +466,9 @@ class BundleImporter:
             self.upload.complete_time,
             self.upload.publish_time,
         ):
-            assert (
-                timestamp is None or timestamp < current_time_plus_tolerance
-            ), 'Timestamp is in the future'
+            assert timestamp is None or timestamp < current_time_plus_tolerance, (
+                'Timestamp is in the future'
+            )
         # Manage source info
         if self.import_settings.set_from_oasis:
             self.upload.from_oasis = True
@@ -494,9 +494,9 @@ class BundleImporter:
         """Creates datasets from the bundle."""
         required_keys_datasets = ('dataset_id', 'dataset_name', 'user_id')
 
-        assert (
-            'datasets' in self.bundle_info
-        ), 'Missing datasets definition in bundle_info.json'
+        assert 'datasets' in self.bundle_info, (
+            'Missing datasets definition in bundle_info.json'
+        )
         datasets = self.bundle_info['datasets']
         new_datasets: List[datamodel.Dataset] = []
         dataset_id_mapping: Dict[
@@ -523,7 +523,9 @@ class BundleImporter:
                 # is created in both environments. In that case, we consider them
                 # to be the "same" dataset, even if they do not have the same dataset_id.
                 # Thus, in that case the dataset id needs to be translated.
-                assert not existing_dataset.doi, f'Matched dataset {existing_dataset.dataset_id} has a DOI, cannot be updated'
+                assert not existing_dataset.doi, (
+                    f'Matched dataset {existing_dataset.dataset_id} has a DOI, cannot be updated'
+                )
             except KeyError:
                 # Completely new dataset, create it
                 new_dataset = datamodel.Dataset(**dataset_dict)
@@ -555,17 +557,17 @@ class BundleImporter:
                 entry_dict['process_status'] in ProcessStatus.STATUSES_NOT_PROCESSING
             ), 'Invalid entry `process_status`'
             # Check referential consistency
-            assert (
-                entry_dict['upload_id'] == self.upload.upload_id
-            ), 'Mismatching upload_id in entry definition'
+            assert entry_dict['upload_id'] == self.upload.upload_id, (
+                'Mismatching upload_id in entry definition'
+            )
             expected_entry_id = utils.generate_entry_id(
                 self.upload.upload_id,
                 entry_dict['mainfile'],
                 entry_dict.get('mainfile_key'),
             )
-            assert (
-                entry_dict['_id'] == expected_entry_id
-            ), 'Provided entry id does not match generated value'
+            assert entry_dict['_id'] == expected_entry_id, (
+                'Provided entry id does not match generated value'
+            )
             check_user_ids(
                 entry_dict.get('entry_coauthors', []),
                 'Invalid entry_coauthor reference: {id}',
@@ -616,9 +618,9 @@ class BundleImporter:
     def _import_files(self):
         try:
             cls = PublicUploadFiles if self.upload.published else StagingUploadFiles
-            assert not os.path.exists(
-                cls.base_folder_for(self.upload.upload_id)
-            ), 'Upload folder already exists'
+            assert not os.path.exists(cls.base_folder_for(self.upload.upload_id)), (
+                'Upload folder already exists'
+            )
             self.upload_files = cls(self.upload.upload_id, create=True)
 
             for file_source in self.upload_files.files_from_bundle(

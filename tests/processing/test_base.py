@@ -65,14 +65,14 @@ def assert_events(expected_events: List[Union[str, List[str]]]):
         elif isinstance(expected, list):
             # list -> expecting a number of events, in any order
             while expected:
-                assert ind <= len(
-                    events
-                ), f'Not enough events, expecting one of {expected}'
+                assert ind <= len(events), (
+                    f'Not enough events, expecting one of {expected}'
+                )
                 event = events[ind]
                 ind += 1
-                assert (
-                    event in expected
-                ), f'Unexpected event: {event}, expecting one of {expected}'
+                assert event in expected, (
+                    f'Unexpected event: {event}, expecting one of {expected}'
+                )
                 expected.remove(event)  # type: ignore
         else:
             assert False, 'Bad value in expected_events'

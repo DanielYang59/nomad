@@ -134,18 +134,18 @@ class Pagination(BaseModel):
             + (1 if page else 0)
             + (1 if page_after_value else 0)
         )
-        assert (
-            n_offset_criteria <= 1
-        ), 'Can only specify one `page_offset`, `page`, or `page_after_value'
+        assert n_offset_criteria <= 1, (
+            'Can only specify one `page_offset`, `page`, or `page_after_value'
+        )
 
         if page_size == 0:
-            assert (
-                page_offset is None
-            ), 'Cannot specify `page_offset` when `page_size` is set to 0'
+            assert page_offset is None, (
+                'Cannot specify `page_offset` when `page_size` is set to 0'
+            )
             assert page is None, 'Cannot specify `page` when `page_size` is set to 0'
-            assert (
-                page_after_value is None
-            ), 'Cannot specify `page_after_value` when `page_size` is set to 0'
+            assert page_after_value is None, (
+                'Cannot specify `page_after_value` when `page_size` is set to 0'
+            )
 
         return values
 
@@ -268,9 +268,9 @@ class PaginationResponse(Pagination):
         Populates the urls (`page_url`, `next_page_url`, `first_page_url` from the
         request and `next_page_after_value`. Only applicable for GET requests.
         """
-        assert (
-            request.method.upper() == 'GET'
-        ), 'Trying to populate urls, but method is not GET.'
+        assert request.method.upper() == 'GET', (
+            'Trying to populate urls, but method is not GET.'
+        )
         original_url = str(request.url)
         self.page_url = original_url
         if self.page_size:

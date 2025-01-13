@@ -134,7 +134,7 @@ def test_mapping_compatibility(elastic_infra):
                 if next_a == next_b:
                     continue
 
-            results.append(f"{'v0' if key in a else 'v1'}:{path}{key}")
+            results.append(f'{"v0" if key in a else "v1"}:{path}{key}')
 
         return results
 

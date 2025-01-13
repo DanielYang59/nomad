@@ -1766,9 +1766,9 @@ class MSection(metaclass=MObjectMeta):
         child_name = stack.pop(0)
         child_index = int(stack.pop(0)) if len(stack) > 0 and isint(stack[0]) else None
         child_def = self._ensure_definition(child_name)
-        assert isinstance(
-            child_def, SubSection
-        ), f'Could not find section definition with name "{child_name}".'
+        assert isinstance(child_def, SubSection), (
+            f'Could not find section definition with name "{child_name}".'
+        )
         if (child_instance := self.m_get(child_def, index=child_index)) is None:
             child_instance = child_def.sub_section.section_cls()
             self.m_set(child_def, child_instance, index=child_index)
@@ -1878,9 +1878,9 @@ class MSection(metaclass=MObjectMeta):
             subsection_as_dict=subsection_as_dict,
         )
 
-        assert not (
-            include is not None and exclude is not None
-        ), 'You can only include or exclude, not both.'
+        assert not (include is not None and exclude is not None), (
+            'You can only include or exclude, not both.'
+        )
 
         if include is not None:
 
@@ -2244,7 +2244,7 @@ class MSection(metaclass=MObjectMeta):
             ):
                 if not isinstance(m_context, Context):
                     raise MetainfoError(
-                        f"A context object is needed to resolve definition {dct['m_def_id']}"
+                        f'A context object is needed to resolve definition {dct["m_def_id"]}'
                     )
                 cls = m_context.resolve_section_definition(
                     dct.get('m_def', None), dct['m_def_id']
@@ -2643,7 +2643,7 @@ class MSection(metaclass=MObjectMeta):
         # if name_quantity_def is not None:
         #     name = self.m_get(name_quantity_def)
         try:
-            main = f"{self.__dict__['name']}:{m_section_name}"
+            main = f'{self.__dict__["name"]}:{m_section_name}'
         except KeyError:
             main = m_section_name
 
@@ -3031,9 +3031,9 @@ class Property(Definition):
         """
         Retrieve a potential overwritten property from a base-class.
         """
-        assert self.m_parent and isinstance(
-            self.m_parent, Section
-        ), 'Property must be property of a section.'
+        assert self.m_parent and isinstance(self.m_parent, Section), (
+            'Property must be property of a section.'
+        )
         for base_section in self.m_parent_as(Section).all_base_sections.values():
             if base_property := base_section.all_properties.get(self.name):
                 if base_property.m_def != self.m_def:
@@ -3386,9 +3386,9 @@ class Quantity(Property):
 
             dim_quantity = self.m_parent.all_quantities.get(dimension, None)
 
-            assert (
-                dim_quantity is not None
-            ), f'Dimensions ({dimension}) must be quantities of the same section ({self.m_parent}).'
+            assert dim_quantity is not None, (
+                f'Dimensions ({dimension}) must be quantities of the same section ({self.m_parent}).'
+            )
 
             assert (
                 isinstance(dim_quantity.type, ExactNumber)
@@ -3516,13 +3516,13 @@ class SubSection(Property):
 
     @constraint(warning=False)
     def has_sub_section(self):
-        assert (
-            self.sub_section is not None
-        ), 'Each subsection must define the section that is used as subsection via the "sub_section" quantity'
+        assert self.sub_section is not None, (
+            'Each subsection must define the section that is used as subsection via the "sub_section" quantity'
+        )
         try:
-            assert not isinstance(
-                self.sub_section.m_resolved(), MProxy
-            ), 'Cannot resolve "sub_section"'
+            assert not isinstance(self.sub_section.m_resolved(), MProxy), (
+                'Cannot resolve "sub_section"'
+            )
         except MetainfoReferenceError as e:
             assert False, f'Cannot resolve "sub_section": {str(e)}'
 

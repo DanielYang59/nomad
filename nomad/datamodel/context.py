@@ -72,9 +72,9 @@ class Context(MetainfoContext):
             upload_id, entry_id = root.metadata.upload_id, root.metadata.entry_id
         if required:
             assert entry_id is not None, 'Only archives with entry_id can be referenced'
-            assert (
-                upload_id is not None
-            ), 'Only archives with upload_id can be referenced'
+            assert upload_id is not None, (
+                'Only archives with upload_id can be referenced'
+            )
         return upload_id, entry_id
 
     @staticmethod
@@ -127,9 +127,9 @@ class Context(MetainfoContext):
             return None  # type: ignore
 
         upload_id, entry_id = self._get_ids(target_root, required=True)
-        assert (
-            source_root.m_context == self
-        ), 'Can only create references from archives with this context'
+        assert source_root.m_context == self, (
+            'Can only create references from archives with this context'
+        )
         installation_url = getattr(
             target_root.m_context, 'installation_url', self.installation_url
         )

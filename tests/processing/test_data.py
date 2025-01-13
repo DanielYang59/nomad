@@ -243,9 +243,9 @@ def assert_user_metadata(entries_metadata, user_metadata):
         entry_metadata_dict = entry_metadata.m_to_dict()
         for k, value_expected in user_metadata.items():
             value_actual = entry_metadata_dict[k]
-            assert (
-                value_actual == value_expected
-            ), f'Mismatch {k}: {value_expected} != {value_actual}'
+            assert value_actual == value_expected, (
+                f'Mismatch {k}: {value_expected} != {value_actual}'
+            )
 
 
 @pytest.mark.timeout(config.tests.default_timeout)

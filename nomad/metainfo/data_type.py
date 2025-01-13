@@ -1412,9 +1412,9 @@ def _normalize_complex(value, complex_type, to_unit: str | ureg.Unit | None):
     if isinstance(value, dict):
         real = value.get('re')
         imag = value.get('im')
-        assert (
-            real is not None or imag is not None
-        ), 'Cannot convert an empty dict to complex number.'
+        assert real is not None or imag is not None, (
+            'Cannot convert an empty dict to complex number.'
+        )
 
         def __combine(_real, _imag):
             _real_list: bool = isinstance(_real, list)

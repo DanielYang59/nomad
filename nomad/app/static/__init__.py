@@ -62,9 +62,9 @@ class GuiFiles(StaticFiles):
         if path not in ['env.js', 'artifacts.js']:
             response = await super().get_response(path, scope)
         else:
-            assert (
-                GuiFiles.gui_data_etag is not None
-            ), 'Etag for gui data was not initialized'
+            assert GuiFiles.gui_data_etag is not None, (
+                'Etag for gui data was not initialized'
+            )
             response = PlainTextResponse(
                 GuiFiles.gui_env_data
                 if path == 'env.js'

@@ -321,9 +321,9 @@ class ArchiveWriter:
                 for uuid, pos in sorted(self._toc.items())
             }
         )
-        assert (
-            toc_position == self._toc_position
-        ), f'{toc_position} - {self._toc_position}'
+        assert toc_position == self._toc_position, (
+            f'{toc_position} - {self._toc_position}'
+        )
 
         self.close()
 

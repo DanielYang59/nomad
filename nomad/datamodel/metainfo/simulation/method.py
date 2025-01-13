@@ -97,7 +97,7 @@ class Mesh(MSection):
             'Logarithmic',
             'Tan',
             'Gauss-Legendre',
-            'Gauss-Laguerre' 'Clenshaw-Curtis',
+            'Gauss-LaguerreClenshaw-Curtis',
             'Newton-Cotes',
             'Gauss-Hermite',
         ),

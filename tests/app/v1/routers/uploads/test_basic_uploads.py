@@ -383,17 +383,17 @@ def assert_pagination(pagination, expected_pagination):
     """Checks that the contents of `paginaion` matches what is expected."""
     for key, value in expected_pagination.items():
         if value is None:
-            assert (
-                key not in pagination
-            ), f'No value expected for {key}, got {pagination[key]}'
+            assert key not in pagination, (
+                f'No value expected for {key}, got {pagination[key]}'
+            )
         elif value is Any:
-            assert (
-                pagination.get(key) is not None
-            ), f'Value expected for {key}, got None'
+            assert pagination.get(key) is not None, (
+                f'Value expected for {key}, got None'
+            )
         else:
-            assert (
-                pagination.get(key) == value
-            ), f'For {key} we expecte {value}, but got {pagination.get(key)}'
+            assert pagination.get(key) == value, (
+                f'For {key} we expecte {value}, but got {pagination.get(key)}'
+            )
 
 
 def block_until_completed(client, upload_id: str, user_auth):
@@ -687,13 +687,13 @@ def test_get_uploads(auth_headers, client, mongo_module, example_data, kwargs):
         response_data = response_json['data']
 
         if expected_upload_ids is not None:
-            assert (
-                len(response_data) == len(expected_upload_ids)
-            ), f'Wrong number of records returned, expected {len(expected_upload_ids)}, got {len(response_data)}'
+            assert len(response_data) == len(expected_upload_ids), (
+                f'Wrong number of records returned, expected {len(expected_upload_ids)}, got {len(response_data)}'
+            )
             found_upload_ids = [upload['upload_id'] for upload in response_data]
-            assert (
-                expected_upload_ids == found_upload_ids
-            ), f'Wrong upload is list returned. Expected {repr(expected_upload_ids)}, got {repr(found_upload_ids)}.'
+            assert expected_upload_ids == found_upload_ids, (
+                f'Wrong upload is list returned. Expected {repr(expected_upload_ids)}, got {repr(found_upload_ids)}.'
+            )
 
         assert_pagination(response_json['pagination'], expected_pagination)
 
@@ -1411,9 +1411,9 @@ def test_get_upload_raw_path(
                         # Check: only root elements specified in expected_content are allowed
                         for zip_path in zip_paths:
                             first_path_element = zip_path.split(os.path.sep)[0]
-                            assert (
-                                first_path_element in expected_content
-                            ), f'Unexpected entry found in the zip root folder: {first_path_element}'
+                            assert first_path_element in expected_content, (
+                                f'Unexpected entry found in the zip root folder: {first_path_element}'
+                            )
                         # Check: all elements specified in expected_content must exist
                         for expected_path in expected_content:
                             found = False
@@ -1423,19 +1423,19 @@ def test_get_upload_raw_path(
                                 ):
                                     found = True
                                     break
-                            assert (
-                                found
-                            ), f'Missing expected path in zip file: {expected_path}'
+                            assert found, (
+                                f'Missing expected path in zip file: {expected_path}'
+                            )
         else:
             if expected_content:
                 if offset is not None:
-                    assert (
-                        response.text == expected_content
-                    ), 'Wrong content (offset and length)'
+                    assert response.text == expected_content, (
+                        'Wrong content (offset and length)'
+                    )
                 else:
-                    assert (
-                        expected_content in response.text
-                    ), 'Expected content not found'
+                    assert expected_content in response.text, (
+                        'Expected content not found'
+                    )
 
 
 @pytest.mark.parametrize(
@@ -1650,9 +1650,9 @@ def test_get_upload_rawdir_path(
         assert data['path'] == (path.rstrip('/') or '')
         if expected_content is not None:
             dir_content_returned = data['directory_metadata']['content']
-            assert [
-                d['name'] for d in dir_content_returned
-            ] == expected_content, 'Incorrect list of files returned'
+            assert [d['name'] for d in dir_content_returned] == expected_content, (
+                'Incorrect list of files returned'
+            )
             for d in dir_content_returned:
                 if query_args.get('include_entry_info'):
                     assert (d.get('entry_id') is not None) == ('mainfile' in d['name'])
@@ -3596,13 +3596,13 @@ def test_post_upload_action_delete_entry_files(
         upload = Upload.get(upload_id)
         upload.block_until_complete()
         for path in expect_exists or []:
-            assert upload.upload_files.raw_path_exists(
-                path
-            ), f'Missing expected path: {path}'
+            assert upload.upload_files.raw_path_exists(path), (
+                f'Missing expected path: {path}'
+            )
         for path in expect_not_exists or []:
-            assert not upload.upload_files.raw_path_exists(
-                path
-            ), f'Expected path not to exist: {path}'
+            assert not upload.upload_files.raw_path_exists(path), (
+                f'Expected path not to exist: {path}'
+            )
 
 
 @pytest.mark.parametrize(

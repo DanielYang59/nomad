@@ -435,9 +435,9 @@ class DocumentType:
             if annotation is None and not auto_include_subsections:
                 continue
 
-            assert not isinstance(
-                annotation, list
-            ), 'sub sections can only have one elasticsearch annotation'
+            assert not isinstance(annotation, list), (
+                'sub sections can only have one elasticsearch annotation'
+            )
             continue_with_auto_include_subsections = auto_include_subsections or (
                 False if annotation is None else annotation.auto_include_subsections
             )
@@ -751,7 +751,7 @@ def get_tokenizer(regex):
                         # remains unique so that it will be returned by
                         # ElasticSearch when "skip_duplicates" is used in the
                         # query.
-                        tokens.append(f'{token} {value[:match.end()]}')
+                        tokens.append(f'{token} {value[: match.end()]}')
         return tokens
 
     return tokenizer

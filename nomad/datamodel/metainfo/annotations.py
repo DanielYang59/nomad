@@ -18,7 +18,7 @@
 
 from typing import List, Any, Union, Dict, Optional
 from enum import Enum
-from pydantic import Field, validator
+from pydantic import Field, validator, root_validator
 import re
 
 from pydantic.main import BaseModel
@@ -415,9 +415,9 @@ class ELNAnnotation(AnnotationModel):
         if not component:
             return definition
 
-        assert isinstance(
-            definition, Quantity
-        ), 'Only quantities can be eln annotated with a component.'
+        assert isinstance(definition, Quantity), (
+            'Only quantities can be eln annotated with a component.'
+        )
         quantity = definition
         type_ = quantity.type
         name = quantity.name
@@ -981,6 +981,71 @@ class PlotAnnotation(AnnotationModel):
             ), f'{item} is not a valid quantity reference.'
 
         return value
+
+
+class RegexCondition(BaseModel):
+    regex_path: Optional[str] = Field(
+        None,
+        description="""
+        The JMESPath to the target key in the dictionary. If not set, the path is assumed to be the same as
+        the source path.
+        """,
+    )
+    regex_pattern: str = Field(..., description='Regex pattern to be matched.')
+
+
+class Condition(BaseModel):
+    regex_condition: RegexCondition = Field(
+        ..., description='Condition to check for the regex.'
+    )
+
+
+class Rule(BaseModel):
+    source: Optional[str] = Field(
+        None, description='JMESPath to the source value in the source dictionary.'
+    )
+    target: str = Field(
+        ..., description='JMESPath to the target value in the target dictionary.'
+    )
+    conditions: Optional[list[Condition]] = Field(
+        None, description='Conditions to check prior to applying the transformation.'
+    )
+    default_value: Optional[Any] = Field(
+        None, description='Default value to set if source is not found.'
+    )
+    use_rule: Optional[str] = Field(
+        None, description='Reference to another rule using #mapping_name.rule_name.'
+    )
+
+    def override_fields(self, referenced_rule: 'Rule') -> 'Rule':
+        """
+        Override fields from the referenced rule.
+
+        Args:
+            referenced_rule (Rule): The referenced rule whose fields will be overridden.
+
+        Returns:
+            Rule: The current rule with overridden fields from the referenced rule.
+        """
+        overridden_rule = self.copy()
+        # Update non-empty fields from the referenced rule, excluding 'use_rule' to prevent circular references
+        for field_name, field_value in referenced_rule.dict().items():
+            if field_value and field_name != 'use_rule':
+                setattr(overridden_rule, field_name, field_value)
+        return overridden_rule
+
+
+Rule.update_forward_refs()
+
+
+class Rules(BaseModel):
+    name: Optional[str] = Field(
+        None, description='Name for the rule set, for identification.'
+    )
+    other_metadata: Optional[str] = Field(
+        None, description='Placeholder for other metadata.'
+    )
+    rules: dict[str, Rule] = Field(..., description='Dictionary of named rules.')
 
 
 class H5WebAnnotation(AnnotationModel):

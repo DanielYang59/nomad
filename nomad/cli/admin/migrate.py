@@ -137,9 +137,9 @@ def migrate_mongo_uploads(
                 upload_dict_dst = db_dst.upload.find_one({'_id': upload_id})
                 if upload_dict_dst:
                     if overwrite == 'always':
-                        assert not _is_processing(
-                            upload_dict_dst
-                        ), 'Destination upload is processing'
+                        assert not _is_processing(upload_dict_dst), (
+                            'Destination upload is processing'
+                        )
                     elif overwrite == 'if-newer':
                         complete_time = upload_dict.get('complete_time', datetime.min)
                         complete_time_dst = upload_dict_dst.get(
@@ -258,9 +258,9 @@ def _convert_mongo_upload(
         _rename_key(upload_dict, 'user_id', 'main_author')
         # Verify and then remove redundant legacy field 'published'.
         if 'published' in upload_dict:
-            assert (
-                upload_dict['published'] == published
-            ), 'Inconsistency: published flag vs publish_time'
+            assert upload_dict['published'] == published, (
+                'Inconsistency: published flag vs publish_time'
+            )
         # Set license if missing
         if 'license' not in upload_dict:
             upload_dict['license'] = 'CC BY 4.0'
@@ -287,13 +287,13 @@ def _convert_mongo_upload(
             assert 'metadata' in entry_dict, 'Entry dict has no metadata key'
             entry_metadata_dict: Dict[str, Any] = entry_dict['metadata']
             with_embargo = entry_metadata_dict.get('with_embargo')
-            assert (
-                with_embargo == first_with_embargo
-            ), 'Inconsistent embargo settings for entries'
+            assert with_embargo == first_with_embargo, (
+                'Inconsistent embargo settings for entries'
+            )
             shared_with_set = set(entry_metadata_dict.get('shared_with') or ())
-            assert (
-                shared_with_set == first_shared_with_set
-            ), 'Inconsistent shared_with settings for entries'
+            assert shared_with_set == first_shared_with_set, (
+                'Inconsistent shared_with settings for entries'
+            )
             uploader = entry_metadata_dict.get('uploader')
             assert uploader == first_entry_uploader, 'Inconsistent uploader for entries'
             external_db = entry_metadata_dict.get('external_db')
@@ -302,7 +302,9 @@ def _convert_mongo_upload(
                     # Problem is unfixable (two different non-empty values encountered)
                     assert False, 'Inconsistent external_db for entries - unfixable'
                 elif not fix_problems:
-                    assert False, 'Inconsistent external_db for entries - use --fix-problems to fix'
+                    assert False, (
+                        'Inconsistent external_db for entries - use --fix-problems to fix'
+                    )
                 first_external_db = first_external_db or external_db  # Fix it
                 fixed_external_db = True
             common_coauthors.intersection_update(
@@ -317,9 +319,9 @@ def _convert_mongo_upload(
         # Check embargo setting on the upload
         if published:
             if first_with_embargo:
-                assert upload_dict.get(
-                    'embargo_length'
-                ), f'Embargo flag set on entries, but no embargo_length specified on upload'
+                assert upload_dict.get('embargo_length'), (
+                    f'Embargo flag set on entries, but no embargo_length specified on upload'
+                )
             else:
                 upload_dict['embargo_length'] = 0
         if 'embargo_length' not in upload_dict:
@@ -329,9 +331,9 @@ def _convert_mongo_upload(
         upload_dict['external_db'] = first_external_db
         # main_author
         if first_entry_uploader != upload_dict['main_author']:
-            assert (
-                first_external_db
-            ), 'Different uploader on entry and upload, but external_db not set'
+            assert first_external_db, (
+                'Different uploader on entry and upload, but external_db not set'
+            )
             # It's ok, but we should fetch main_author from entries.uploader instead of uplad.user_id
             upload_dict['main_author'] = first_entry_uploader
         # coauthors - put as many as possible in Upload.coauthors, the rest in entry.entry_coauthors
@@ -354,9 +356,9 @@ def _convert_mongo_upload(
         'embargo_length',
         'license',
     ):
-        assert (
-            upload_dict.get(field) is not None
-        ), f'Missing required upload field: {field}'
+        assert upload_dict.get(field) is not None, (
+            f'Missing required upload field: {field}'
+        )
 
     if upload_update:
         upload_dict.update(upload_update)
@@ -364,9 +366,9 @@ def _convert_mongo_upload(
     # migrate entries
     newly_encountered_dataset_ids: Set[str] = set()
     for entry_dict in entry_dicts:
-        assert not _is_processing(
-            entry_dict
-        ), f'the entry {entry_dict["_id"]} has status processing, but the upload is not processing.'
+        assert not _is_processing(entry_dict), (
+            f'the entry {entry_dict["_id"]} has status processing, but the upload is not processing.'
+        )
         _convert_mongo_entry(entry_dict, common_coauthors, fix_problems, logger)
         # Convert datasets
         datasets = entry_dict.get('datasets')
@@ -435,7 +437,9 @@ def _convert_mongo_entry(
     )
     if entry_dict['_id'] != generated_entry_id:
         if not fix_problems:
-            assert False, f'Entry id {entry_dict["_id"]} does not match generated value - use --fix-problems to fix'
+            assert False, (
+                f'Entry id {entry_dict["_id"]} does not match generated value - use --fix-problems to fix'
+            )
         logger.warn(
             'Fixing bad id for entry',
             old_id=entry_dict['_id'],
@@ -467,16 +471,16 @@ def _convert_mongo_entry(
         for key in _metadata_keys_to_remove_v0:
             if key in entry_metadata:
                 entry_metadata.pop(key)
-        assert (
-            not entry_metadata
-        ), f'Unexpected fields in Calc.metadata: {repr(entry_metadata)}'
+        assert not entry_metadata, (
+            f'Unexpected fields in Calc.metadata: {repr(entry_metadata)}'
+        )
         entry_dict.pop('metadata')
 
     # Check that all required fields are populated
     for field in ('_id', 'upload_id', 'entry_create_time', 'parser_name'):
-        assert (
-            entry_dict.get(field) is not None
-        ), f'Missing required entry field: {field}'
+        assert entry_dict.get(field) is not None, (
+            f'Missing required entry field: {field}'
+        )
 
     # Check if the parser exists
     parser_name = entry_dict.get('parser_name')
@@ -492,9 +496,9 @@ def _convert_mongo_proc(proc_dict: Dict[str, Any]):
         process_status = proc_dict['tasks_status']
         if process_status == 'CREATED':
             process_status = ProcessStatus.READY
-        assert (
-            process_status in ProcessStatus.STATUSES_VALID_IN_DB
-        ), f'Invalid tasks_status: {process_status}'
+        assert process_status in ProcessStatus.STATUSES_VALID_IN_DB, (
+            f'Invalid tasks_status: {process_status}'
+        )
         proc_dict['process_status'] = process_status
         last_status_message = proc_dict.get('last_status_message')
         if not last_status_message:
@@ -508,9 +512,9 @@ def _convert_mongo_proc(proc_dict: Dict[str, Any]):
                     f'Process {current_process} completed successfully'
                 )
             else:
-                assert (
-                    False
-                ), f'Unexpected proc state: {current_process} / {process_status}'
+                assert False, (
+                    f'Unexpected proc state: {current_process} / {process_status}'
+                )
             proc_dict['last_status_message'] = last_status_message
 
         for field in ('tasks', 'current_task', 'tasks_status'):
@@ -523,9 +527,9 @@ def _convert_mongo_dataset(dataset_dict: Dict[str, Any]):
     _rename_key(dataset_dict, 'modified', 'dataset_modified_time')
     # Check that all required fields are there
     for field in ('dataset_name',):
-        assert (
-            dataset_dict.get(field) is not None
-        ), f'Dataset missing required field {field}'
+        assert dataset_dict.get(field) is not None, (
+            f'Dataset missing required field {field}'
+        )
 
 
 def _convert_mongo_doi(doi_dict: Dict[str, Any]):

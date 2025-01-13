@@ -97,9 +97,9 @@ class ExampleData:
         if with_es:
             archives = list(self.archives.values())
             errors = search.index(archives, update_materials=True, refresh=True)
-            assert (
-                not errors
-            ), f'The following errors encountered during indexing: {errors}'
+            assert not errors, (
+                f'The following errors encountered during indexing: {errors}'
+            )
 
         if archive_nomad_version is not None:
             for archive in self.archives.values():
@@ -274,9 +274,9 @@ class ExampleData:
         upload_values['with_embargo'] = upload_dict['embargo_length'] > 0
         upload_values['published'] = upload_dict.get('publish_time') is not None
         for k in list(mongo_upload_metadata) + ['with_embargo', 'published']:
-            assert (
-                k not in kwargs
-            ), f'Upload level metadata specified on entry level: {k}'
+            assert k not in kwargs, (
+                f'Upload level metadata specified on entry level: {k}'
+            )
         entry_metadata.m_update(**upload_values)
         entry_metadata.m_update(**kwargs)
 

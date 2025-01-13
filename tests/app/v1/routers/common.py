@@ -1257,9 +1257,9 @@ def assert_required(data, required, default_key: str):
                 if key != default_key and re.match(exclude_re, key):
                     found_exclude = key
 
-            assert (
-                found_exclude is None
-            ), f'{exclude} excluded but found {found_exclude}'
+            assert found_exclude is None, (
+                f'{exclude} excluded but found {found_exclude}'
+            )
 
 
 def assert_aggregations(

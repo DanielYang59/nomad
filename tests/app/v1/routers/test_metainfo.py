@@ -291,7 +291,7 @@ def test_two_schemas(
 
     def public(fn: str) -> str:
         return os.path.join(
-            config.fs.public, f"ex/{fn.replace('.zip', '')}/raw-public.plain.zip"
+            config.fs.public, f'ex/{fn.replace(".zip", "")}/raw-public.plain.zip'
         )
 
     archive_name = 'example_upload_two_schemas.zip'
