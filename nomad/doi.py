@@ -157,7 +157,7 @@ class DOI(Document):
 
         mds_resource = ET.Element('resource')
         mds_resource.attrib['xsi:schemaLocation'] = (
-            'http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3.1/metadata.xsd'
+            'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd'
         )
         mds_resource.attrib['xmlns'] = 'http://datacite.org/schema/kernel-4'
         mds_resource.attrib['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
