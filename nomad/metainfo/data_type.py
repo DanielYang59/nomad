@@ -294,10 +294,10 @@ class Primitive(Datatype):
                     raise ValueError(
                         f'Cannot set {value} for the scalar quantity {self._definition}.'
                     )
-                try:
-                    value = value[0]
-                except IndexError:
-                    value = value.min()
+                # just to extract the scalar of the same type
+                # do not use value.item() as it will convert to python type
+                # value.max() will also work
+                value = value.min()
                 given_type = value.dtype.type
 
             # type match, no need to consider conversion
