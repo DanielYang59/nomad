@@ -376,12 +376,15 @@ class ArchiveQuery:
 
         return num_entry
 
-    async def _download_async(self, number: int) -> list[EntryArchive]:
+    async def _download_async(
+        self, number: int, *, as_plain_dict: bool = False
+    ) -> list[EntryArchive]:
         """
         Download required entries asynchronously.
 
         Params:
             number (int): number of **entries** to download
+            as_plain_dict (bool): return as plain dictionary
 
         Returns:
             A list of EntryArchive
@@ -403,7 +406,9 @@ class ArchiveQuery:
         ) as bar:
             async with AsyncClient(timeout=Timeout(timeout=300)) as session:
                 tasks = [
-                    asyncio.create_task(self._acquire(ids, session, semaphore, bar))
+                    asyncio.create_task(
+                        self._acquire(ids, session, semaphore, bar, as_plain_dict)
+                    )
                     for ids in batched(self._entries[:actual_number], self._batch_size)
                 ]
                 results = await asyncio.gather(*tasks)
@@ -416,7 +421,8 @@ class ArchiveQuery:
         session: AsyncClient,
         semaphore: Semaphore,
         bar,
-    ) -> list[EntryArchive] | None:
+        as_plain_dict: bool,
+    ) -> list[EntryArchive | dict] | None:
         """
         Perform the download task.
 
@@ -459,17 +465,24 @@ class ArchiveQuery:
 
             response_json: list = response.json()['data']
 
-            for index in range(len(ids)):
-                entry_id, upload_id = ids[index]
-                context = ClientContext(self._url, upload_id=upload_id, auth=self._auth)
-                result = EntryArchive.m_from_dict(
-                    response_json[index]['archive'], m_context=context
-                )
+            if as_plain_dict:
+                results = [x['archive'] for x in response_json]
+            else:
+                for index in range(len(ids)):
+                    entry_id, upload_id = ids[index]
+                    context = ClientContext(
+                        self._url, upload_id=upload_id, auth=self._auth
+                    )
+                    result = EntryArchive.m_from_dict(
+                        response_json[index]['archive'], m_context=context
+                    )
 
-                if not result:
-                    print(f'No result returned for id {entry_id}, is the query proper?')
+                    if not result:
+                        print(
+                            f'No result returned for id {entry_id}, is the query proper?'
+                        )
 
-                results.append(result)
+                    results.append(result)
 
             return results
 
@@ -488,7 +501,9 @@ class ArchiveQuery:
 
         return run_async(self._fetch_async, number)
 
-    def download(self, number: int = 0) -> list[EntryArchive]:
+    def download(
+        self, number: int = 0, *, as_plain_dict: bool = False
+    ) -> list[EntryArchive]:
         """
         Download fetched entries from remote.
         Automatically call .fetch() if not fetched.
@@ -513,7 +528,9 @@ class ArchiveQuery:
             # if not sufficient fetched entries, fetch first
             self.fetch(number - pending_size)
 
-        async_query = run_async(self._download_async, number)
+        async_query = run_async(
+            self._download_async, number, as_plain_dict=as_plain_dict
+        )
         self._entries_dict.append(async_query)
         return async_query
 
@@ -526,7 +543,9 @@ class ArchiveQuery:
 
         return await self._fetch_async(number)
 
-    async def async_download(self, number: int = 0) -> list[EntryArchive]:
+    async def async_download(
+        self, number: int = 0, *, as_plain_dict: bool = False
+    ) -> list[EntryArchive]:
         """
         Asynchronous interface for use in a running event loop.
         """
@@ -544,7 +563,7 @@ class ArchiveQuery:
             # if not sufficient fetched entries, fetch first
             await self.async_fetch(number - pending_size)
 
-        return await self._download_async(number)
+        return await self._download_async(number, as_plain_dict=as_plain_dict)
 
     def entry_list(self) -> list[tuple[str, str]]:
         return self._entries
@@ -560,7 +579,9 @@ class ArchiveQuery:
         Params:
             keys_to_filter (int): number of **entries** to download at a single time
             resolve_references (bool): boolean if the references are to be resolved
-            query_selection (str or list[int]): selection of which archives to be used for conversion. Available options are either 'last', 'all' or a list of indices that each denoting the index of download call (e.g. [0,2,1])
+            query_selection (str or list[int]): selection of which archives to be used for conversion.
+                Available options are either 'last', 'all' or a list of indices
+                that each denoting the index of download call (e.g. [0,2,1])
         Returns:
             pandas dataframe of the downloaded (and selected) archives
         """

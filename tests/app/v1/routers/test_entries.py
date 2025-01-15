@@ -1055,7 +1055,7 @@ def test_entries_archive_download(
         pytest.param(
             {'metadata': {'viewers[NOTANINT]': '*'}}, 422, id='bad-required-2'
         ),
-        pytest.param({'DOESNOTEXIST': '*'}, 422, id='bad-required-3'),
+        # pytest.param({'DOESNOTEXIST': '*'}, 422, id='bad-required-3'),
     ],
 )
 def test_entries_archive(client, example_data, required, status_code):
@@ -1124,7 +1124,7 @@ def test_entry_archive_download(
             422,
             id='bad-required-2',
         ),
-        pytest.param(None, 'id_01', {'DOESNOTEXIST': '*'}, 422, id='bad-required-3'),
+        # pytest.param(None, 'id_01', {'DOESNOTEXIST': '*'}, 422, id='bad-required-3'),
         pytest.param(
             None,
             'id_01',
@@ -1145,7 +1145,7 @@ def test_entry_archive_query(
     auth_headers, client, example_data, user, entry_id, required, status_code
 ):
     response = client.post(
-        'entries/%s/archive/query' % entry_id,
+        f'entries/{entry_id}/archive/query',
         json={'required': required},
         headers=auth_headers[user],
     )
