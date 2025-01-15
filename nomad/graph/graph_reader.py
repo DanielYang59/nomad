@@ -2867,11 +2867,6 @@ class ArchiveReader(ArchiveLikeReader):
         if not isinstance(node.archive, GenericDict):  # type: ignore
             return node
 
-        async def __if_contains(m_def):
-            return await _if_exists(
-                self.global_root, _convert_ref_to_path(m_def.strict_reference())
-            )
-
         custom_def: str | None = await async_get(node.archive, 'm_def', None)
         custom_def_id: str | None = await async_get(node.archive, 'm_def_id', None)
         if custom_def is None and custom_def_id is None:
@@ -2879,26 +2874,25 @@ class ArchiveReader(ArchiveLikeReader):
                 definition = node.definition
                 if isinstance(definition, SubSection):
                     definition = definition.sub_section.m_resolved()
-                if not await __if_contains(definition):
-                    with (
-                        DefinitionReader(
-                            RequestConfig(directive=DirectiveType.plain),
-                            user=self.user,
-                            init=False,
-                            config=config,
-                            global_root=self.global_root,
-                        ) as reader,
-                        timer(
-                            logger,
-                            '/'.join(node.current_path + [Token.DEF]),
-                            reader_type='DefinitionReader',
-                        ),
-                    ):
-                        await _populate_result(
-                            node.result_root,
-                            node.current_path + [Token.DEF],
-                            await reader.read(definition),
-                        )
+                with (
+                    DefinitionReader(
+                        RequestConfig(directive=DirectiveType.plain),
+                        user=self.user,
+                        init=False,
+                        config=config,
+                        global_root=self.global_root,
+                    ) as reader,
+                    timer(
+                        logger,
+                        '/'.join(node.current_path + [Token.DEF]),
+                        reader_type='DefinitionReader',
+                    ),
+                ):
+                    await _populate_result(
+                        node.result_root,
+                        node.current_path + [Token.DEF],
+                        await reader.read(definition),
+                    )
             return node
 
         try:
@@ -2909,10 +2903,7 @@ class ArchiveReader(ArchiveLikeReader):
             )
             return node
 
-        if (
-            config.include_definition is not DefinitionType.none
-            and not await __if_contains(new_def)
-        ):
+        if config.include_definition is not DefinitionType.none:
             with (
                 DefinitionReader(
                     RequestConfig(directive=DirectiveType.plain),
