@@ -588,15 +588,16 @@ class RequiredReader:
                 )
 
             if (prop_def := dataset.definition.all_properties.get(prop)) is None:
-                raise HTTPException(
-                    422,
-                    detail=[
-                        dict(
-                            msg=f'{dataset.definition.name} has no property {prop}',
-                            loc=[key],
-                        )
-                    ],
-                )
+                # raise HTTPException(
+                #     422,
+                #     detail=[
+                #         dict(
+                #             msg=f'{dataset.definition.name} has no property {prop}',
+                #             loc=[key],
+                #         )
+                #     ],
+                # )
+                continue
 
             prop_def = self._unwrap_reference(prop_def)
 
