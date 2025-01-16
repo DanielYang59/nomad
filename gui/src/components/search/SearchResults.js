@@ -20,7 +20,8 @@ import PropTypes from 'prop-types'
 import jmespath from 'jmespath'
 import { Paper, Typography, Tooltip, IconButton } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
-import LaunchIcon from '@material-ui/icons/Launch'
+import Icon from '@material-ui/core/Icon'
+import GitHubIcon from '@material-ui/icons/GitHub'
 import {
   Datatable,
   DatatableLoadMorePagination,
@@ -31,7 +32,7 @@ import {
 import EntryDownloadButton from '../entry/EntryDownloadButton'
 import EntryDetails, { EntryRowActions } from '../entry/EntryDetails'
 import { MaterialRowActions } from '../material/MaterialDetails'
-import { pluralize, formatInteger, parseJMESPath, filterOptions } from '../../utils'
+import { pluralize, formatInteger, parseJMESPath } from '../../utils'
 import { isEmpty, isArray } from 'lodash'
 import { useSearchContext } from './SearchContext'
 
@@ -43,8 +44,17 @@ export const ActionURL = React.memo(({action, data}) => {
   const {path} = parseJMESPath(action.path)
   let href = jmespath.search(data, path)
   href = isArray(href) ? href[0] : href
-  return <Tooltip title={action.description || ''}>
-    <IconButton href={href} target="_blank"><LaunchIcon/></IconButton>
+  const disabled = !href
+  const size = 'medium'
+  const svgIcon = {
+    'github': <GitHubIcon fontSize={size}/>
+  }[action.icon]
+  return <Tooltip title={disabled ? 'Not available' : (action.description || '')}>
+    <div>
+      <IconButton size={size} href={href} target="_blank" disabled={disabled}>
+        {svgIcon || <Icon fontSize={size}>{action?.icon || 'launch'}</Icon>}
+      </IconButton>
+    </div>
   </Tooltip>
 })
 ActionURL.propTypes = {
@@ -88,15 +98,15 @@ export const SearchResults = React.memo(({
   }, [selected, apiQuery])
 
   const actions = useCallback((data) => {
-    const actionComponents = []
-    for (const [key, value] of Object.entries(filterOptions(rows.actions))) {
+    const actionComponents = [];
+    (rows?.actions?.items || []).forEach((action, i) => {
       const component = {
-        'url': <ActionURL key={key} action={value} data={data}/>
-      }[value.type]
+        url: <ActionURL key={i} action={action} data={data}/>
+      }[action.type]
       if (component) {
         actionComponents.push(component)
       }
-    }
+    })
     if (resource === "entries") {
       actionComponents.push(<EntryRowActions key="entries-default-action" data={data}/>)
     } else if (resource === "materials") {

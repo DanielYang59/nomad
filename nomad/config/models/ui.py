@@ -326,6 +326,17 @@ class RowAction(ConfigBaseModel):
         description="""Description of the action shown to the user."""
     )
     type: str = Field(description='Used to identify the action type.')
+    icon: str = Field(
+        default='launch',
+        description="""
+        The icon to show for the action. You can browse the available icons at:
+        https://fonts.google.com/icons?icon.set=Material+Icons. Note that you
+        have to give the icon name in snake_case. In addition, the following
+        extra icons are available:
+
+         - `github`: @material-ui/icons/GitHub
+        """,
+    )
 
 
 class RowActionURL(RowAction):
@@ -338,16 +349,39 @@ class RowActionURL(RowAction):
         'url', description='Set as `url` to get this widget type.'
     )
 
+    @root_validator(pre=True)
+    def _validate(cls, values):
+        values['type'] = 'url'
+        return values
+
 
 class RowActions(Options):
     """Controls the visualization of row actions that are shown at the end of each row."""
 
     enabled: bool = Field(True, description='Whether to enable row actions.')
     options: Optional[Dict[str, RowActionURL]] = Field(
-        description="""
-        All available row actions.
-    """
+        deprecated="""Deprecated, use 'items' instead."""
     )
+    items: Optional[List[RowActionURL]] = Field(
+        descpription='List of actions to show for each row.'
+    )
+
+    @root_validator(pre=True)
+    def _validate(cls, values):
+        # Backwards compatibility for options
+        items = values.get('items')
+        if not items:
+            options = values.get('options') or {}
+            keys = list(options.keys())
+            include = values.get('include') or keys
+            exclude = values.get('exclude') or []
+            items = []
+            for key in include:
+                if key not in exclude:
+                    item = options[key]
+                    items.append(item)
+            values['items'] = items
+        return values
 
 
 class RowDetails(ConfigBaseModel):
@@ -371,9 +405,9 @@ class RowSelection(ConfigBaseModel):
 class Rows(ConfigBaseModel):
     """Controls the visualization of rows in the search results."""
 
-    actions: RowActions
-    details: RowDetails
-    selection: RowSelection
+    actions: RowActions = Field(RowActions())
+    details: RowDetails = Field(RowDetails())
+    selection: RowSelection = Field(RowSelection())
 
 
 # Deprecated
@@ -1116,11 +1150,7 @@ class App(ConfigBaseModel):
         description='List of columns for the results table.'
     )
     rows: Optional[Rows] = Field(
-        Rows(
-            actions=RowActions(enabled=True),
-            details=RowDetails(enabled=True),
-            selection=RowSelection(enabled=True),
-        ),
+        Rows(),
         description='Controls the display of entry rows in the results table.',
     )
     menu: Optional[Menu] = Field(
