@@ -1125,8 +1125,6 @@ plugins:
             - mainfile
             - entry_name
           rows:
-            actions:
-              enabled: true
             details:
               enabled: false
             selection:

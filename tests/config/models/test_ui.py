@@ -18,7 +18,16 @@
 
 import pytest
 
-from nomad.config.models.ui import App, Columns, Column
+from nomad.config.models.ui import (
+    App,
+    Columns,
+    Column,
+    Rows,
+    RowActions,
+    RowDetails,
+    RowSelection,
+    RowActionURL,
+)
 
 
 @pytest.mark.parametrize(
@@ -58,3 +67,43 @@ def test_columns(original, final):
         label='test', path='test', category='test', filter_menus={}, columns=original
     )
     assert app.columns == final
+
+
+@pytest.mark.parametrize(
+    'original, final',
+    [
+        pytest.param(
+            {
+                'enabled': True,
+                'options': {
+                    'a': {'type': 'url', 'path': 'a'},
+                    'b': {'type': 'url', 'path': 'b'},
+                },
+                'include': ['a'],
+                'exclude': ['b'],
+            },
+            [RowActionURL(path='a')],
+            id='row actions using old model (dict)',
+        ),
+        pytest.param(
+            RowActions(
+                options={
+                    'a': RowActionURL(path='a'),
+                    'b': RowActionURL(path='b'),
+                },
+                include=['a'],
+                exclude=['b'],
+            ),
+            [RowActionURL(path='a')],
+            id='row actions old model (objects)',
+        ),
+    ],
+)
+def test_row_actions(original, final):
+    """Test the backwards compatibility of the row actions field."""
+    rows = Rows(
+        actions=original,
+        details=RowDetails(enabled=True),
+        selection=RowSelection(enabled=True),
+    )
+    assert rows.actions.items == final
