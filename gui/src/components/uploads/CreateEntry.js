@@ -76,12 +76,12 @@ const CreateEntry = React.memo((props) => {
 
     const getTemplatesFromGlobalDefinitions = (definitions, prefix, archive, getReference) => {
       const templates = definitions.filter(definition => {
-        if (definition.m_def !== SectionMDef) {
+        if (definition.m_def !== SectionMDef || definition.m_annotations?.schema?.[0].enabled === false) {
           return false
         }
         return definition._allBaseSections?.find(baseSection => baseSection.name === 'EntryData')
       }).map(definition => {
-        const label = definition.label || definition.name
+        const label = definition.m_annotations?.schema?.[0]?.label || definition.label || definition.name
         const template = definition.m_annotations?.template?.[0] || {}
         const findCategory = definition => (
           definition.categories.find(category => (
@@ -120,7 +120,9 @@ const CreateEntry = React.memo((props) => {
     const getTemplates = async () => {
       const globalDefinitions = await globalMetainfo.getDefs()
       const globalTemplates = getTemplatesFromGlobalDefinitions(
-        globalDefinitions, '__global__', null, section => section._qualifiedName)
+        globalDefinitions, '__global__', null, section => section._qualifiedName
+      )
+      console.log(globalTemplates)
       return globalTemplates.map(template => ({group: 'OASIS', ...template}))
     }
 

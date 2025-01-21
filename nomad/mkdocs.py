@@ -76,8 +76,11 @@ def get_field_type_info(field: ModelField) -> Tuple[str, Set[Any]]:
         cls = type_
         name = None
 
-        # All string subclasses displayed as str
-        if isclass(type_) and issubclass(type_, str):
+        # All string subclasses displayed as str. Note that bool has to be on
+        # top, as it is also a subclass of int.
+        if isclass(type_) and issubclass(type_, bool):
+            name = 'bool'
+        elif isclass(type_) and issubclass(type_, str):
             name = 'str'
         elif isclass(type_) and issubclass(type_, int):
             name = 'int'

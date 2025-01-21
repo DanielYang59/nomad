@@ -1091,6 +1091,41 @@ class H5WebAnnotation(AnnotationModel):
     paths: List[str] = Field([], description="""List of section paths to visualize.""")
 
 
+class SchemaAnnotation(AnnotationModel):
+    """
+    Used to annotate Schemas to control how and if they are displayed in the GUI.
+
+    You can attach this annotation to a schema class definition using the
+    `m_def` attribute, for example:
+
+    ```python
+    from nomad.datamodel.data import Schema
+    from nomad.datamodel.metainfo.annotations import SchemaAnnotation
+
+    class MySchema(Schema):
+        m_def = Section(a_schema=SchemaAnnotation(
+            label='My Schema',
+            enabled=False
+        ))
+    ```
+    """
+
+    label: str = Field(
+        description="""
+        Custom label to show for this schema in the GUI when instantiating new
+        entries from it. If not set, the label set for the section will be used.
+        """,
+    )
+    enabled: bool = Field(
+        True,
+        description="""
+        If set to False, the schema will not be available for instantiating
+        entries in the GUI. Note that the schema can still be instantiated
+        regularly with Python even it if is disabled in the GUI.
+        """,
+    )
+
+
 AnnotationModel.m_registry['eln'] = ELNAnnotation
 AnnotationModel.m_registry['browser'] = BrowserAnnotation
 AnnotationModel.m_registry['tabular_parser'] = TabularParserAnnotation
@@ -1098,3 +1133,4 @@ AnnotationModel.m_registry['tabular'] = TabularAnnotation
 AnnotationModel.m_registry['hdf5'] = HDF5Annotation
 AnnotationModel.m_registry['plot'] = PlotAnnotation
 AnnotationModel.m_registry['h5web'] = H5WebAnnotation
+AnnotationModel.m_registry['schema'] = SchemaAnnotation
