@@ -33,6 +33,12 @@ test.each([
     ['Dec 1, 2014', 'Dec 1, 2015']
   ],
   [
+    'undefined timestamp',
+    {x: ["2014-12-01T00:00:00+00:00"], y: ["2015-12-01T00:00:00+00:00"]},
+    {title: 'Test', dtype: DType.Timestamp, scale: undefined},
+    ['Dec 1, 2014', 'Dec 1, 2015']
+  ],
+  [
     'log float',
     {x: [1, 10], y: [100, 1000]},
     {title: 'Test', dtype: DType.Float, scale: 'log'},

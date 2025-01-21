@@ -26,7 +26,7 @@ import { useHistory } from 'react-router-dom'
 import { getUrl } from '../nav/Routes'
 
 function getAxisType(type, scale) {
-  return type === DType.Timestamp && scale === 'linear'
+  return type === DType.Timestamp && (scale === 'linear' || !scale)
     ? 'date'
     : scale
 }
