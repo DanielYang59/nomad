@@ -256,7 +256,7 @@ def get_gui_config() -> str:
             return [_sort_dict(v) for v in d]
         return d
 
-    # We save a  single list of enabled entry points
+    # We save a single list of enabled entry points
     plugins = _sort_dict(config.plugins.dict(exclude_unset=True))
     entry_points = [
         entry_point.dict_safe()
