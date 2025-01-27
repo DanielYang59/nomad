@@ -21,7 +21,7 @@ import pytest
 import json
 
 from tests.normalizing.conftest import run_processing
-from nomad.datamodel.metainfo import basesections
+from nomad.datamodel.metainfo.basesections import v1 as basesections
 
 
 class MockResponse:

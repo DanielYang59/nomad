@@ -28,7 +28,7 @@ import requests
 from ase.data import atomic_masses, atomic_numbers, chemical_symbols
 from unidecode import unidecode
 
-from nomad.datamodel import EntryArchive
+from nomad.metainfo import SchemaPackage
 from nomad.datamodel.metainfo.workflow import Link, Task, TaskReference, Workflow
 from nomad.metainfo.data_type import m_str
 
@@ -66,6 +66,9 @@ def pub_chem_add_throttle_header(response: requests.Response, message: str = '')
     if 'X-Throttling-Control' in response.headers:
         message += f' (Throttling-Control: {response.headers["X-Throttling-Control"]})'
     return message
+
+
+m_package = SchemaPackage(aliases=['nomad.datamodel.metainfo.basesections'])
 
 
 def pub_chem_api_get_properties(
