@@ -41,7 +41,7 @@ from nomad.datamodel.data import (
 from nomad.datamodel.metainfo.annotations import (
     ELNAnnotation,
 )
-from nomad.datamodel.metainfo.basesections import (
+from nomad.datamodel.metainfo.basesections.v1 import (
     Activity,
     Analysis,
     AnalysisResult,
@@ -55,16 +55,16 @@ from nomad.datamodel.metainfo.basesections import (
     Measurement,
     MeasurementResult,
     Process,
-    PublicationReference,
     PureSubstance,
+    PublicationReference,
     ReadableIdentifiers,
     SynthesisMethod,
     System,
 )
-from nomad.datamodel.metainfo.basesections import (
+from nomad.datamodel.metainfo.basesections.v1 import (
     CompositeSystem as Ensemble,  # For legacy support
 )
-from nomad.datamodel.metainfo.basesections import (
+from nomad.datamodel.metainfo.basesections.v1 import (
     SystemComponent as Component,
 )
 from nomad.datamodel.metainfo.common import ProvenanceTracker
@@ -396,7 +396,7 @@ class ELNSubstance(PureSubstance, EntryData):
         a_template=dict(
             substance_identifiers=dict(),
             substance=dict(
-                m_def='nomad.datamodel.metainfo.basesections.PubChemPureSubstanceSection'
+                m_def='nomad.datamodel.metainfo.basesections.v1.PubChemPureSubstanceSection'
             ),
         ),
         label='Substance ELN',
