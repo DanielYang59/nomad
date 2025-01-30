@@ -112,7 +112,12 @@ const MeanSquaredDisplacement = React.memo(({
           name = `${name}: D=${D} ${D_label}`
         }
         if (!isNil(value?.diffusion_constant_errors)) {
-          const diffusionConstantError = new Quantity(value.diffusion_constant_errors, diffusionUnit)
+          const diffusionConstantError = new Quantity(
+            Array.isArray(value.diffusion_constant_errors)
+              ? value.diffusion_constant_errors[0]
+              : value.diffusion_constant_errors,
+            diffusionUnit
+          )
           const R = formatNumber(diffusionConstantError.value(), DType.Float, 'standard', 2)
           name = `${name}; R=${R}`
         }
